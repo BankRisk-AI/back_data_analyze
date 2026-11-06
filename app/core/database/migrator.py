@@ -5,9 +5,11 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from app.core.database.connection import connect
+from app.core.logging import get_logger
 
 CORE_DIR = Path(__file__).with_name("migrations") / "core"
 LOCK_KEY = 7_302_026            # advisory lock: two processes never migrate at the same time
+logger = get_logger(__name__)
 
 
 @dataclass(frozen=True)
@@ -30,6 +32,7 @@ def discover(modules: dict[str, Path] | None = None) -> list[Migration]:
 
 def migrate(schema: str = "public", modules: dict[str, Path] | None = None) -> list[str]:
     """Applies the pending migrations (each in its own transaction step) and returns their versions."""
+    logger.info("migration started schema=%s", schema)
     conn = connect(schema)
     applied_now: list[str] = []
     try:
@@ -48,6 +51,10 @@ def migrate(schema: str = "public", modules: dict[str, Path] | None = None) -> l
                 cur.execute(m.path.read_text(encoding="utf-8"))
                 cur.execute("INSERT INTO schema_migrations(version) VALUES (%s)", (m.version,))
                 applied_now.append(m.version)
+    except Exception:
+        logger.exception("migration failed schema=%s", schema)
+        raise
     finally:
         conn.close()
+    logger.info("migration completed schema=%s applied=%s", schema, len(applied_now))
     return applied_now

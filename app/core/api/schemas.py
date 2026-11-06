@@ -5,8 +5,12 @@ from pydantic import BaseModel, Field
 
 
 class Problem(BaseModel):
-    """application/problem+json (RFC 9457). `type` is a stable identifier the client can switch on."""
+    """Stable frontend error envelope, retaining RFC 9457 fields for compatibility."""
 
+    code: str = Field(examples=["duplicate-file"])
+    message: str = Field(examples=["File already loaded"])
+    details: str | None = Field(default=None, examples=["tr_cre_2.csv was already loaded"])
+    request_id: str = Field(examples=["f4e3a2b1c0d9"])
     type: str = Field(examples=["duplicate-file"])
     title: str = Field(examples=["File already loaded"])
     status: int = Field(examples=[409])

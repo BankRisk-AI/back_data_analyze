@@ -35,6 +35,7 @@ def test_every_app_error_becomes_problem_json_with_its_own_status():
         r = c.get(path)
         assert r.status_code == status and r.headers["content-type"].startswith("application/problem+json")
         assert (r.json()["type"], r.json()["title"], r.json()["status"]) == (kind, title, status)
+        assert r.json()["code"] == kind and r.json()["message"] == title and r.json()["request_id"]
     assert c.get("/teapot").json()["detail"] == "short and stout"
 
 
@@ -44,4 +45,12 @@ def test_validation_errors_list_the_offending_parameter_and_crashes_leak_nothing
     assert r.status_code == 422 and r.json()["type"] == "invalid-request" and "n" in r.json()["detail"]
     r = c.get("/crash")
     assert r.status_code == 500 and r.json()["type"] == "internal-error" and "secret" not in r.text
+    assert r.json()["code"] == "internal-error" and r.json()["request_id"]
     assert c.get("/nope").json()["type"] == "not-found"                                   # unknown routes are problem+json too
+
+
+def test_request_id_is_correlated_in_response_and_error_envelope():
+    c = app_with_routes()
+    r = c.get("/crash", headers={"X-Request-ID": "frontend-request-1"})
+    assert r.headers["X-Request-ID"] == "frontend-request-1"
+    assert r.json()["request_id"] == "frontend-request-1"

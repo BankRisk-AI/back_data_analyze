@@ -3,14 +3,14 @@ keeps a heartbeat while it runs and requeues jobs whose worker disappeared."""
 
 from __future__ import annotations
 
-import logging
 import threading
 import time
 
 from app.core.database import connect
 from app.core.worker.registry import Job, JobHandlerRegistry
+from app.core.logging import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 class _Heartbeat:
@@ -75,6 +75,8 @@ class Worker:
                  AND COALESCE(heartbeat_at, started_at) < now() - (%s * interval '1 second')""",
             (self.stale_after,),
         )
+        if count:
+            logger.warning("requeued %s stale job(s)", count)
         return count
 
     def claim(self) -> Job | None:
@@ -118,14 +120,22 @@ class Worker:
         job = self.claim()
         if job is None:
             return False
+        started = time.perf_counter()
+        logger.info("job started id=%s kind=%s import_id=%s", job.job_id, job.kind, job.import_id)
         try:
             handler = self.registry.resolve(job.kind)
             with _Heartbeat(self, job.job_id, self.heartbeat_interval):
                 handler(job, lambda message, progress: self.update_progress(job.job_id, message, progress))
             self.mark_completed(job)
+            logger.info("job completed id=%s kind=%s duration_ms=%.2f", job.job_id, job.kind, (time.perf_counter() - started) * 1000)
         except Exception as exc:
             logger.exception("Job %s (%s) failed", job.job_id, job.kind)
-            self.mark_failed(job, str(exc))
+            try:
+                self.mark_failed(job, str(exc))
+            except Exception:
+                logger.exception("could not mark failed job id=%s kind=%s", job.job_id, job.kind)
+            else:
+                logger.error("job marked failed id=%s kind=%s", job.job_id, job.kind)
         return True
 
     def run(self) -> None:

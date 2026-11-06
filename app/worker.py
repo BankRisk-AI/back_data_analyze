@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import argparse
-import logging
 
 from app.core.config import get_schema
 from app.core.worker import JobHandlerRegistry, Worker
 from app.modules import MODULES
+from app.core.logging import configure_logging, get_logger
+
+logger = get_logger(__name__)
 
 
 def build_registry() -> JobHandlerRegistry:
@@ -24,7 +26,8 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--stale-after", type=int, default=900, help="seconds without heartbeat after which a processing job is requeued")
     args = parser.parse_args(argv)
 
-    logging.basicConfig(level=logging.INFO)
+    configure_logging()
+    logger.info("worker starting poll_interval=%s stale_after=%s", args.poll, args.stale_after)
     Worker(build_registry(), poll_interval=args.poll, stale_after=args.stale_after, schema=get_schema()).run()
 
 

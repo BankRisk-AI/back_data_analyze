@@ -1956,6 +1956,28 @@ components:
       title: PreviewPage
     Problem:
       properties:
+        code:
+          type: string
+          title: Code
+          examples:
+          - duplicate-file
+        message:
+          type: string
+          title: Message
+          examples:
+          - File already loaded
+        details:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Details
+          examples:
+          - tr_cre_2.csv was already loaded
+        request_id:
+          type: string
+          title: Request Id
+          examples:
+          - f4e3a2b1c0d9
         type:
           type: string
           title: Type
@@ -1980,12 +2002,14 @@ components:
           - tr_cre_2.csv was already loaded in import 1 (same sha256)
       type: object
       required:
+      - code
+      - message
+      - request_id
       - type
       - title
       - status
       title: Problem
-      description: application/problem+json (RFC 9457). `type` is a stable identifier
-        the client can switch on.
+      description: Stable frontend error envelope, retaining RFC 9457 fields for compatibility.
     ProblemType:
       properties:
         type:

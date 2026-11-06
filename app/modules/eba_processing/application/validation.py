@@ -9,6 +9,7 @@ from psycopg2 import sql
 from app.core.config import get_schema
 from app.core.database import connect
 from app.core.exceptions import AppError
+from app.core.logging import get_logger
 from app.modules.eba_processing.application.session import read_session
 from app.modules.eba_processing.domain import RULES, FileValidation, ValidationReport
 from app.modules.eba_processing.infrastructure import jobs
@@ -20,6 +21,9 @@ class NothingToValidate(AppError):
     kind = "no-staging"
     status = 409
     title = "Nothing to validate"
+
+
+logger = get_logger(__name__)
 
 
 def report_to_dict(r: ValidationReport) -> dict:
@@ -68,6 +72,7 @@ def run_validation(import_id: int, schema: str | None = None, emit=None) -> Vali
     schema = schema or get_schema()
     emit = emit or (lambda message, percent: None)
     started = time.perf_counter()
+    logger.info("validation started import_id=%s", import_id)
     conn = connect(schema)
     try:
         cur = conn.cursor()
@@ -89,8 +94,10 @@ def run_validation(import_id: int, schema: str | None = None, emit=None) -> Vali
         jobs.save_report(cur, import_id, report_to_dict(report))
         jobs.set_status_after_validation(cur, import_id, report.can_proceed)
         conn.commit()
+        logger.info("validation completed import_id=%s duration_ms=%.2f", import_id, (time.perf_counter() - started) * 1000)
         return report
     except Exception:
+        logger.exception("validation failed import_id=%s", import_id)
         conn.rollback()
         raise
     finally:

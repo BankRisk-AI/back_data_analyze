@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import time
 import uuid
 
 from fastapi import FastAPI, Request
@@ -10,6 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .errors import install_error_handlers
+from app.core.logging import configure_logging, get_logger
 
 
 class SpaStaticFiles(StaticFiles):
@@ -25,6 +27,7 @@ class SpaStaticFiles(StaticFiles):
 
 
 PROBLEM_REF = {"$ref": "#/components/schemas/Problem"}
+logger = get_logger(__name__)
 
 
 def describe_errors_as_problem_json(schema: dict) -> dict:
@@ -51,6 +54,7 @@ def describe_errors_as_problem_json(schema: dict) -> dict:
 
 
 def create_base_app(title: str, description: str, version: str = "0.1", cors_origins: list[str] | None = None) -> FastAPI:
+    configure_logging()
     app = FastAPI(title=title, description=description, version=version)
     install_error_handlers(app)
     original_openapi = app.openapi
@@ -65,8 +69,13 @@ def create_base_app(title: str, description: str, version: str = "0.1", cors_ori
     @app.middleware("http")
     async def request_id(request: Request, call_next):
         rid = request.headers.get("x-request-id") or uuid.uuid4().hex[:12]
+        request.state.request_id = rid
+        started = time.perf_counter()
+        logger.info("request started %s %s request_id=%s", request.method, request.url.path, rid)
         response = await call_next(request)
         response.headers["X-Request-ID"] = rid
+        logger.info("request completed %s %s status=%s duration_ms=%.2f request_id=%s",
+                    request.method, request.url.path, response.status_code, (time.perf_counter() - started) * 1000, rid)
         return response
 
     if cors_origins:

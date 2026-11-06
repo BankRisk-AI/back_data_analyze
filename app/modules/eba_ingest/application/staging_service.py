@@ -7,6 +7,7 @@ from dataclasses import dataclass
 
 from app.core.config import get_schema
 from app.core.database import connect
+from app.core.logging import get_logger
 from app.modules.eba_ingest.application.upload_service import (
     DEFAULT_MAX_BYTES,
     check_before_registering,
@@ -25,6 +26,7 @@ from app.modules.eba_ingest.infrastructure.staging.period_report import fill_per
 from app.shared.staging import staging_identifier, staging_qualified
 
 Emit = "callable[[str, int], None]"
+logger = get_logger(__name__)
 
 
 @dataclass
@@ -112,6 +114,7 @@ def _process(cur, import_id: int, files: list[repo.SourceFileRow], emit, job_id:
 def process_import(import_id: int, schema: str | None = None, emit=None, job_id: int | None = None) -> IngestReport:
     """Worker path: reads the files already registered for the import (they are NOT stored or hashed again)."""
     t0 = time.perf_counter()
+    logger.info("import processing started import_id=%s job_id=%s", import_id, job_id)
     emit = emit or (lambda message, percent: None)
     conn = connect(schema or get_schema())
     try:
@@ -121,8 +124,10 @@ def process_import(import_id: int, schema: str | None = None, emit=None, job_id:
             raise IngestError(f"import {import_id} has no source files")
         report = _process(cur, import_id, files, emit, job_id, repo.import_owner(cur, import_id), t0)
         conn.commit()
+        logger.info("import processing completed import_id=%s duration_ms=%.2f", import_id, (time.perf_counter() - t0) * 1000)
         return report
     except Exception:
+        logger.exception("import processing failed import_id=%s job_id=%s", import_id, job_id)
         conn.rollback()
         raise
     finally:
