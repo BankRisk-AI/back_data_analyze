@@ -12,7 +12,8 @@ from app.core.worker import JobHandlerRegistry
 
 VERSION = "0.2"
 DESCRIPTION = (
-    "EBA Data Explorer API. Modules: **ingest** (upload and staging), **processing** (preview, profile, charts, validation). "
+    "EBA Data Explorer API. Modules: **ingest** (upload and staging), **processing** (staging analysis and validation), "
+    "**public-analysis** (analysis and chart data for promoted facts). "
     "Errors are `application/problem+json` (RFC 9457); long operations are jobs processed by `python -m app.worker`."
 )
 

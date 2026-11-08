@@ -2,8 +2,9 @@ openapi: 3.1.0
 info:
   title: EBA Data Explorer
   description: 'EBA Data Explorer API. Modules: **ingest** (upload and staging), **processing**
-    (preview, profile, charts, validation). Errors are `application/problem+json`
-    (RFC 9457); long operations are jobs processed by `python -m app.worker`.'
+    (staging analysis and validation), **public-analysis** (analysis and chart data
+    for promoted facts). Errors are `application/problem+json` (RFC 9457); long operations
+    are jobs processed by `python -m app.worker`.'
   version: '0.2'
 paths:
   /api/health:
@@ -1036,8 +1037,380 @@ paths:
           content:
             application/problem+json:
               schema: *id001
+  /api/public/periods:
+    get:
+      tags:
+      - public-analysis
+      summary: List active public periods
+      operationId: list_public_analysis_periods
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/PublicPeriod'
+                type: array
+                title: Response List Public Analysis Periods
+  /api/public/versions/{version_id}/datasets/{dataset}/preview:
+    get:
+      tags:
+      - public-analysis
+      summary: Preview promoted public data
+      operationId: preview_public_analysis
+      parameters:
+      - name: version_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Version Id
+      - name: dataset
+        in: path
+        required: true
+        schema:
+          enum:
+          - oth
+          - cre
+          - mrk
+          - tr_oth
+          - tr_cre
+          - tr_mrk
+          type: string
+          description: Public dataset or tr_ alias
+          title: Dataset
+        description: Public dataset or tr_ alias
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+          title: Page
+      - name: page_size
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 1000
+          minimum: 1
+          default: 50
+          title: Page Size
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Preview'
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema: *id001
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
+  /api/public/versions/{version_id}/datasets/{dataset}/profile:
+    get:
+      tags:
+      - public-analysis
+      summary: Profile promoted public data
+      operationId: profile_public_analysis
+      parameters:
+      - name: version_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Version Id
+      - name: dataset
+        in: path
+        required: true
+        schema:
+          enum:
+          - oth
+          - cre
+          - mrk
+          - tr_oth
+          - tr_cre
+          - tr_mrk
+          type: string
+          description: Public dataset or tr_ alias
+          title: Dataset
+        description: Public dataset or tr_ alias
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema: *id001
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
+  /api/public/versions/{version_id}/datasets/{dataset}/histogram:
+    get:
+      tags:
+      - public-analysis
+      summary: Histogram data for a public item
+      operationId: histogram_public_analysis
+      parameters:
+      - name: version_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Version Id
+      - name: dataset
+        in: path
+        required: true
+        schema:
+          enum:
+          - oth
+          - cre
+          - mrk
+          - tr_oth
+          - tr_cre
+          - tr_mrk
+          type: string
+          description: Public dataset or tr_ alias
+          title: Dataset
+        description: Public dataset or tr_ alias
+      - name: item
+        in: query
+        required: true
+        schema:
+          type: string
+          description: Indicator code
+          title: Item
+        description: Indicator code
+      - name: period
+        in: query
+        required: true
+        schema:
+          type: string
+          description: YYYYMM period
+          title: Period
+        description: YYYYMM period
+      - name: bins
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 200
+          minimum: 1
+          description: Number of histogram bins
+          default: 20
+          title: Bins
+        description: Number of histogram bins
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Histogram'
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema: *id001
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
+  /api/public/versions/{version_id}/datasets/{dataset}/aggregate:
+    get:
+      tags:
+      - public-analysis
+      summary: Calculate a backend public aggregation
+      operationId: aggregate_public_analysis
+      parameters:
+      - name: version_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Version Id
+      - name: dataset
+        in: path
+        required: true
+        schema:
+          enum:
+          - oth
+          - cre
+          - mrk
+          - tr_oth
+          - tr_cre
+          - tr_mrk
+          type: string
+          description: Public dataset or tr_ alias
+          title: Dataset
+        description: Public dataset or tr_ alias
+      - name: item
+        in: query
+        required: true
+        schema:
+          type: string
+          description: Indicator code
+          title: Item
+        description: Indicator code
+      - name: period
+        in: query
+        required: true
+        schema:
+          type: string
+          description: YYYYMM period
+          title: Period
+        description: YYYYMM period
+      - name: function
+        in: query
+        required: false
+        schema:
+          enum:
+          - sum
+          - avg
+          - min
+          - max
+          - count
+          type: string
+          description: Aggregation function
+          default: sum
+          title: Function
+        description: Aggregation function
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Aggregate'
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema: *id001
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
+  /api/public/versions/{version_id}/datasets/{dataset}/scatter:
+    get:
+      tags:
+      - public-analysis
+      summary: Scatter plot points for two public items
+      operationId: scatter_public_analysis
+      parameters:
+      - name: version_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Version Id
+      - name: dataset
+        in: path
+        required: true
+        schema:
+          enum:
+          - oth
+          - cre
+          - mrk
+          - tr_oth
+          - tr_cre
+          - tr_mrk
+          type: string
+          description: Public dataset or tr_ alias
+          title: Dataset
+        description: Public dataset or tr_ alias
+      - name: item_x
+        in: query
+        required: true
+        schema:
+          type: string
+          description: Indicator code for the x axis
+          title: Item X
+        description: Indicator code for the x axis
+      - name: item_y
+        in: query
+        required: true
+        schema:
+          type: string
+          description: Indicator code for the y axis
+          title: Item Y
+        description: Indicator code for the y axis
+      - name: period
+        in: query
+        required: true
+        schema:
+          type: string
+          description: YYYYMM period
+          title: Period
+        description: YYYYMM period
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Scatter'
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema: *id001
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
 components:
   schemas:
+    Aggregate:
+      properties:
+        version_id:
+          type: integer
+          title: Version Id
+        dataset:
+          type: string
+          title: Dataset
+        item:
+          type: string
+          title: Item
+        period:
+          type: string
+          title: Period
+        function:
+          type: string
+          title: Function
+        value:
+          anyOf:
+          - type: number
+          - type: integer
+          - type: 'null'
+          title: Value
+      type: object
+      required:
+      - version_id
+      - dataset
+      - item
+      - period
+      - function
+      - value
+      title: Aggregate
     AmountSummary:
       properties:
         numeric:
@@ -1372,6 +1745,43 @@ components:
       - database
       - modules
       title: Health
+    Histogram:
+      properties:
+        version_id:
+          type: integer
+          title: Version Id
+        dataset:
+          type: string
+          title: Dataset
+        item:
+          type: string
+          title: Item
+        period:
+          type: string
+          title: Period
+        rows:
+          type: integer
+          title: Rows
+        bins:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Bins
+        stats:
+          additionalProperties: true
+          type: object
+          title: Stats
+      type: object
+      required:
+      - version_id
+      - dataset
+      - item
+      - period
+      - rows
+      - bins
+      - stats
+      title: Histogram
     HistogramBin:
       properties:
         x0:
@@ -2022,6 +2432,48 @@ components:
       - banks
       - rows
       title: PeriodInfo
+    Preview:
+      properties:
+        version_id:
+          type: integer
+          title: Version Id
+        dataset:
+          type: string
+          title: Dataset
+        columns:
+          items:
+            type: string
+          type: array
+          title: Columns
+        rows:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Rows
+        total:
+          type: integer
+          title: Total
+        page:
+          type: integer
+          title: Page
+        page_size:
+          type: integer
+          title: Page Size
+        pages:
+          type: integer
+          title: Pages
+      type: object
+      required:
+      - version_id
+      - dataset
+      - columns
+      - rows
+      - total
+      - page
+      - page_size
+      - pages
+      title: Preview
     PreviewPage:
       properties:
         file_id:
@@ -2221,6 +2673,35 @@ components:
       - column_roles
       - validation_rules
       title: ProcessingConfig
+    Profile:
+      properties:
+        version_id:
+          type: integer
+          title: Version Id
+        dataset:
+          type: string
+          title: Dataset
+        rows:
+          type: integer
+          title: Rows
+        columns:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Columns
+        amount:
+          additionalProperties: true
+          type: object
+          title: Amount
+      type: object
+      required:
+      - version_id
+      - dataset
+      - rows
+      - columns
+      - amount
+      title: Profile
     ProfileResponse:
       properties:
         file_id:
@@ -2370,6 +2851,38 @@ components:
       - severity
       - description
       title: RuleInfo
+    Scatter:
+      properties:
+        version_id:
+          type: integer
+          title: Version Id
+        dataset:
+          type: string
+          title: Dataset
+        item_x:
+          type: string
+          title: Item X
+        item_y:
+          type: string
+          title: Item Y
+        period:
+          type: string
+          title: Period
+        points:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Points
+      type: object
+      required:
+      - version_id
+      - dataset
+      - item_x
+      - item_y
+      - period
+      - points
+      title: Scatter
     ScatterAxis:
       properties:
         item:
@@ -2635,3 +3148,5 @@ tags:
 - name: processing
   description: Preview, profile, null analysis, distribution and scatter charts, and
     validation of staged data.
+- name: public-analysis
+  description: Analysis and chart-ready data from public facts and mirror views.

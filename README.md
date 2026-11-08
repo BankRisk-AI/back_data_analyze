@@ -62,7 +62,9 @@ make test      # testele PostgreSQL
 ```
 
 ## Teste
-`python -m pytest -q tests` (23 de teste; necesită `EBA_TEST_DSN`, implicit `postgresql://bench:bench@localhost/ing`). `tests/test_real_files.py` rulează pe fișierele originale din 2020 dacă folderul din `EBA_REAL_DIR` le conține (altfel este sărit).
+`make test` sau `python -m pytest -q tests` rulează suita PostgreSQL.
+`tests/test_real_files.py` rulează pe fișierele originale din 2020 dacă folderul
+din `EBA_REAL_DIR` le conține; altfel testul este sărit.
 
 ## Promovarea în public
 
@@ -81,6 +83,16 @@ face rollback și păstrează staging-ul pentru retry.
 `GET /api/periods` listează versiunile active, iar preview-ul public este disponibil
 la `/api/versions/{version_id}/datasets/{oth|cre|mrk}/preview`. Analiza staging
 rămâne disponibilă pentru importurile care nu au fost încă promovate.
+
+Analiza datelor promovate este disponibilă separat în modulul `eba_public_analysis`,
+sub prefixul `/api/public`: perioade, preview, profil (`.../profile`), histogramă
+(`.../histogram?item=...&period=...&bins=20`), scatter
+(`.../scatter?item_x=...&item_y=...&period=...`) și agregări
+(`.../aggregate?item=...&period=...&function=sum|avg|min|max|count`).
+Răspunsurile sunt pregătite pentru grafice, iar funcții noi de indicatori/agregări
+pot fi adăugate în stratul application fără modificarea schemei Chapter 4.
+Dataset-urile acceptate sunt `oth`, `cre`, `mrk` și aliasurile `tr_oth`,
+`tr_cre`, `tr_mrk`.
 
 ## Contractul cu modulul 2
 - Tabelele de pregătire: `staging.f<file_id>`, cu `file_id` din `source_file`; coloanele sunt cele ale fișierului, normalizate, toate `text`; celulele goale sunt `NULL`.

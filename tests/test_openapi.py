@@ -33,7 +33,7 @@ def test_every_operation_is_documented_for_clients():
             assert op.get("summary") and op.get("tags"), f"{method.upper()} {path} lacks a summary or a tag"
             assert "200" in op["responses"] or "201" in op["responses"] or "202" in op["responses"]
     assert len(ids) == len(set(ids)) and not [i for i in ids if "_api_" in i], "operation ids must be explicit and unique"
-    assert {t["name"] for t in spec["tags"]} == {"system", "ingest", "processing"}
+    assert {t["name"] for t in spec["tags"]} == {"system", "ingest", "processing", "public-analysis"}
 
 
 @pytest.mark.parametrize("path, method", [("/api/datasets/{file_id}/preview", "get"), ("/api/datasets/{file_id}/histogram", "get"), ("/api/datasets/{file_id}/scatter", "get"),

@@ -116,7 +116,7 @@ def test_request_id_is_returned_and_echoed(client):
 # ----------------------------------------------------------------------------------- system endpoints
 def test_health_reports_database_queue_and_a_missing_worker(client, db):
     h = client.get("/api/health").json()
-    assert h["status"] == "ok" and h["database"] is True and h["modules"] == ["eba_ingest", "eba_processing"] and h["queue"]["pending"] == 0 and h["worker_hint"] is None
+    assert h["status"] == "ok" and h["database"] is True and h["modules"] == ["eba_ingest", "eba_processing", "eba_public_analysis"] and h["queue"]["pending"] == 0 and h["worker_hint"] is None
     imp, _ = stage(db, banks(3))
     db.cur.execute("INSERT INTO job(import_id, kind, status) VALUES (%s, 'validate_data', 'pending')", (imp,))
     assert client.get("/api/health").json()["worker_hint"] is None                     # waiting for a few seconds is normal
