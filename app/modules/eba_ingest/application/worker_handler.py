@@ -7,6 +7,7 @@ from app.core.worker import Job, JobHandlerRegistry, ProgressReporter
 from app.modules.eba_ingest.application.staging_service import process_import
 from app.modules.eba_ingest.domain import IngestError
 from app.modules.eba_ingest.infrastructure.database import repositories as repo
+from app.modules.eba_ingest.application.load_service import run_load
 
 
 def handle_validate(job: Job, progress: ProgressReporter, schema: str | None = None) -> None:
@@ -34,3 +35,4 @@ def _mark_import(import_id: int, schema: str, status: str) -> None:
 def register_handlers(registry: JobHandlerRegistry, storage_dir: str | None = None, schema: str | None = None, max_bytes: int | None = None) -> None:
     """storage_dir and max_bytes are accepted for compatibility: the worker no longer stores files, the API does."""
     registry.register("validate", lambda job, progress: handle_validate(job, progress, schema))
+    registry.register("load", lambda job, progress: run_load(job.import_id, schema or job.schema, progress))

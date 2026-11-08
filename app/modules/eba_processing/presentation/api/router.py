@@ -10,12 +10,13 @@ from app.core.config import get_schema
 from app.modules.eba_processing.application import analytics as analytics_uc
 from app.modules.eba_processing.application import datasets as datasets_uc
 from app.modules.eba_processing.application import validation as validation_uc
+from app.modules.eba_processing.application import public as public_uc
 from app.modules.eba_processing.domain import (
     AGGREGATIONS, CLIPS, DEFAULT_BINS, DEFAULT_PAGE_SIZE, DEFAULT_SCATTER_POINTS, DEFAULT_TOP_VALUES, MAX_BINS, MAX_PAGE_SIZE, MAX_SCATTER_POINTS,
     MAX_TOP_VALUES, QUERY_TIMEOUT_SECONDS, RULES, SCALES, SEVERITIES, Filters, parse_dims,
 )
 from app.modules.eba_processing.presentation.api.schemas import (
-    DatasetSummary, HistogramResponse, ItemPage, NullAnalysis, PreviewPage, ProcessingConfig, ProfileResponse, ScatterResponse, ValidationQueued, ValidationState,
+    DatasetSummary, HistogramResponse, ItemPage, NullAnalysis, PreviewPage, ProcessingConfig, ProfileResponse, ScatterResponse, ValidationQueued, ValidationState, PublicPeriod, PublicPreview,
 )
 
 TAG = "processing"
@@ -26,6 +27,18 @@ DIM = Query(default=None, description="Dimension filter column:value, repeatable
 def build_router(schema: str | None = None) -> APIRouter:
     schema = schema or get_schema()
     router = APIRouter(prefix="/api", tags=[TAG])
+
+    @router.get("/periods", response_model=list[PublicPeriod], operation_id="list_public_periods",
+                summary="Active public reporting periods")
+    def public_periods():
+        return public_uc.periods(schema)
+
+    @router.get("/versions/{version_id}/datasets/{dataset}/preview", response_model=PublicPreview,
+                operation_id="preview_public_dataset", summary="Preview an active public dataset",
+                responses=problem_responses(404, 422))
+    def public_preview(version_id: int, dataset: str, page: Annotated[int, Query(ge=1)] = 1,
+                       page_size: Annotated[int, Query(ge=1, le=MAX_PAGE_SIZE)] = DEFAULT_PAGE_SIZE):
+        return public_uc.preview(version_id, dataset, schema, page, page_size)
 
     def filters(period=None, lei=None, item=None, dim=None, exclude_aggregate=False) -> Filters:
         return Filters(period=period, lei=lei, item=item, dims=parse_dims(dim), exclude_aggregate=exclude_aggregate)

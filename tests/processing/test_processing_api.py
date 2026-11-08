@@ -128,7 +128,7 @@ def test_health_reports_database_queue_and_a_missing_worker(client, db):
 def test_meta_lists_enums_and_every_problem_type(client):
     m = client.get("/api/meta").json()
     assert m["job_statuses"] == ["pending", "processing", "completed", "failed"] and "validated" in m["import_statuses"] and "unrecognised" in m["file_types"]
-    assert set(m["job_kinds"]) == {"validate", "validate_data"}
+    assert set(m["job_kinds"]) == {"validate", "validate_data", "load"}
     types = {p["type"]: p["status"] for p in m["problem_types"]}
     assert types["duplicate-file"] == 409 and types["file-too-large"] == 413 and types["unreadable-file"] == 422 and types["dataset-not-found"] == 404
     assert types["no-staging"] == 409 and types["query-too-slow"] == 504 and types["invalid-parameter"] == 422 and types["internal-error"] == 500 and types["invalid-request"] == 422

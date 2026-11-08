@@ -109,7 +109,10 @@ def import_head(cur, import_id: int):
         """SELECT i.status, i.edition_label, i.created_at, u.username, j.job_id, j.status, j.progress, j.message, j.error
            FROM import_batch i
            LEFT JOIN app_user u ON u.user_id = i.created_by
-           LEFT JOIN LATERAL (SELECT job_id, status, progress, message, error FROM job WHERE import_id = i.import_id AND kind = 'validate' ORDER BY job_id DESC LIMIT 1) j ON true
+           LEFT JOIN LATERAL (SELECT job_id, status, progress, message, error FROM job
+                              WHERE import_id = i.import_id
+                                AND (i.status <> 'loaded' OR (kind = 'load' AND status = 'completed'))
+                              ORDER BY job_id DESC LIMIT 1) j ON true
            WHERE i.import_id = %s""",
         (import_id,),
     )
@@ -123,7 +126,10 @@ def list_import_rows(cur, limit: int):
                   COALESCE((SELECT array_agg(f.file_name ORDER BY f.file_id) FROM source_file f WHERE f.import_id = i.import_id), '{}'),
                   j.error, j.status, j.progress, j.message
            FROM import_batch i LEFT JOIN app_user u ON u.user_id = i.created_by
-           LEFT JOIN LATERAL (SELECT error, status, progress, message FROM job WHERE import_id = i.import_id AND kind = 'validate' ORDER BY job_id DESC LIMIT 1) j ON true
+           LEFT JOIN LATERAL (SELECT error, status, progress, message FROM job
+                              WHERE import_id = i.import_id
+                                AND (i.status <> 'loaded' OR (kind = 'load' AND status = 'completed'))
+                              ORDER BY job_id DESC LIMIT 1) j ON true
            ORDER BY i.import_id DESC LIMIT %s""",
         (limit,),
     )

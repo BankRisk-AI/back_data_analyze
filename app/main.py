@@ -8,6 +8,7 @@ from app.core.api import create_base_app, mount_ui
 from app.core.api.system import build_system_router, call_with_options
 from app.core.config import get_cors_origins, get_max_upload_bytes, get_schema, get_storage_dir, get_ui_dir, get_user_id
 from app.core.module import ModuleSpec
+from app.core.worker import JobHandlerRegistry
 
 VERSION = "0.2"
 DESCRIPTION = (
@@ -26,7 +27,11 @@ def create_app(modules: list[ModuleSpec] | None = None, schema: str | None = Non
                "user_id": user_id if user_id is not None else get_user_id()}
     app = create_base_app("EBA Data Explorer", DESCRIPTION, VERSION, cors_origins=get_cors_origins())
     app.openapi_tags = [{"name": "system", "description": "Health, enumerations and the state of any job."}] + [t for m in modules for t in m.tags]
-    job_kinds = ["validate", "validate_data"]
+    registry = JobHandlerRegistry()
+    for module in modules:
+        if module.register_handlers:
+            module.register_handlers(registry)
+    job_kinds = sorted(registry.kinds())
     app.include_router(build_system_router(schema, VERSION, [m.name for m in modules], job_kinds))
     for spec in modules:
         if spec.router_factory:

@@ -224,6 +224,110 @@ paths:
           content:
             application/problem+json:
               schema: *id001
+  /api/imports/{import_id}/load:
+    post:
+      tags:
+      - ingest
+      summary: Queue promotion of a validated import into public tables
+      operationId: queue_load
+      parameters:
+      - name: import_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Import Id
+      responses:
+        '202':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoadQueued'
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema: *id001
+        '409':
+          description: Conflict
+          content:
+            application/problem+json:
+              schema: *id001
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
+  /api/periods:
+    get:
+      tags:
+      - processing
+      summary: Active public reporting periods
+      operationId: list_public_periods
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/PublicPeriod'
+                type: array
+                title: Response List Public Periods
+  /api/versions/{version_id}/datasets/{dataset}/preview:
+    get:
+      tags:
+      - processing
+      summary: Preview an active public dataset
+      operationId: preview_public_dataset
+      parameters:
+      - name: version_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Version Id
+      - name: dataset
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Dataset
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+          title: Page
+      - name: page_size
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 1000
+          minimum: 1
+          default: 50
+          title: Page Size
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicPreview'
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema: *id001
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
   /api/processing/config:
     get:
       tags:
@@ -1736,6 +1840,23 @@ components:
       - progress
       - created_at
       title: JobInfo
+    LoadQueued:
+      properties:
+        job_id:
+          type: integer
+          title: Job Id
+        status:
+          type: string
+          title: Status
+        created:
+          type: boolean
+          title: Created
+      type: object
+      required:
+      - job_id
+      - status
+      - created
+      title: LoadQueued
     Meta:
       properties:
         import_statuses:
@@ -2126,6 +2247,85 @@ components:
       - amount
       - elapsed_ms
       title: ProfileResponse
+    PublicPeriod:
+      properties:
+        version_id:
+          type: integer
+          title: Version Id
+        year:
+          type: integer
+          title: Year
+        quarter:
+          type: integer
+          title: Quarter
+        period_end:
+          type: string
+          title: Period End
+        import_id:
+          type: integer
+          title: Import Id
+        rows_oth:
+          type: integer
+          title: Rows Oth
+        rows_cre:
+          type: integer
+          title: Rows Cre
+        rows_mrk:
+          type: integer
+          title: Rows Mrk
+      type: object
+      required:
+      - version_id
+      - year
+      - quarter
+      - period_end
+      - import_id
+      - rows_oth
+      - rows_cre
+      - rows_mrk
+      title: PublicPeriod
+    PublicPreview:
+      properties:
+        version_id:
+          type: integer
+          title: Version Id
+        dataset:
+          type: string
+          title: Dataset
+        columns:
+          items:
+            type: string
+          type: array
+          title: Columns
+        rows:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Rows
+        total:
+          type: integer
+          title: Total
+        page:
+          type: integer
+          title: Page
+        page_size:
+          type: integer
+          title: Page Size
+        pages:
+          type: integer
+          title: Pages
+      type: object
+      required:
+      - version_id
+      - dataset
+      - columns
+      - rows
+      - total
+      - page
+      - page_size
+      - pages
+      title: PublicPreview
     QueueState:
       properties:
         pending:

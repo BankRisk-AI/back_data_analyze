@@ -40,3 +40,6 @@ class JobHandlerRegistry:
 
     def __contains__(self, kind: str) -> bool:
         return kind in self._handlers
+
+    def kinds(self) -> tuple[str, ...]:
+        return tuple(self._handlers)

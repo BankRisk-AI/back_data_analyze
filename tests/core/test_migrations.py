@@ -26,9 +26,9 @@ def query(schema, text, params=()):
 
 
 def test_a_new_database_gets_every_migration_once(schema):
-    assert migrate(schema) == ["core/001_baseline", "core/002_job_heartbeat"]
+    assert migrate(schema) == ["core/001_baseline", "core/002_job_heartbeat", "core/003_chapter4_views"]
     assert migrate(schema) == []                                                              # idempotent
-    assert [r[0] for r in query(schema, "SELECT version FROM schema_migrations ORDER BY version")] == ["core/001_baseline", "core/002_job_heartbeat"]
+    assert [r[0] for r in query(schema, "SELECT version FROM schema_migrations ORDER BY version")] == ["core/001_baseline", "core/002_job_heartbeat", "core/003_chapter4_views"]
     cols = {r[0] for r in query(schema, "SELECT column_name FROM information_schema.columns WHERE table_schema = %s AND table_name = 'job'", (schema,))}
     assert {"progress", "message", "started_at", "heartbeat_at", "error"} <= cols
 
@@ -46,7 +46,7 @@ def test_a_database_created_before_migrations_existed_is_adopted_not_recreated(s
         cur.execute((CORE_DIR / "001_baseline.sql").read_text(encoding="utf-8"))                      # as the old init_db did
         cur.execute("INSERT INTO import_batch(status) VALUES ('uploaded')")
     conn.close()
-    assert migrate(schema) == ["core/002_job_heartbeat"]                                              # 001 is recorded, not run again (it would fail)
+    assert migrate(schema) == ["core/002_job_heartbeat", "core/003_chapter4_views"]                  # 001 is recorded, not run again (it would fail)
     assert query(schema, "SELECT count(*) FROM import_batch") == [(1,)]                               # data kept
 
 

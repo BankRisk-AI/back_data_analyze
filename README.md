@@ -1,4 +1,6 @@
-# eba_ingest: modulul 1 (încărcarea)
+# EBA Analyst
+
+Ingest, validare și promovare atomică a fișierelor EBA în schema publică Chapter 4.
 
 Ia fișierele EBA **originale** (`.csv` sau `.xlsx`, exact cum se descarcă), le păstrează neschimbate, le înregistrează în baza de date și încarcă fiecare fișier de date într-o **tabelă de pregătire** (staging) din PostgreSQL, gata pentru modulul 2 (prelucrarea). Se folosește din linia de comandă, ca bibliotecă Python sau, prin adaptorul HTTP din versiunea 0.2, din interfața React `eba-ingest-ui`.
 
@@ -61,6 +63,24 @@ make test      # testele PostgreSQL
 
 ## Teste
 `python -m pytest -q tests` (23 de teste; necesită `EBA_TEST_DSN`, implicit `postgresql://bench:bench@localhost/ing`). `tests/test_real_files.py` rulează pe fișierele originale din 2020 dacă folderul din `EBA_REAL_DIR` le conține (altfel este sărit).
+
+## Promovarea în public
+
+După ce validarea nu mai are erori, promovarea se pune în coadă:
+
+```text
+POST /api/imports/{id}/load
+```
+
+Workerul citește SDD și TR_Metadata din storage, rezolvă indicatorii și LEI-urile,
+creează versiunile și facts în cele 13 tabele Chapter 4, verifică numărul și suma
+rândurilor și apoi marchează importul `loaded`. Staging-ul este șters după commit;
+`EBA_DROP_STAGING_AFTER_LOAD=false` îl păstrează pentru depanare. O eroare de load
+face rollback și păstrează staging-ul pentru retry.
+
+`GET /api/periods` listează versiunile active, iar preview-ul public este disponibil
+la `/api/versions/{version_id}/datasets/{oth|cre|mrk}/preview`. Analiza staging
+rămâne disponibilă pentru importurile care nu au fost încă promovate.
 
 ## Contractul cu modulul 2
 - Tabelele de pregătire: `staging.f<file_id>`, cu `file_id` din `source_file`; coloanele sunt cele ale fișierului, normalizate, toate `text`; celulele goale sunt `NULL`.

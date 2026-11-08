@@ -12,8 +12,9 @@ from app.core.api import problem_responses
 from app.core.config import get_max_upload_bytes, get_schema, get_storage_dir, get_user_id
 from app.modules.eba_ingest.application.queries import drop_staging, get_import, list_imports
 from app.modules.eba_ingest.application.upload_service import enqueue_import
+from app.modules.eba_ingest.application.load_service import enqueue_load
 from app.modules.eba_ingest.domain import FileTooLarge, UnreadableFile
-from app.modules.eba_ingest.presentation.api.schemas import DroppedStaging, ImportDetail, ImportSummary, IngestConfig
+from app.modules.eba_ingest.presentation.api.schemas import DroppedStaging, ImportDetail, ImportSummary, IngestConfig, LoadQueued
 
 TAG = "ingest"
 
@@ -77,5 +78,10 @@ def build_router(storage_dir: str | None = None, schema: str | None = None, max_
         if get_import(import_id, schema) is None:
             raise StarletteHTTPException(404, f"import {import_id} does not exist")
         return {"dropped": drop_staging(import_id, schema)}
+
+    @router.post("/imports/{import_id}/load", status_code=202, response_model=LoadQueued, operation_id="queue_load",
+                 summary="Queue promotion of a validated import into public tables", responses=problem_responses(404, 409))
+    def load(import_id: int):
+        return enqueue_load(import_id, schema)
 
     return router

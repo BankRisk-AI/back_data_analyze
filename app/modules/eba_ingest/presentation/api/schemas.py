@@ -69,3 +69,9 @@ class IngestConfig(BaseModel):
 
 class DroppedStaging(BaseModel):
     dropped: int = Field(description="Number of staging tables dropped")
+
+
+class LoadQueued(BaseModel):
+    job_id: int
+    status: str
+    created: bool
