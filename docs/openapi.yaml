@@ -265,75 +265,6 @@ paths:
           content:
             application/problem+json:
               schema: *id001
-  /api/periods:
-    get:
-      tags:
-      - processing
-      summary: Active public reporting periods
-      operationId: list_public_periods
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: '#/components/schemas/PublicPeriod'
-                type: array
-                title: Response List Public Periods
-  /api/versions/{version_id}/datasets/{dataset}/preview:
-    get:
-      tags:
-      - processing
-      summary: Preview an active public dataset
-      operationId: preview_public_dataset
-      parameters:
-      - name: version_id
-        in: path
-        required: true
-        schema:
-          type: integer
-          title: Version Id
-      - name: dataset
-        in: path
-        required: true
-        schema:
-          type: string
-          title: Dataset
-      - name: page
-        in: query
-        required: false
-        schema:
-          type: integer
-          minimum: 1
-          default: 1
-          title: Page
-      - name: page_size
-        in: query
-        required: false
-        schema:
-          type: integer
-          maximum: 1000
-          minimum: 1
-          default: 50
-          title: Page Size
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PublicPreview'
-        '404':
-          description: Not found
-          content:
-            application/problem+json:
-              schema: *id001
-        '422':
-          description: Invalid request or parameter
-          content:
-            application/problem+json:
-              schema: *id001
   /api/processing/config:
     get:
       tags:
@@ -1656,6 +1587,10 @@ components:
           - type: integer
           - type: 'null'
           title: File Id
+        seconds:
+          type: number
+          title: Seconds
+          default: 0.0
         pairs:
           items:
             $ref: '#/components/schemas/PairModel'
@@ -2122,6 +2057,10 @@ components:
             type: object
           type: array
           title: Examples
+        seconds:
+          type: number
+          title: Seconds
+          default: 0.0
       type: object
       required:
       - rule
@@ -2223,6 +2162,9 @@ components:
         progress:
           type: integer
           title: Progress
+        attempts:
+          type: integer
+          title: Attempts
         message:
           anyOf:
           - type: string
@@ -2253,6 +2195,7 @@ components:
       - kind
       - status
       - progress
+      - attempts
       - created_at
       title: JobInfo
     LoadQueued:
@@ -2770,48 +2713,6 @@ components:
       - rows_cre
       - rows_mrk
       title: PublicPeriod
-    PublicPreview:
-      properties:
-        version_id:
-          type: integer
-          title: Version Id
-        dataset:
-          type: string
-          title: Dataset
-        columns:
-          items:
-            type: string
-          type: array
-          title: Columns
-        rows:
-          items:
-            additionalProperties: true
-            type: object
-          type: array
-          title: Rows
-        total:
-          type: integer
-          title: Total
-        page:
-          type: integer
-          title: Page
-        page_size:
-          type: integer
-          title: Page Size
-        pages:
-          type: integer
-          title: Pages
-      type: object
-      required:
-      - version_id
-      - dataset
-      - columns
-      - rows
-      - total
-      - page
-      - page_size
-      - pages
-      title: PublicPreview
     QueueState:
       properties:
         pending:

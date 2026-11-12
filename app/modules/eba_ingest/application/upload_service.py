@@ -74,7 +74,7 @@ def register_files(cur, import_id: int, stored: list[StoredFile]) -> None:
 
 def enqueue_import(paths, storage_dir: str, user_id: int | None = None, edition_label: str | None = None,
                    max_bytes: int | None = None, schema: str = "public") -> int:
-    """Stores the files, registers the import and queues a 'validate' job. The worker does the reading (see staging_service)."""
+    """Stores the files, registers an import and queues a 'stage' job. The worker does the reading (see staging_service)."""
     max_bytes = max_bytes or get_max_upload_bytes()
     stored, created_now = store_files(paths, storage_dir, max_bytes)
     conn = None

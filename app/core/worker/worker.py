@@ -46,6 +46,7 @@ class Worker:
         schema: str = "public",
         heartbeat_interval: float = 30.0,
         recovery_interval: float = 60.0,
+        max_attempts: int = 3,
     ) -> None:
         self.registry = registry
         self.poll_interval = poll_interval
@@ -53,6 +54,7 @@ class Worker:
         self.schema = schema
         self.heartbeat_interval = heartbeat_interval
         self.recovery_interval = recovery_interval
+        self.max_attempts = max_attempts
 
     # ---- small database operations (one short connection each) -------------------------------------------
     def _execute(self, sql: str, params: tuple = ()) -> tuple[int, tuple | None]:
@@ -68,13 +70,45 @@ class Worker:
 
     def recover_stale_jobs(self) -> int:
         """Jobs still 'processing' whose heartbeat (or start) is older than stale_after seconds go back to 'pending'."""
-        count, _ = self._execute(
-            """UPDATE job
-               SET status = 'pending', message = 'requeued after worker stop', started_at = NULL, heartbeat_at = NULL
-               WHERE status = 'processing'
-                 AND COALESCE(heartbeat_at, started_at) < now() - (%s * interval '1 second')""",
-            (self.stale_after,),
-        )
+        conn = connect(self.schema)
+        abandoned: list[Job] = []
+        try:
+            with conn, conn.cursor() as cur:
+                cur.execute(
+                    """SELECT job_id, import_id, kind, attempts
+                       FROM job
+                       WHERE status = 'processing'
+                         AND COALESCE(heartbeat_at, started_at) < now() - (%s * interval '1 second')
+                       FOR UPDATE""",
+                    (self.stale_after,),
+                )
+                rows = cur.fetchall()
+                for job_id, import_id, kind, attempts in rows:
+                    if attempts < self.max_attempts:
+                        cur.execute(
+                            """UPDATE job SET status='pending', message='requeued after worker stop',
+                                      started_at=NULL, heartbeat_at=NULL
+                               WHERE job_id=%s""",
+                            (job_id,),
+                        )
+                    else:
+                        cur.execute(
+                            """UPDATE job SET status='failed', message='failed',
+                                      error=%s, finished_at=now()
+                               WHERE job_id=%s""",
+                            (f"abandoned after {attempts} attempts (worker stopped)", job_id),
+                        )
+                        abandoned.append(Job(job_id, import_id, kind, attempts, self.schema))
+        finally:
+            conn.close()
+        for job in abandoned:
+            handler = self.registry.give_up_handler(job.kind)
+            if handler:
+                try:
+                    handler(job)
+                except Exception:
+                    logger.exception("give-up handler failed for job id=%s kind=%s", job.job_id, job.kind)
+        count = len(rows)
         if count:
             logger.warning("requeued %s stale job(s)", count)
         return count
@@ -88,9 +122,10 @@ class Worker:
                  LIMIT 1
                )
                UPDATE job
-               SET status = 'processing', progress = 0, message = 'processing', started_at = now(), heartbeat_at = now()
+               SET status = 'processing', progress = 0, message = 'processing', attempts = attempts + 1,
+                   started_at = now(), heartbeat_at = now()
                WHERE job_id IN (SELECT job_id FROM candidate)
-               RETURNING job_id, import_id, kind"""
+               RETURNING job_id, import_id, kind, attempts"""
         )
         return Job(*row, schema=self.schema) if row else None
 

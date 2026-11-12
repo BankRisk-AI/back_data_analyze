@@ -51,7 +51,7 @@ def add_source_file(cur, import_id: int, name: str, size: int, sha: str, file_ty
     return cur.fetchone()[0]
 
 
-def enqueue_job(cur, import_id: int, kind: str = "validate") -> int:
+def enqueue_job(cur, import_id: int, kind: str = "stage") -> int:
     cur.execute("INSERT INTO job(import_id, kind, status, progress, message) VALUES (%s, %s, 'pending', 0, 'queued') RETURNING job_id", (import_id, kind))
     return cur.fetchone()[0]
 
@@ -77,7 +77,7 @@ def finish_job(cur, import_id: int, job_id: int | None, ok: bool, error: str | N
     status, message = ("completed", "completed") if ok else ("failed", "rejected")
     if job_id is None:
         cur.execute(
-            "INSERT INTO job(import_id, kind, status, progress, message, error, finished_at) VALUES (%s, 'validate', %s, 100, %s, %s, now())",
+            "INSERT INTO job(import_id, kind, status, progress, message, error, finished_at) VALUES (%s, 'stage', %s, 100, %s, %s, now())",
             (import_id, status, message, error),
         )
     else:

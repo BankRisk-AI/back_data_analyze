@@ -210,6 +210,7 @@ class IssueModel(BaseModel):
     affected_rows: int
     detail: str
     examples: list[dict[str, Any]]
+    seconds: float = 0.0
 
 
 class FileValidationModel(BaseModel):
@@ -243,28 +244,6 @@ class ValidationState(BaseModel):
     import_status: str | None = None
     job: ValidationJob | None = None
     report: ValidationReportModel | None = None
-
-
-class PublicPeriod(BaseModel):
-    version_id: int
-    year: int
-    quarter: int
-    period_end: str
-    import_id: int
-    rows_oth: int
-    rows_cre: int
-    rows_mrk: int
-
-
-class PublicPreview(BaseModel):
-    version_id: int
-    dataset: str
-    columns: list[str]
-    rows: list[dict[str, Any]]
-    total: int
-    page: int
-    page_size: int
-    pages: int
 
 
 class RuleInfo(BaseModel):

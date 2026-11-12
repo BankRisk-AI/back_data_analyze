@@ -128,7 +128,7 @@ def test_health_reports_database_queue_and_a_missing_worker(client, db):
 def test_meta_lists_enums_and_every_problem_type(client):
     m = client.get("/api/meta").json()
     assert m["job_statuses"] == ["pending", "processing", "completed", "failed"] and "validated" in m["import_statuses"] and "unrecognised" in m["file_types"]
-    assert set(m["job_kinds"]) == {"validate", "validate_data", "load"}
+    assert set(m["job_kinds"]) == {"stage", "validate_data", "load"}
     types = {p["type"]: p["status"] for p in m["problem_types"]}
     assert types["duplicate-file"] == 409 and types["file-too-large"] == 413 and types["unreadable-file"] == 422 and types["dataset-not-found"] == 404
     assert types["no-staging"] == 409 and types["query-too-slow"] == 504 and types["invalid-parameter"] == 422 and types["internal-error"] == 500 and types["invalid-request"] == 422
@@ -139,7 +139,7 @@ def test_job_endpoints(client, db, staged):
     q = client.post(f"/api/imports/{imp}/validation")
     assert q.status_code == 202 and q.json()["created"] is True
     jobs = client.get(f"/api/imports/{imp}/jobs").json()
-    assert [j["kind"] for j in jobs] == ["validate_data", "validate"] and jobs[0]["status"] == "pending"
+    assert [j["kind"] for j in jobs] == ["validate_data", "stage"] and jobs[0]["status"] == "pending"
     one = client.get(f"/api/jobs/{q.json()['job_id']}").json()
     assert one["import_id"] == imp and one["progress"] == 0 and one["finished_at"] is None
     problem(client.get("/api/jobs/9999"), 404, "not-found")

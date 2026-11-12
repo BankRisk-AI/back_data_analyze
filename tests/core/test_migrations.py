@@ -26,9 +26,10 @@ def query(schema, text, params=()):
 
 
 def test_a_new_database_gets_every_migration_once(schema):
-    assert migrate(schema) == ["core/001_baseline", "core/002_job_heartbeat", "core/003_chapter4_views", "core/004_fact_unique"]
+    expected = ["core/001_baseline", "core/002_job_heartbeat", "core/003_chapter4_views", "core/004_fact_unique", "core/005_job_attempts", "core/006_job_kind_stage"]
+    assert migrate(schema) == expected
     assert migrate(schema) == []                                                              # idempotent
-    assert [r[0] for r in query(schema, "SELECT version FROM schema_migrations ORDER BY version")] == ["core/001_baseline", "core/002_job_heartbeat", "core/003_chapter4_views", "core/004_fact_unique"]
+    assert [r[0] for r in query(schema, "SELECT version FROM schema_migrations ORDER BY version")] == expected
     cols = {r[0] for r in query(schema, "SELECT column_name FROM information_schema.columns WHERE table_schema = %s AND table_name = 'job'", (schema,))}
     assert {"progress", "message", "started_at", "heartbeat_at", "error"} <= cols
 
@@ -46,7 +47,7 @@ def test_a_database_created_before_migrations_existed_is_adopted_not_recreated(s
         cur.execute((CORE_DIR / "001_baseline.sql").read_text(encoding="utf-8"))                      # as the old init_db did
         cur.execute("INSERT INTO import_batch(status) VALUES ('uploaded')")
     conn.close()
-    assert migrate(schema) == ["core/002_job_heartbeat", "core/003_chapter4_views", "core/004_fact_unique"]  # 001 is recorded, not run again
+    assert migrate(schema) == ["core/002_job_heartbeat", "core/003_chapter4_views", "core/004_fact_unique", "core/005_job_attempts", "core/006_job_kind_stage"]  # 001 is recorded, not run again
     assert query(schema, "SELECT count(*) FROM import_batch") == [(1,)]                               # data kept
 
 
@@ -55,13 +56,13 @@ def test_old_job_states_are_converted(schema):
     with conn, conn.cursor() as cur:
         cur.execute((CORE_DIR / "001_baseline.sql").read_text(encoding="utf-8"))
         cur.execute("ALTER TABLE job DROP CONSTRAINT job_status_check")                               # a database made with the earlier job states
+        cur.execute("ALTER TABLE job DROP CONSTRAINT job_kind_check")
         cur.execute("INSERT INTO import_batch(status) VALUES ('uploaded')")
-        cur.execute("INSERT INTO job(import_id, kind, status) VALUES (1, 'validate', 'done'), (1, 'validate', 'running')")
+        cur.execute("INSERT INTO job(import_id, kind, status) VALUES (1, 'stage', 'done'), (1, 'stage', 'running')")
     conn.close()
     migrate(schema)
     assert sorted(r[0] for r in query(schema, "SELECT status FROM job")) == ["completed", "processing"]
-    with pytest.raises(psycopg2.errors.CheckViolation):
-        query(schema, "INSERT INTO job(import_id, kind, status) VALUES (1, 'validate', 'running')")
+    assert query(schema, "SELECT kind FROM job ORDER BY job_id") == [("stage",), ("stage",)]
 
 
 def test_module_migration_folders_are_applied_after_the_core_in_order(schema, tmp_path):

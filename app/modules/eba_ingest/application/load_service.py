@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import calendar
 import re
+import time
 from collections import Counter, defaultdict
 from datetime import date
 from pathlib import Path
@@ -167,6 +168,8 @@ def _metadata(path: str):
 
 
 def _load(cur, import_id: int, emit):
+    timings: dict[str, float] = {}
+    phase_started = time.perf_counter()
     cur.execute("SELECT status, edition_label, created_by FROM import_batch WHERE import_id = %s FOR UPDATE", (import_id,))
     head = cur.fetchone()
     if not head:
@@ -182,6 +185,8 @@ def _load(cur, import_id: int, emit):
         raise LoadError("no tr_oth, tr_cre or tr_mrk data files")
     paths = _reference_files(cur, import_id)
     sdd_map, label_map = _sdd(paths["SDD"], head[1], {x[1] for x in data}) if "SDD" in paths else ({}, {})
+    timings["reference_files"] = round(time.perf_counter() - phase_started, 2)
+    phase_started = time.perf_counter()
     target_tables = {"tr_oth": "fact_oth", "tr_cre": "fact_cre", "tr_mrk": "fact_mrk"}
     source_only = {"lei_code", "nsa", "period", "item", "label"}
     target_columns: dict[str, list[str]] = {}
@@ -260,6 +265,8 @@ def _load(cur, import_id: int, emit):
                            WHERE btrim(p) = l.lei)
             ON CONFLICT (lei) DO NOTHING
         """).format(table, sql.SQL(non_aggregate)))
+    timings["bank_resolution"] = round(time.perf_counter() - phase_started, 2)
+    phase_started = time.perf_counter()
 
     indicator_cache = {}
     cur.execute("SELECT indicator_id, std_code FROM indicator")
@@ -368,6 +375,8 @@ def _load(cur, import_id: int, emit):
         staged, loaded, amount_sum = cur.fetchone()
         quality[typ] = {"file": name, "rows_staged": staged, "aggregate_rows_excluded": staged - loaded,
                         "rows_loaded": loaded, "amount_sum": float(amount_sum)}
+    timings["fact_inserts"] = round(time.perf_counter() - phase_started, 2)
+    phase_started = time.perf_counter()
     for key, version_id in versions.items():
         cur.execute("UPDATE dataset_version SET quality=%s WHERE version_id=%s", (Json({"validation": {}, "files": list(quality.values())}), version_id))
     for typ, report in quality.items():
@@ -377,9 +386,10 @@ def _load(cur, import_id: int, emit):
         tolerance = max(1e-6, abs(report["amount_sum"]) * 1e-12)
         if actual_rows != report["rows_loaded"] or abs(float(actual_sum) - report["amount_sum"]) > tolerance:
             raise LoadError(f"load-mismatch in {report['file']}")
+    timings["post_checks"] = round(time.perf_counter() - phase_started, 2)
     cur.execute("INSERT INTO decision_log(import_id,step,detail) VALUES (%s,'item_resolution',%s)", (import_id, Json({"counts": dict(resolution)})))
     cur.execute("UPDATE import_batch SET status='loaded' WHERE import_id=%s", (import_id,))
-    return list(versions.values())
+    return list(versions.values()), timings
 
 
 def run_load(import_id: int, schema: str | None = None, emit=None) -> None:
@@ -396,9 +406,9 @@ def run_load(import_id: int, schema: str | None = None, emit=None) -> None:
                 raise LoadError(f"import {import_id} is already loaded")
             _check_load_status(cur, import_id)
             cur.execute("UPDATE import_batch SET status='loading' WHERE import_id=%s", (import_id,))
-            versions = _load(cur, import_id, emit)
+            versions, timings = _load(cur, import_id, emit)
             cur.execute("INSERT INTO decision_log(import_id,step,detail) VALUES (%s,'load_report',%s)",
-                        (import_id, Json({"versions": versions, "staging_dropped": None})))
+                        (import_id, Json({"versions": versions, "timings": timings, "staging_dropped": None})))
             conn.commit()
         import os
         dropped = os.getenv("EBA_DROP_STAGING_AFTER_LOAD", "true").lower() != "false"

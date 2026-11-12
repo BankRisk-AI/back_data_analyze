@@ -22,6 +22,7 @@ class ValidationIssue:
     affected_rows: int = 0
     detail: str = ""
     examples: list[dict] = field(default_factory=list)
+    seconds: float = 0.0
 
 
 @dataclass

@@ -24,11 +24,12 @@ def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="EBA Analyst worker")
     parser.add_argument("--poll", type=float, default=1.0)
     parser.add_argument("--stale-after", type=int, default=900, help="seconds without heartbeat after which a processing job is requeued")
+    parser.add_argument("--max-attempts", type=int, default=3)
     args = parser.parse_args(argv)
 
     configure_logging()
     logger.info("worker starting poll_interval=%s stale_after=%s", args.poll, args.stale_after)
-    Worker(build_registry(), poll_interval=args.poll, stale_after=args.stale_after, schema=get_schema()).run()
+    Worker(build_registry(), poll_interval=args.poll, stale_after=args.stale_after, max_attempts=args.max_attempts, schema=get_schema()).run()
 
 
 if __name__ == "__main__":

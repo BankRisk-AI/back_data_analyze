@@ -34,7 +34,7 @@ def report_to_dict(r: ValidationReport) -> dict:
             {"file_id": f.file_id, "file_name": f.file_name, "file_type": f.file_type, "rows": f.rows,
              "errors": f.count("error"), "warnings": f.count("warning"), "infos": f.count("info"),
              "issues": [{"rule": i.rule, "title": i.title, "severity": i.severity, "status": "passed" if i.passed else "failed",
-                         "affected_rows": i.affected_rows, "detail": i.detail, "examples": i.examples} for i in f.issues]}
+                         "affected_rows": i.affected_rows, "detail": i.detail, "examples": i.examples, "seconds": i.seconds} for i in f.issues]}
             for f in r.files
         ],
     }
@@ -86,7 +86,10 @@ def run_validation(import_id: int, schema: str | None = None, emit=None) -> Vali
             fv = FileValidation(ds.file_id, ds.file_name, ds.file_type, cur.fetchone()[0])
             for rule_id, fn in RULE_FUNCTIONS:
                 emit(f"{ds.file_name}: {rule_id}", 5 + int(90 * done / steps))
-                fv.issues.append(fn(cur, ds))
+                rule_started = time.perf_counter()
+                issue = fn(cur, ds)
+                issue.seconds = round(time.perf_counter() - rule_started, 2)
+                fv.issues.append(issue)
                 done += 1
             report.files.append(fv)
         report.generated_at = datetime.now(timezone.utc).isoformat()

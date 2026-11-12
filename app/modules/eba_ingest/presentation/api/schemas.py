@@ -26,6 +26,7 @@ class FileModel(BaseModel):
     reason: str | None = Field(default=None, description="Why the file was not recognised")
     staging_table: str | None = Field(default=None, examples=["staging.f6"])
     file_id: int | None = None
+    seconds: float = 0.0
     pairs: list[PairModel] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
 

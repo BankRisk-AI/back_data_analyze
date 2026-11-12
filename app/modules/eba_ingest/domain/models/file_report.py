@@ -26,6 +26,7 @@ class FileReport:
     reason: str | None = None
     staging_table: str | None = None
     file_id: int | None = None
+    seconds: float = 0.0
 
     pairs: list[PairReport] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)

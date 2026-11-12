@@ -10,7 +10,7 @@ from app.modules.eba_ingest.infrastructure.database import repositories as repo
 from app.modules.eba_ingest.application.load_service import run_load
 
 
-def handle_validate(job: Job, progress: ProgressReporter, schema: str | None = None) -> None:
+def handle_stage(job: Job, progress: ProgressReporter, schema: str | None = None) -> None:
     """Reads the files registered for the import and loads them into staging tables, reporting real progress."""
     schema = schema or job.schema or get_schema()
     try:
@@ -32,7 +32,19 @@ def _mark_import(import_id: int, schema: str, status: str) -> None:
         conn.close()
 
 
+def handle_give_up(job: Job) -> None:
+    conn = connect(job.schema)
+    try:
+        with conn, conn.cursor() as cur:
+            cur.execute("SELECT status FROM import_batch WHERE import_id = %s FOR UPDATE", (job.import_id,))
+            row = cur.fetchone()
+            if row and row[0] != "loaded":
+                repo.set_import_status(cur, job.import_id, "failed")
+    finally:
+        conn.close()
+
+
 def register_handlers(registry: JobHandlerRegistry, storage_dir: str | None = None, schema: str | None = None, max_bytes: int | None = None) -> None:
     """storage_dir and max_bytes are accepted for compatibility: the worker no longer stores files, the API does."""
-    registry.register("validate", lambda job, progress: handle_validate(job, progress, schema))
-    registry.register("load", lambda job, progress: run_load(job.import_id, schema or job.schema, progress))
+    registry.register("stage", lambda job, progress: handle_stage(job, progress, schema), handle_give_up)
+    registry.register("load", lambda job, progress: run_load(job.import_id, schema or job.schema, progress), handle_give_up)

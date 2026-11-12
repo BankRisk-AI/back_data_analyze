@@ -1,6 +1,8 @@
 """Integration test on the ORIGINAL 2020 EBA files. Skipped when the folder is not available (set EBA_REAL_DIR)."""
-import os, pytest
+import os, time, pytest
 from app.modules.eba_ingest import ingest
+from app.modules.eba_ingest.application.load_service import run_load
+from app.modules.eba_processing.application.validation import run_validation
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -26,7 +28,9 @@ def test_original_2020_files_exist():
 
 
 def test_original_2020_files(db):
+    started = time.perf_counter()
     r = ingest([os.path.join(REAL, f) for f in FILES], db.storage, user_id=1, edition_label="2020", schema=db.schema)
+    stage_seconds = time.perf_counter() - started
     assert r.status == "uploaded" and all(f.recognised for f in r.files)
     by = {f.file_type: f for f in r.files}
     assert {k: by[k].encoding for k in ("tr_oth", "tr_cre", "tr_mrk")} == {"tr_oth": "cp1252", "tr_cre": "cp1252", "tr_mrk": "cp1252"}   # the files are not UTF-8
@@ -35,4 +39,14 @@ def test_original_2020_files(db):
     assert [(p.year, p.quarter, p.banks) for p in by["tr_oth"].pairs] == [(2020, 1, 131), (2020, 2, 135)]
     assert [(p.rows) for p in by["tr_cre"].pairs] == [182195, 210083]
     db.cur.execute("SELECT count(*) FROM source_file WHERE length(sha256) = 64 AND stored_path IS NOT NULL"); assert db.cur.fetchone()[0] == 5
-    assert r.seconds < 60
+    assert stage_seconds <= 60
+
+    started = time.perf_counter()
+    validation = run_validation(r.import_id, db.schema)
+    validation_seconds = time.perf_counter() - started
+    assert validation.can_proceed and validation_seconds <= 90
+
+    started = time.perf_counter()
+    run_load(r.import_id, db.schema)
+    load_seconds = time.perf_counter() - started
+    assert load_seconds <= 120

@@ -49,6 +49,7 @@ class JobInfo(BaseModel):
     kind: str
     status: str
     progress: int
+    attempts: int
     message: str | None = None
     error: str | None = None
     created_at: str
@@ -110,9 +111,10 @@ def build_system_router(schema: str, version: str, module_names: list[str], job_
 
     def _job(row) -> JobInfo:
         return JobInfo(job_id=row[0], import_id=row[1], kind=row[2], status=row[3], progress=row[4] or 0, message=row[5], error=row[6],
-                       created_at=row[7].isoformat(), started_at=row[8].isoformat() if row[8] else None, finished_at=row[9].isoformat() if row[9] else None)
+                       created_at=row[8].isoformat(), started_at=row[9].isoformat() if row[9] else None, finished_at=row[10].isoformat() if row[10] else None,
+                       attempts=row[7])
 
-    cols = "job_id, import_id, kind, status, progress, message, error, created_at, started_at, finished_at"
+    cols = "job_id, import_id, kind, status, progress, message, error, attempts, created_at, started_at, finished_at"
 
     @router.get("/jobs/{job_id}", response_model=JobInfo, operation_id="get_job", summary="State of any job", responses=problem_responses(404))
     def get_job(job_id: int):

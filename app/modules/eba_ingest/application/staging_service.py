@@ -81,10 +81,12 @@ def inspect_file(f: repo.SourceFileRow) -> Inspection:
 
 
 def stage_file(cur, insp: Inspection) -> None:
+    started = time.perf_counter()
     rep = insp.report
     rep.rows = staging.create_and_copy(cur, rep.file_id, insp.columns, insp.rows, rep.name)
     rep.staging_table = staging_qualified(rep.file_id)
     fill_period_report(cur, staging_identifier(rep.file_id), rep)
+    rep.seconds = round(time.perf_counter() - started, 2)
 
 
 def _process(cur, import_id: int, files: list[repo.SourceFileRow], emit, job_id: int | None, user_id: int | None, t0: float) -> IngestReport:

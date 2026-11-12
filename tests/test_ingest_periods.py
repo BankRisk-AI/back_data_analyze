@@ -27,7 +27,7 @@ def test_worker_path_gives_the_same_report_as_the_synchronous_path(db):
     iid = enqueue_import([p], db.storage, schema=db.schema)
     Worker(build_registry(), schema=db.schema, poll_interval=0).process_one()
     got = get_import(iid, db.schema)
-    strip = lambda f: {k: v for k, v in f.items() if k not in ("file_id", "staging_table")}
+    strip = lambda f: {k: v for k, v in f.items() if k not in ("file_id", "staging_table", "seconds")}
     assert [strip(f) for f in got["files"]] == [strip(f) for f in sync.to_dict()["files"]]
     assert (got["status"], got["job_status"], got["progress"], got["has_staging"]) == ("uploaded", "completed", 100, True)
 

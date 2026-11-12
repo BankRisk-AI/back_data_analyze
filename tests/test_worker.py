@@ -11,7 +11,7 @@ def test_worker_claims_and_completes_pending_import(db):
     import_id = enqueue_import([path], db.storage, schema=db.schema)
     calls = []
     registry = JobHandlerRegistry()
-    registry.register("validate", lambda job, progress: calls.append(job.import_id))
+    registry.register("stage", lambda job, progress: calls.append(job.import_id))
     worker = Worker(registry, schema=db.schema, poll_interval=0)
 
     assert worker.process_one() is True
