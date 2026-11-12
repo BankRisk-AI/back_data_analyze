@@ -8,9 +8,7 @@ import pytest
 
 from dotenv import load_dotenv
 from psycopg2 import sql
-from urllib.parse import urlsplit, urlunsplit
-
-from app.modules.eba_ingest import init_db
+from app.core.database import init_database
 
 
 # ---------------------------------------------------------
@@ -20,10 +18,8 @@ from app.modules.eba_ingest import init_db
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(PROJECT_ROOT / ".env")
 
-DATABASE_URL = os.getenv("DATABASE_URL")
-
-TEST_DATABASE = "eba_test"
-SCHEMA = "ing_test"
+TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL")
+SCHEMA = "public"
 
 HEADER = "LEI_Code,NSA,Period,Item,Label,Amount,footnote\n"
 
@@ -34,118 +30,30 @@ HEADER = "LEI_Code,NSA,Period,Item,Label,Amount,footnote\n"
 
 @pytest.fixture(scope="session")
 def database_url():
-    """
-    Creates an isolated PostgreSQL database for the test session.
-    Removes it after all tests have finished.
-    """
+    if not TEST_DATABASE_URL:
+        pytest.skip("TEST_DATABASE_URL is not configured")
 
-    if not DATABASE_URL:
-        pytest.fail("DATABASE_URL is missing from .env")
-
-    config = urlsplit(DATABASE_URL)
-
-    if config.path.lstrip("/") == TEST_DATABASE:
-        pytest.fail(
-            "DATABASE_URL points to the test database. "
-            "Tests must use a separate development database."
-        )
-
-    # Connect to PostgreSQL maintenance database.
-    admin_database_url = urlunsplit(config._replace(path="/postgres"))
-
+    conn = psycopg2.connect(TEST_DATABASE_URL)
+    conn.autocommit = True
     try:
-        admin_conn = psycopg2.connect(admin_database_url)
-    except psycopg2.Error as exc:
-        pytest.fail(f"Cannot connect to PostgreSQL: {exc}")
-
-    admin_conn.autocommit = True
-
-    try:
-        with admin_conn.cursor() as cur:
-            # Remove an old test database, if it exists.
-            cur.execute(
-                """
-                SELECT pg_terminate_backend(pid)
-                FROM pg_stat_activity
-                WHERE datname = %s
-                  AND pid <> pg_backend_pid()
-                """,
-                (TEST_DATABASE,),
-            )
-
-            cur.execute(
-                sql.SQL("DROP DATABASE IF EXISTS {}").format(
-                    sql.Identifier(TEST_DATABASE)
-                )
-            )
-
-            # Create a fresh test database.
-            cur.execute(
-                sql.SQL("CREATE DATABASE {}").format(
-                    sql.Identifier(TEST_DATABASE)
-                )
-            )
-
-    except psycopg2.Error as exc:
-        pytest.fail(
-            "Could not create the test database. "
-            "The PostgreSQL user needs CREATEDB permission. "
-            f"Details: {exc}"
-        )
-    finally:
-        admin_conn.close()
-
-    test_database_url = urlunsplit(config._replace(path=f"/{TEST_DATABASE}"))
-
-    try:
-        # Create the application schema.
-        conn = psycopg2.connect(test_database_url)
-        conn.autocommit = True
-
         with conn.cursor() as cur:
-            cur.execute(
-                sql.SQL("CREATE SCHEMA {}").format(
-                    sql.Identifier(SCHEMA)
-                )
-            )
-
+            cur.execute("DROP SCHEMA IF EXISTS staging CASCADE")
+            cur.execute("DROP SCHEMA IF EXISTS public CASCADE")
+            cur.execute("CREATE SCHEMA public")
+            cur.execute("CREATE SCHEMA staging")
+    finally:
         conn.close()
 
-        # Initialize application tables and staging schema.
-        previous_database_url = os.environ.get("DATABASE_URL")
-        os.environ["DATABASE_URL"] = test_database_url
-        init_db(SCHEMA)
-
-        yield test_database_url
-
+    previous_database_url = os.environ.get("DATABASE_URL")
+    os.environ["DATABASE_URL"] = TEST_DATABASE_URL
+    try:
+        init_database(SCHEMA)
+        yield TEST_DATABASE_URL
     finally:
-        # Drop the test database after the test session.
         if previous_database_url is None:
             os.environ.pop("DATABASE_URL", None)
         else:
             os.environ["DATABASE_URL"] = previous_database_url
-        cleanup_conn = psycopg2.connect(admin_database_url)
-        cleanup_conn.autocommit = True
-
-        try:
-            with cleanup_conn.cursor() as cur:
-                cur.execute(
-                    """
-                    SELECT pg_terminate_backend(pid)
-                    FROM pg_stat_activity
-                    WHERE datname = %s
-                      AND pid <> pg_backend_pid()
-                    """,
-                    (TEST_DATABASE,),
-                )
-
-                cur.execute(
-                    sql.SQL("DROP DATABASE IF EXISTS {}").format(
-                        sql.Identifier(TEST_DATABASE)
-                    )
-                )
-        finally:
-            cleanup_conn.close()
 
 
 # ---------------------------------------------------------

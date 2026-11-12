@@ -42,7 +42,7 @@ def migrate(schema: str = "public", modules: dict[str, Path] | None = None) -> l
             cur.execute("SELECT version FROM schema_migrations")
             done = {r[0] for r in cur.fetchall()}
             if not done:                                                            # a database created before migrations existed
-                cur.execute("SELECT to_regclass('import_batch') IS NOT NULL")
+                cur.execute("SELECT to_regclass(%s) IS NOT NULL", (f"{schema}.import_batch",))
                 if cur.fetchone()[0]:
                     cur.execute("INSERT INTO schema_migrations(version) VALUES ('core/001_baseline')"); done.add("core/001_baseline")
             for m in discover(modules):
