@@ -2,6 +2,7 @@ import pytest
 
 from app.core.worker import Worker
 from app.modules.eba_ingest import drop_staging
+from app.modules.eba_ingest.application.queries import StagingInUse
 from app.modules.eba_processing.application import validation as V
 from app.modules.eba_processing.application.validation import NothingToValidate, report_to_dict
 from app.worker import build_registry
@@ -98,7 +99,11 @@ def test_the_worker_runs_the_validation_job_with_progress(db):
 def test_a_failing_validation_marks_the_job_failed(db):
     imp, _ = stage(db, banks(5))
     q = V.enqueue_validation(imp, db.schema)
+    with pytest.raises(StagingInUse):
+        drop_staging(imp, db.schema)
+    db.cur.execute("UPDATE job SET status='completed' WHERE job_id=%s", (q["job_id"],))
     drop_staging(imp, db.schema)                                                                                      # the data disappear before the worker runs
+    db.cur.execute("UPDATE job SET status='pending' WHERE job_id=%s", (q["job_id"],))
     Worker(build_registry(), schema=db.schema, poll_interval=0).process_one()
     st = V.get_validation(imp, db.schema)
     assert st["job"]["job_id"] == q["job_id"] and st["job"]["status"] == "failed" and "no staging tables" in st["job"]["error"] and st["report"] is None

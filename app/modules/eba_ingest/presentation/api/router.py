@@ -72,7 +72,7 @@ def build_router(storage_dir: str | None = None, schema: str | None = None, max_
         return report
 
     @router.delete("/imports/{import_id}/staging", response_model=DroppedStaging, operation_id="drop_staging", summary="Drop the staging tables of an import",
-                   responses=problem_responses(404))
+                   responses=problem_responses(404, 409))
     def drop(import_id: int):
         """The stored original files are never touched."""
         if get_import(import_id, schema) is None:

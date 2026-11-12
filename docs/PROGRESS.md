@@ -3,14 +3,16 @@
 ## Done
 
 - Stage 0: make the project installable and testable (2026-11-12)
+- Stage 1a: set-based staging-to-fact promotion (2026-11-12); measured
+  benchmark improved from about 34.1s to about 4.8s for 100,000 rows on the local
+  PostgreSQL setup (promotion-only measurement)
+- Stage 1b: fact uniqueness and data-safety guards (2026-11-12)
 
 ## Next step
 
-- Stage 1: set-based load via INSERT...SELECT from staging without fetchall;
-  unique key on fact_* via migration 004; load only from validated/approved;
-  block DELETE staging while a job is active; job attempt limit; remove
-  duplicate endpoints `/api/periods` and `/api/versions/...` from
-  `eba_processing`; rename job kind `validate` -> `stage` with migration.
+- Stage 1c: job attempt limit; remove duplicate endpoints `/api/periods` and
+  `/api/versions/...` from `eba_processing`; rename job kind `validate` ->
+  `stage` with a migration updating existing job rows.
 
 ## Backlog
 

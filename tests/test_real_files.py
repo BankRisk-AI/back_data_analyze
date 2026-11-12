@@ -1,9 +1,29 @@
 """Integration test on the ORIGINAL 2020 EBA files. Skipped when the folder is not available (set EBA_REAL_DIR)."""
 import os, pytest
 from app.modules.eba_ingest import ingest
-REAL = os.environ.get("EBA_REAL_DIR", "/mnt/user-data/uploads")
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+REAL = Path(
+    os.getenv("EBA_REAL_DIR", str(PROJECT_ROOT / "eba_data"))
+)
+
 FILES = ["tr_oth_2.csv", "tr_cre_2.csv", "tr_mrk_2.csv", "SDD_2.xlsx", "TR_Metadata_2.xlsx"]
 pytestmark = pytest.mark.skipif(not all(os.path.exists(os.path.join(REAL, f)) for f in FILES), reason="original EBA files not found")
+
+
+def test_original_2020_files_exist():
+    missing = [
+        filename
+        for filename in FILES
+        if not (REAL / filename).is_file()
+    ]
+
+    assert not missing, (
+        f"Missing EBA 2020 files in {REAL}: {missing}"
+    )
+
 
 def test_original_2020_files(db):
     r = ingest([os.path.join(REAL, f) for f in FILES], db.storage, user_id=1, edition_label="2020", schema=db.schema)

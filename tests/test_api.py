@@ -37,6 +37,13 @@ def test_list_and_detail_and_drop_staging(client, db):
     assert client.delete(f"/api/imports/{iid}/staging").json() == {"dropped": 1}
     assert client.get(f"/api/imports/{iid}").json()["has_staging"] is False and client.get("/api/imports").json()[0]["has_staging"] is False
 
+def test_drop_staging_is_blocked_while_job_is_pending(client, db):
+    iid = post(client, db).json()["import_id"]
+    response = client.delete(f"/api/imports/{iid}/staging")
+    assert response.status_code == 409 and response.json()["type"] == "staging-in-use"
+    ImportWorker(db.storage, db.schema, poll_interval=0).process_one()
+    assert client.delete(f"/api/imports/{iid}/staging").status_code == 200
+
 def test_problem_details_for_refusals(client, db):
     first = post(client, db).json()["import_id"]
     db.cur.execute("UPDATE import_batch SET status = 'loaded' WHERE import_id = %s", (first,))

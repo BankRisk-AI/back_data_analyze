@@ -9,6 +9,7 @@ from pathlib import Path
 
 from openpyxl import load_workbook
 from psycopg2 import sql
+from psycopg2.errors import UniqueViolation
 from psycopg2.extras import Json
 
 from app.core.config import get_schema
@@ -16,15 +17,58 @@ from app.core.database import connect
 from app.core.exceptions import AppError
 from app.modules.eba_ingest.infrastructure.database import repositories as repo
 from app.shared.staging import staging_identifier
+from app.shared.sql.predicates import aggregate_rows_predicate, blank_text, numeric_amount
 
 LOAD_KIND = "load"
-NUMBER = r"^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$"
-
-
 class LoadError(AppError):
     kind = "load-error"
     status = 409
     title = "Import could not be loaded"
+
+
+def _check_load_status(cur, import_id: int) -> None:
+    cur.execute("SELECT status FROM import_batch WHERE import_id=%s", (import_id,))
+    row = cur.fetchone()
+    if not row:
+        raise LoadError(f"import {import_id} does not exist")
+    status = row[0]
+    if status in ("validated", "approved"):
+        return
+    if status != "failed":
+        raise LoadError(f"import {import_id} cannot be loaded: status is {status}; expected validated or approved")
+
+    cur.execute(
+        "SELECT kind, status FROM job WHERE import_id=%s ORDER BY job_id DESC LIMIT 2",
+        (import_id,),
+    )
+    jobs = cur.fetchall()
+    retry_job = jobs and jobs[0] == ("load", "failed")
+    retry_job = retry_job or (
+        jobs
+        and jobs[0] == ("load", "processing")
+        and len(jobs) > 1
+        and jobs[1] == ("load", "failed")
+    )
+    if not retry_job:
+        raise LoadError(f"import {import_id} cannot be retried: latest job is not a failed load")
+
+    cur.execute(
+        "SELECT detail FROM decision_log WHERE import_id=%s AND step='validation_report' ORDER BY log_id DESC LIMIT 1",
+        (import_id,),
+    )
+    report = cur.fetchone()
+    if not report or not (report[0] or {}).get("summary", {}).get("can_proceed", False):
+        raise LoadError(f"import {import_id} cannot be retried: latest validation report does not allow proceeding")
+
+    cur.execute(
+        """SELECT count(*) FROM source_file
+           WHERE import_id=%s AND file_type IN ('tr_oth','tr_cre','tr_mrk')
+             AND to_regclass(%s || '.f' || file_id) IS NULL""",
+        (import_id, "staging"),
+    )
+    missing = cur.fetchone()[0]
+    if missing:
+        raise LoadError(f"import {import_id} cannot be retried: {missing} data staging table(s) are missing")
 
 
 def enqueue_load(import_id: int, schema: str | None = None) -> dict:
@@ -33,12 +77,9 @@ def enqueue_load(import_id: int, schema: str | None = None) -> dict:
         with conn, conn.cursor() as cur:
             cur.execute("SELECT status FROM import_batch WHERE import_id=%s", (import_id,))
             row = cur.fetchone()
-            if not row:
-                raise LoadError(f"import {import_id} does not exist")
-            if row[0] == "loaded":
+            if row and row[0] == "loaded":
                 raise LoadError(f"import {import_id} is already loaded")
-            if row[0] not in ("validated", "failed", "approved"):
-                raise LoadError(f"import {import_id} is not ready for load: {row[0]}")
+            _check_load_status(cur, import_id)
             cur.execute("SELECT job_id,status FROM job WHERE import_id=%s AND kind=%s AND status IN ('pending','processing') ORDER BY job_id DESC LIMIT 1", (import_id, LOAD_KIND))
             active = cur.fetchone()
             if active:
@@ -125,15 +166,6 @@ def _metadata(path: str):
     return out
 
 
-def _amount(value):
-    return None if value is None or not str(value).strip() else float(value) if re.fullmatch(NUMBER, str(value).strip()) else None
-
-
-def _column(cur, table: str, name: str):
-    cur.execute("SELECT 1 FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = %s AND column_name = %s", (table, name))
-    return cur.fetchone() is not None
-
-
 def _load(cur, import_id: int, emit):
     cur.execute("SELECT status, edition_label, created_by FROM import_batch WHERE import_id = %s FOR UPDATE", (import_id,))
     head = cur.fetchone()
@@ -150,10 +182,26 @@ def _load(cur, import_id: int, emit):
         raise LoadError("no tr_oth, tr_cre or tr_mrk data files")
     paths = _reference_files(cur, import_id)
     sdd_map, label_map = _sdd(paths["SDD"], head[1], {x[1] for x in data}) if "SDD" in paths else ({}, {})
-    for fid, typ, _ in data:
-        if not all(_column(cur, {"tr_oth": "fact_oth", "tr_cre": "fact_cre", "tr_mrk": "fact_mrk"}[typ], c)
-                   for c in ("amount", "version_id", "bank_id", "indicator_id")):
-            raise LoadError("schema-mismatch")
+    target_tables = {"tr_oth": "fact_oth", "tr_cre": "fact_cre", "tr_mrk": "fact_mrk"}
+    source_only = {"lei_code", "nsa", "period", "item", "label"}
+    target_columns: dict[str, list[str]] = {}
+    staging_columns: dict[int, list[str]] = {}
+    for fid, typ, name in data:
+        table = staging_identifier(fid)
+        cur.execute(sql.SQL("SELECT * FROM {} LIMIT 0").format(table))
+        columns = [d[0] for d in cur.description]
+        staging_columns[fid] = columns
+        cur.execute(
+            """SELECT column_name FROM information_schema.columns
+               WHERE table_schema = current_schema() AND table_name = %s
+               ORDER BY ordinal_position""",
+            (target_tables[typ],),
+        )
+        target_columns[typ] = [r[0] for r in cur.fetchall()]
+        unknown = [c for c in columns if c not in source_only and c not in target_columns[typ]]
+        if unknown:
+            raise LoadError(f"schema-mismatch: {', '.join(unknown)}")
+
     emit("resolving banks and indicators", 10)
     for lei, name, country, finrep, previous in _metadata(paths.get("TR_Metadata", "")):
         cur.execute("""INSERT INTO bank(lei,name,country_code,finrep_reported,previous_leis)
@@ -161,40 +209,69 @@ def _load(cur, import_id: int, emit):
                        ON CONFLICT (lei) DO UPDATE SET name=EXCLUDED.name,country_code=EXCLUDED.country_code,
                        finrep_reported=EXCLUDED.finrep_reported,previous_leis=EXCLUDED.previous_leis""",
                     (lei, name, country, finrep, previous))
-    cur.execute("SELECT bank_id, lei, previous_leis FROM bank")
-    bank_cache = {}
-    for bank_id, current_lei, previous_leis in cur.fetchall():
-        bank_cache[str(current_lei).strip()] = bank_id
-        bank_cache.update({str(lei).strip(): bank_id for lei in (previous_leis or [])})
+    cur.execute("""
+        CREATE TEMP TABLE tmp_load_versions (
+            year integer NOT NULL, quarter integer NOT NULL, version_id integer NOT NULL,
+            PRIMARY KEY (year, quarter)
+        ) ON COMMIT DROP
+    """)
+    cur.execute("""
+        CREATE TEMP TABLE tmp_load_banks (
+            lei text PRIMARY KEY, bank_id integer NOT NULL
+        ) ON COMMIT DROP
+    """)
+    cur.execute("""
+        CREATE TEMP TABLE tmp_load_items (
+            file_group text NOT NULL, item text NOT NULL, label text NOT NULL,
+            indicator_id integer NOT NULL, PRIMARY KEY (file_group, item, label)
+        ) ON COMMIT DROP
+    """)
+    non_aggregate = aggregate_rows_predicate()
+    for fid, typ, _ in data:
+        table = staging_identifier(fid)
+        cur.execute(sql.SQL("""
+            WITH source_leis AS (
+                SELECT DISTINCT btrim(s.lei_code) AS lei
+                FROM {} s
+                WHERE NOT {} AND btrim(s.lei_code) <> ''
+            )
+            INSERT INTO bank(lei)
+            SELECT l.lei
+            FROM source_leis l
+            WHERE NOT EXISTS (
+                  SELECT 1 FROM bank b
+                  WHERE btrim(b.lei) = l.lei
+                     OR EXISTS (SELECT 1 FROM unnest(b.previous_leis) p
+                                WHERE btrim(p) = l.lei)
+              )
+            ON CONFLICT (lei) DO NOTHING
+        """).format(table, sql.SQL(non_aggregate)))
+        cur.execute(sql.SQL("""
+            WITH source_leis AS (
+                SELECT DISTINCT btrim(s.lei_code) AS lei
+                FROM {} s
+                WHERE NOT {}
+            )
+            INSERT INTO tmp_load_banks(lei, bank_id)
+            SELECT l.lei, b.bank_id
+            FROM source_leis l
+            JOIN bank b ON btrim(b.lei) = l.lei
+                OR EXISTS (SELECT 1 FROM unnest(b.previous_leis) p
+                           WHERE btrim(p) = l.lei)
+            ON CONFLICT (lei) DO NOTHING
+        """).format(table, sql.SQL(non_aggregate)))
+
     indicator_cache = {}
     cur.execute("SELECT indicator_id, std_code FROM indicator")
     indicator_cache.update({code: indicator_id for indicator_id, code in cur.fetchall()})
-    target_tables = {"tr_oth": "fact_oth", "tr_cre": "fact_cre", "tr_mrk": "fact_mrk"}
-    target_columns = {}
-    for typ, target in target_tables.items():
-        cur.execute("""SELECT column_name FROM information_schema.columns
-                       WHERE table_schema = current_schema() AND table_name = %s""", (target,))
-        target_columns[typ] = {r[0] for r in cur.fetchall()}
     versions = {}
     resolution = Counter()
     quality = defaultdict(dict)
     for fid, typ, name in data:
         table = staging_identifier(fid)
-        cur.execute(sql.SQL("SELECT * FROM {}").format(table))
-        columns = [d[0] for d in cur.description]
-        rows = cur.fetchall()
-        total_rows = len(rows)
-        period_idx = columns.index("period")
-        lei_idx = columns.index("lei_code")
-        item_idx = columns.index("item")
-        label_idx = columns.index("label") if "label" in columns else None
-        amount_idx = columns.index("amount")
-        bucket = 0
-        for row_number, row in enumerate(rows, 1):
-            lei, country, period = str(row[lei_idx] or "").strip(), str(row[columns.index("nsa")] or "").strip(), str(row[period_idx] or "").strip()
-            if re.fullmatch(r"x+", lei, re.I) or country.upper() == "OT":
-                bucket += 1
-                continue
+        cur.execute(sql.SQL("SELECT DISTINCT btrim(period) FROM {} WHERE NOT {}").format(table, sql.SQL(non_aggregate)))
+        periods = [row[0] or "" for row in cur.fetchall()]
+        for period in periods:
             if not re.fullmatch(r"\d{6}", period):
                 raise LoadError(f"invalid period in {name}")
             year, month = int(period[:4]), int(period[4:])
@@ -206,27 +283,34 @@ def _load(cur, import_id: int, emit):
                 old = cur.fetchone()
                 if old:
                     cur.execute("UPDATE dataset_version SET is_active=false WHERE version_id=%s", old)
-                last = cur.execute("SELECT 1")  # keep transaction explicit
                 cur.execute("SELECT COALESCE(max(version_no),0)+1 FROM dataset_version WHERE year=%s AND quarter=%s", key)
                 version_no = cur.fetchone()[0]
                 cur.execute("""INSERT INTO dataset_version(year,quarter,period_end,import_id,version_no,is_active,quality)
                                VALUES (%s,%s,%s,%s,%s,true,%s) RETURNING version_id""",
                             (year, quarter, date(year, month, calendar.monthrange(year, month)[1]), import_id, version_no, Json({"validation": {}, "files": []})))
                 versions[key] = cur.fetchone()[0]
-            item = str(row[item_idx] or "").strip()
-            group = typ.replace("tr_", "")
+        if versions:
+            cur.execute("INSERT INTO tmp_load_versions(year,quarter,version_id) VALUES " +
+                        ",".join(["(%s,%s,%s)"] * len(versions)) + " ON CONFLICT DO NOTHING",
+                        [value for key, value in versions.items() for value in (key[0], key[1], value)])
+
+        group = typ.replace("tr_", "")
+        cur.execute(sql.SQL("SELECT btrim(item), coalesce(btrim(label), ''), count(*) FROM {} WHERE NOT {} GROUP BY 1,2")
+                    .format(table, sql.SQL(non_aggregate)))
+        for item, label, count in cur.fetchall():
+            item, label = item or "", label or ""
             info = sdd_map.get(item)
             method = "sdd" if info else "label"
-            if not info and label_idx is not None:
-                std = label_map.get((group, str(row[label_idx] or "").strip()))
+            if not info:
+                std = label_map.get((group, label))
                 info = sdd_map.get(std) if std else None
             if not info:
                 method = "own"
                 std = item
-                info = {"label": str(row[label_idx] or item).strip() if label_idx is not None else item, "group": group, "category": "Unclassified"}
+                info = {"label": label or item, "group": group, "category": "Unclassified"}
             else:
                 std = info.get("std_code", item)
-            resolution[method] += 1
+            resolution[method] += count
             indicator = indicator_cache.get(std)
             if indicator is None:
                 cur.execute("""INSERT INTO indicator(std_code,label,report_type,file_group,aggregation_rule)
@@ -234,45 +318,56 @@ def _load(cur, import_id: int, emit):
                                RETURNING indicator_id""",
                             (std, info["label"], info.get("category") or "Unclassified", group,
                              "ratio" if "ratio" in info["label"].lower() else "flow" if info.get("category") == "P&L" else "stock"))
-                indicator = cur.fetchone()
-                if indicator is None:
+                indicator_row = cur.fetchone()
+                if indicator_row is None:
                     cur.execute("SELECT indicator_id FROM indicator WHERE std_code=%s", (std,))
-                    indicator = cur.fetchone()
-                indicator = indicator[0]
+                    indicator_row = cur.fetchone()
+                indicator = indicator_row[0]
                 indicator_cache[std] = indicator
-            bank_id = bank_cache.get(lei)
-            if bank_id is None:
-                cur.execute("INSERT INTO bank(lei) VALUES (%s) ON CONFLICT (lei) DO NOTHING RETURNING bank_id", (lei,))
-                bank_row = cur.fetchone()
-                if bank_row is None:
-                    cur.execute("SELECT bank_id FROM bank WHERE lei=%s", (lei,))
-                    bank_row = cur.fetchone()
-                bank_id = bank_row[0]
-                bank_cache[lei] = bank_id
-            vals = {c: row[columns.index(c)] if c in columns else None for c in columns}
-            target = target_tables[typ]
-            source_only = {"lei_code", "nsa", "period", "item", "label"}
-            unknown = [c for c in columns if c not in source_only and c not in target_columns[typ]]
-            if unknown:
-                raise LoadError(f"schema-mismatch: {', '.join(unknown)}")
-            allowed = [c for c in columns if c not in source_only]
-            fields = ["version_id", "bank_id", "indicator_id"] + allowed
-            def typed(c):
-                value = str(vals[c] or "").strip()
-                if not value:
-                    return None
-                if c == "amount":
-                    return _amount(value)
-                if c == "n_quarters":
-                    return int(value) if re.fullmatch(r"[+-]?\d+", value) else None
-                return value
-            values = [versions[key], bank_id, indicator] + [typed(c) for c in allowed]
-            placeholders = sql.SQL(",").join(sql.Placeholder() for _ in fields)
-            cur.execute(sql.SQL("INSERT INTO {} ({}) VALUES ({})").format(sql.Identifier(target), sql.SQL(",").join(map(sql.Identifier, fields)), placeholders), values)
-            if row_number == total_rows or row_number % 10000 == 0:
-                emit(f"loading {name}: {row_number}/{total_rows}", 25 + int(45 * row_number / max(total_rows, 1)))
-        quality[typ] = {"file": name, "rows_staged": len(rows), "aggregate_rows_excluded": bucket,
-                        "rows_loaded": len(rows) - bucket, "amount_sum": sum(_amount(r[amount_idx]) or 0 for r in rows if not (re.fullmatch(r"x+", str(r[lei_idx] or "").strip(), re.I) or str(r[columns.index("nsa")] or "").upper() == "OT"))}
+            cur.execute("INSERT INTO tmp_load_items(file_group,item,label,indicator_id) VALUES (%s,%s,%s,%s) ON CONFLICT DO NOTHING",
+                        (group, item, label, indicator))
+
+        columns = staging_columns[fid]
+        allowed = [c for c in target_columns[typ] if c in columns]
+        fields = ["version_id", "bank_id", "indicator_id"] + allowed
+        expressions = ["tv.version_id", "tb.bank_id", "ti.indicator_id"]
+        for column in allowed:
+            quoted = sql.Identifier(column).as_string(cur)
+            if column == "amount":
+                expressions.append(numeric_amount(quoted))
+            elif column == "n_quarters":
+                expressions.append(f"CASE WHEN {quoted} ~ '^[+-]?\\d+$' THEN {quoted}::smallint END")
+            else:
+                expressions.append(blank_text(quoted))
+        quarter_expr = "((substring(btrim(s.period), 5, 2)::integer - 1) / 3 + 1)"
+        cur.execute("SET LOCAL enable_nestloop = off")
+        cur.execute(sql.SQL("""
+            INSERT INTO {} ({})
+            SELECT {}
+            FROM {} s
+            JOIN tmp_load_versions tv
+              ON tv.year = substring(btrim(s.period), 1, 4)::integer
+             AND tv.quarter = {}
+            JOIN tmp_load_banks tb ON tb.lei = btrim(s.lei_code)
+            JOIN tmp_load_items ti
+              ON ti.file_group = {}
+             AND ti.item = coalesce(btrim(s.item), '')
+             AND ti.label = coalesce(btrim(s.label), '')
+            WHERE NOT {}
+        """).format(sql.Identifier(target_tables[typ]),
+                    sql.SQL(", ").join(map(sql.Identifier, fields)),
+                    sql.SQL(", ").join(sql.SQL(expression) for expression in expressions),
+                    table, sql.SQL(quarter_expr), sql.Literal(group), sql.SQL(non_aggregate)))
+        emit(f"loaded {name}", 70)
+        cur.execute(sql.SQL("""
+            SELECT count(*), count(*) FILTER (WHERE NOT {}),
+                   coalesce(sum({}) FILTER (WHERE NOT {}), 0)
+            FROM {}
+        """).format(sql.SQL(non_aggregate), sql.SQL(numeric_amount("amount")),
+                    sql.SQL(non_aggregate), table))
+        staged, loaded, amount_sum = cur.fetchone()
+        quality[typ] = {"file": name, "rows_staged": staged, "aggregate_rows_excluded": staged - loaded,
+                        "rows_loaded": loaded, "amount_sum": float(amount_sum)}
     for key, version_id in versions.items():
         cur.execute("UPDATE dataset_version SET quality=%s WHERE version_id=%s", (Json({"validation": {}, "files": list(quality.values())}), version_id))
     for typ, report in quality.items():
@@ -299,12 +394,14 @@ def run_load(import_id: int, schema: str | None = None, emit=None) -> None:
                 raise LoadError(f"import {import_id} does not exist")
             if current[0] == "loaded":
                 raise LoadError(f"import {import_id} is already loaded")
+            _check_load_status(cur, import_id)
             cur.execute("UPDATE import_batch SET status='loading' WHERE import_id=%s", (import_id,))
             versions = _load(cur, import_id, emit)
             cur.execute("INSERT INTO decision_log(import_id,step,detail) VALUES (%s,'load_report',%s)",
                         (import_id, Json({"versions": versions, "staging_dropped": None})))
             conn.commit()
-        dropped = __import__("os").getenv("EBA_DROP_STAGING_AFTER_LOAD", "true").lower() != "false"
+        import os
+        dropped = os.getenv("EBA_DROP_STAGING_AFTER_LOAD", "true").lower() != "false"
         if dropped:
             try:
                 with conn, conn.cursor() as cur:
@@ -314,12 +411,16 @@ def run_load(import_id: int, schema: str | None = None, emit=None) -> None:
         with conn, conn.cursor() as cur:
             cur.execute("INSERT INTO decision_log(import_id,step,detail) VALUES (%s,'load_report',%s)",
                         (import_id, Json({"staging_dropped": dropped})))
-    except Exception:
+    except Exception as exc:
         conn.rollback()
         failed_conn = connect(schema)
         with failed_conn, failed_conn.cursor() as cur:
             cur.execute("UPDATE import_batch SET status='failed' WHERE import_id=%s AND status <> 'loaded'", (import_id,))
         failed_conn.close()
+        if isinstance(exc, UniqueViolation):
+            constraint = getattr(exc.diag, "constraint_name", "") or ""
+            table = next((name for name in ("fact_oth", "fact_cre", "fact_mrk") if name in constraint), "fact")
+            raise LoadError(f"duplicate-facts: {table}") from exc
         raise
     finally:
         conn.close()

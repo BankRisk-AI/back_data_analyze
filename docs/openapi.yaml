@@ -220,6 +220,11 @@ paths:
           content:
             application/problem+json:
               schema: *id001
+        '409':
+          description: Conflict
+          content:
+            application/problem+json:
+              schema: *id001
         '422':
           description: Invalid request or parameter
           content:

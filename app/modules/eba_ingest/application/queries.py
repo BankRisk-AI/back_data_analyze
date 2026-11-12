@@ -2,7 +2,14 @@
 from __future__ import annotations
 
 from app.core.database import connect
+from app.core.exceptions import AppError
 from app.modules.eba_ingest.infrastructure.database import repositories as repo
+
+
+class StagingInUse(AppError):
+    kind = "staging-in-use"
+    status = 409
+    title = "Staging is in use"
 
 
 def drop_staging(import_id: int, schema: str = "public") -> int:
@@ -10,6 +17,17 @@ def drop_staging(import_id: int, schema: str = "public") -> int:
     conn = connect(schema)
     try:
         with conn, conn.cursor() as cur:
+            cur.execute(
+                """SELECT i.status,
+                          EXISTS (SELECT 1 FROM job j
+                                  WHERE j.import_id=i.import_id
+                                    AND j.status IN ('pending','processing'))
+                   FROM import_batch i WHERE i.import_id=%s FOR UPDATE""",
+                (import_id,),
+            )
+            row = cur.fetchone()
+            if row and (row[0] == "loading" or row[1]):
+                raise StagingInUse(f"import {import_id} staging cannot be dropped while a job is active")
             return repo.drop_staging_tables(cur, import_id)
     finally:
         conn.close()
