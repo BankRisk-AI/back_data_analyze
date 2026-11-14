@@ -1,0 +1,3030 @@
+[
+  {
+    "year": "2015",
+    "edition": "2015",
+    "file": "2015/Credit risk.csv",
+    "kind": "tr_cre",
+    "size_mb": 15.0,
+    "app_recognises_name": false,
+    "standard_name": "tr_cre.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_code",
+      "NSA",
+      "Period",
+      "Item",
+      "Portfolio",
+      "Country",
+      "Country_rank",
+      "Exposure",
+      "Status",
+      "Perf_Status",
+      "AMOUNT"
+    ],
+    "decimal": "dot",
+    "rows": 251666
+  },
+  {
+    "year": "2015",
+    "edition": "2015",
+    "file": "2015/Data_dictionary.xlsx",
+    "kind": "SDD",
+    "size_mb": 0.1,
+    "app_recognises_name": false,
+    "standard_name": "SDD.xlsx",
+    "sheets": [
+      {
+        "sheet": "Data dictionary",
+        "header": [
+          "Collection",
+          "Template No.",
+          "Item",
+          "Item used for 2014 Stress test data",
+          "Item used for 2013 Transparency exercise data",
+          "Category",
+          "Label"
+        ],
+        "rows": 239
+      }
+    ]
+  },
+  {
+    "year": "2015",
+    "edition": "2015",
+    "file": "2015/Market risk.csv",
+    "kind": "tr_mrk",
+    "size_mb": 0.5,
+    "app_recognises_name": false,
+    "standard_name": "tr_mrk.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_code",
+      "NSA",
+      "Period",
+      "Item",
+      "Portfolio",
+      "MKT_Modprod",
+      "Mkt_risk",
+      "AMOUNT"
+    ],
+    "decimal": "dot",
+    "rows": 10710
+  },
+  {
+    "year": "2015",
+    "edition": "2015",
+    "file": "2015/Metadata.xlsx",
+    "kind": "TR_Metadata",
+    "size_mb": 0.1,
+    "app_recognises_name": false,
+    "standard_name": "TR_Metadata.xlsx",
+    "sheets": [
+      {
+        "sheet": "Status",
+        "header": [
+          "2015 EU-wide transparency exercise\nMetadata for the EBA data set"
+        ],
+        "rows": 4
+      },
+      {
+        "sheet": "Perf_status",
+        "header": [
+          "2015 EU-wide transparency exercise\nMetadata for the EBA data set"
+        ],
+        "rows": 6
+      },
+      {
+        "sheet": "Maturity",
+        "header": [
+          "2015 EU-wide transparency exercise\nMetadata for the EBA data set"
+        ],
+        "rows": 10
+      },
+      {
+        "sheet": "Country",
+        "header": [
+          "2015 EU-wide transparency exercise\nMetadata for the EBA data set"
+        ],
+        "rows": 360
+      },
+      {
+        "sheet": "Exposure",
+        "header": [
+          "2015 EU-wide transparency exercise\nMetadata for the EBA data set"
+        ],
+        "rows": 43
+      },
+      {
+        "sheet": "Portfolio",
+        "header": [
+          "2015 EU-wide transparency exercise\nMetadata for the EBA data set"
+        ],
+        "rows": 9
+      },
+      {
+        "sheet": "MKT_modprod",
+        "header": [
+          "2015 EU-wide transparency exercise\nMetadata for the EBA data set"
+        ],
+        "rows": 6
+      },
+      {
+        "sheet": "MKT_risk",
+        "header": [
+          "2015 EU-wide transparency exercise\nMetadata for the EBA data set"
+        ],
+        "rows": 4
+      },
+      {
+        "sheet": "List of Financial Institutions",
+        "header": [
+          "2015 EU-wide transparency exercise\nMetadata for the EBA data set"
+        ],
+        "rows": 106
+      }
+    ]
+  },
+  {
+    "year": "2015",
+    "edition": "2015",
+    "file": "2015/Other templates.csv",
+    "kind": "tr_oth",
+    "size_mb": 0.8,
+    "app_recognises_name": false,
+    "standard_name": "tr_oth.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_code",
+      "NSA",
+      "Period",
+      "Item",
+      "AMOUNT"
+    ],
+    "decimal": "dot",
+    "rows": 17220
+  },
+  {
+    "year": "2015",
+    "edition": "2015",
+    "file": "2015/Sovereign exposures.csv",
+    "kind": "tr_sov",
+    "size_mb": 48.3,
+    "app_recognises_name": false,
+    "standard_name": "tr_sov.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_code",
+      "NSA",
+      "Period",
+      "Item",
+      "Country",
+      "Maturity",
+      "AMOUNT"
+    ],
+    "decimal": "dot",
+    "rows": 1034880
+  },
+  {
+    "year": "2016",
+    "edition": "2016",
+    "file": "2016/SDD.xlsx",
+    "kind": "SDD",
+    "size_mb": 0.0,
+    "app_recognises_name": true,
+    "standard_name": "SDD.xlsx",
+    "sheets": [
+      {
+        "sheet": "SDD",
+        "header": [
+          "Collection",
+          "Item",
+          "Item_TR_2015",
+          "Category",
+          "Label",
+          "DERIVED_TEMPLATE"
+        ],
+        "rows": 260
+      }
+    ]
+  },
+  {
+    "year": "2016",
+    "edition": "2016",
+    "file": "2016/tr_cre.csv",
+    "kind": "tr_cre",
+    "size_mb": 41.2,
+    "app_recognises_name": true,
+    "standard_name": "tr_cre.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "Portfolio",
+      "Country",
+      "Country_rank",
+      "Exposure",
+      "Status",
+      "Perf_Status",
+      "Amount"
+    ],
+    "decimal": "dot",
+    "rows": 316620
+  },
+  {
+    "year": "2016",
+    "edition": "2016",
+    "file": "2016/tr_mrk.csv",
+    "kind": "tr_mrk",
+    "size_mb": 1.6,
+    "app_recognises_name": true,
+    "standard_name": "tr_mrk.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "Portfolio",
+      "MKT_Modprod",
+      "Mkt_risk",
+      "Amount"
+    ],
+    "decimal": "dot",
+    "rows": 13464
+  },
+  {
+    "year": "2016",
+    "edition": "2016",
+    "file": "2016/tr_oth.csv",
+    "kind": "tr_oth",
+    "size_mb": 2.7,
+    "app_recognises_name": true,
+    "standard_name": "tr_oth.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "Amount",
+      "n_quarters"
+    ],
+    "decimal": "dot",
+    "rows": 23496
+  },
+  {
+    "year": "2016",
+    "edition": "2016",
+    "file": "2016/tr_sov.csv",
+    "kind": "tr_sov",
+    "size_mb": 3.6,
+    "app_recognises_name": true,
+    "standard_name": "tr_sov.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "Country",
+      "Accounting_portfolio",
+      "Amount"
+    ],
+    "decimal": "dot",
+    "rows": 27984
+  },
+  {
+    "year": "2017",
+    "edition": "2017",
+    "file": "2017/TR_Metadata.xlsx",
+    "kind": "TR_Metadata",
+    "size_mb": 0.1,
+    "app_recognises_name": true,
+    "standard_name": "TR_Metadata.xlsx",
+    "sheets": [
+      {
+        "sheet": "Bank list",
+        "header": [
+          "2017 EU-wide Transparency Exercise",
+          "For reference - previous exercises"
+        ],
+        "rows": 135
+      },
+      {
+        "sheet": "Dimensions used",
+        "header": [
+          "Group",
+          "Sheet",
+          "Common identifiers",
+          "Dimensions",
+          "Columns with reported values"
+        ],
+        "rows": 13
+      },
+      {
+        "sheet": "Portfolio",
+        "header": [
+          "Portfolio",
+          "Label"
+        ],
+        "rows": 8
+      },
+      {
+        "sheet": "Country",
+        "header": [
+          "Country",
+          "Label",
+          "ISO_code"
+        ],
+        "rows": 359
+      },
+      {
+        "sheet": "Exposure",
+        "header": [
+          "Exposure",
+          "Label"
+        ],
+        "rows": 42
+      },
+      {
+        "sheet": "Status",
+        "header": [
+          "Status",
+          "Label"
+        ],
+        "rows": 5
+      },
+      {
+        "sheet": "Perf_status",
+        "header": [
+          "Perf_Status",
+          "Label"
+        ],
+        "rows": 5
+      },
+      {
+        "sheet": "MKT_Modprod",
+        "header": [
+          "MKT_Modprod",
+          "Label"
+        ],
+        "rows": 5
+      },
+      {
+        "sheet": "MKT_Risk",
+        "header": [
+          "MKT_Risk",
+          "Label"
+        ],
+        "rows": 3
+      },
+      {
+        "sheet": "Accounting_portfolio",
+        "header": [
+          "Accounting_portfolio",
+          "Label"
+        ],
+        "rows": 6
+      }
+    ]
+  },
+  {
+    "year": "2017",
+    "edition": "2017",
+    "file": "2017/tr_cre.csv",
+    "kind": "tr_cre",
+    "size_mb": 49.0,
+    "app_recognises_name": true,
+    "standard_name": "tr_cre.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "Portfolio",
+      "Country",
+      "Country_rank",
+      "Exposure",
+      "Status",
+      "Perf_Status",
+      "Amount",
+      "footnote"
+    ],
+    "decimal": "dot",
+    "rows": 316028
+  },
+  {
+    "year": "2017",
+    "edition": "2017",
+    "file": "2017/tr_mrk.csv",
+    "kind": "tr_mrk",
+    "size_mb": 1.9,
+    "app_recognises_name": true,
+    "standard_name": "tr_mrk.csv",
+    "encoding": "not utf-8 (cp1252?)",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "Portfolio",
+      "MKT_Modprod",
+      "Mkt_risk",
+      "Amount",
+      "Footnote"
+    ],
+    "decimal": "dot",
+    "rows": 13566
+  },
+  {
+    "year": "2017",
+    "edition": "2017",
+    "file": "2017/tr_oth.csv",
+    "kind": "tr_oth",
+    "size_mb": 3.7,
+    "app_recognises_name": true,
+    "standard_name": "tr_oth.csv",
+    "encoding": "not utf-8 (cp1252?)",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "Amount",
+      "n_quarters",
+      "footnote"
+    ],
+    "decimal": "dot",
+    "rows": 24500
+  },
+  {
+    "year": "2017",
+    "edition": "2017",
+    "file": "2017/tr_sov.csv",
+    "kind": "tr_sov",
+    "size_mb": 4.5,
+    "app_recognises_name": true,
+    "standard_name": "tr_sov.csv",
+    "encoding": "not utf-8 (cp1252?)",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "Country",
+      "Accounting_portfolio",
+      "Amount",
+      "Footnote"
+    ],
+    "decimal": "dot",
+    "rows": 28680
+  },
+  {
+    "year": "2018",
+    "edition": "2018",
+    "file": "2018/SDD.xlsx",
+    "kind": "SDD",
+    "size_mb": 0.0,
+    "app_recognises_name": true,
+    "standard_name": "SDD.xlsx",
+    "sheets": [
+      {
+        "sheet": "SDD",
+        "header": [
+          "Collection",
+          "Category",
+          "DERIVED_TEMPLATE",
+          "Item",
+          "Item_TR_2017",
+          "Item_TR_2016",
+          "Item_TR_2015",
+          "Label"
+        ],
+        "rows": 364
+      }
+    ]
+  },
+  {
+    "year": "2018",
+    "edition": "2018",
+    "file": "2018/TR_Metadata.xlsx",
+    "kind": "TR_Metadata",
+    "size_mb": 0.1,
+    "app_recognises_name": true,
+    "standard_name": "TR_Metadata.xlsx",
+    "sheets": [
+      {
+        "sheet": "Bank list",
+        "header": [
+          "2018 EU-wide Transparency Exercise",
+          "For reference - previous exercises"
+        ],
+        "rows": 132
+      },
+      {
+        "sheet": "Dimensions used",
+        "header": [
+          "Group",
+          "Dataset",
+          "Sheet",
+          "Common identifiers",
+          "Dimensions",
+          "Columns with reported values"
+        ],
+        "rows": 14
+      },
+      {
+        "sheet": "Portfolio",
+        "header": [
+          "Portfolio",
+          "Label"
+        ],
+        "rows": 8
+      },
+      {
+        "sheet": "Country",
+        "header": [
+          "Country",
+          "Label",
+          "ISO_code"
+        ],
+        "rows": 359
+      },
+      {
+        "sheet": "Exposure",
+        "header": [
+          "Exposure",
+          "Label"
+        ],
+        "rows": 42
+      },
+      {
+        "sheet": "Status",
+        "header": [
+          "Status",
+          "Label"
+        ],
+        "rows": 5
+      },
+      {
+        "sheet": "Perf_status",
+        "header": [
+          "Perf_Status",
+          "Label"
+        ],
+        "rows": 5
+      },
+      {
+        "sheet": "MKT_Modprod",
+        "header": [
+          "MKT_Modprod",
+          "Label"
+        ],
+        "rows": 5
+      },
+      {
+        "sheet": "MKT_Risk",
+        "header": [
+          "MKT_Risk",
+          "Label"
+        ],
+        "rows": 3
+      },
+      {
+        "sheet": "Accounting_portfolio",
+        "header": [
+          "Accounting_portfolio",
+          "Label"
+        ],
+        "rows": 6
+      },
+      {
+        "sheet": "Maturity",
+        "header": [
+          "Maturity",
+          "Label"
+        ],
+        "rows": 8
+      }
+    ]
+  },
+  {
+    "year": "2018",
+    "edition": "2018",
+    "file": "2018/tr_cre.csv",
+    "kind": "tr_cre",
+    "size_mb": 46.6,
+    "app_recognises_name": true,
+    "standard_name": "tr_cre.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "NSA",
+      "LEI_Code",
+      "Item",
+      "Label",
+      "Period",
+      "Portfolio",
+      "Country",
+      "Country_rank",
+      "Exposure",
+      "Status",
+      "Perf_Status",
+      "Amount",
+      "footnote"
+    ],
+    "decimal": "dot",
+    "rows": 263728
+  },
+  {
+    "year": "2018",
+    "edition": "2018",
+    "file": "2018/tr_mrk.csv",
+    "kind": "tr_mrk",
+    "size_mb": 2.0,
+    "app_recognises_name": true,
+    "standard_name": "tr_mrk.csv",
+    "encoding": "not utf-8 (cp1252?)",
+    "delimiter": ",",
+    "header": [
+      "NSA",
+      "LEI_Code",
+      "Item",
+      "Label",
+      "Period",
+      "Portfolio",
+      "MKT_Modprod",
+      "Mkt_risk",
+      "Amount",
+      "Footnote"
+    ],
+    "decimal": "dot",
+    "rows": 13362
+  },
+  {
+    "year": "2018",
+    "edition": "2018",
+    "file": "2018/tr_oth.csv",
+    "kind": "tr_oth",
+    "size_mb": 3.5,
+    "app_recognises_name": true,
+    "standard_name": "tr_oth.csv",
+    "encoding": "not utf-8 (cp1252?)",
+    "delimiter": ",",
+    "header": [
+      "NSA",
+      "LEI_Code",
+      "Item",
+      "Label",
+      "Period",
+      "Amount",
+      "n_quarters",
+      "footnote"
+    ],
+    "decimal": "dot",
+    "rows": 24761
+  },
+  {
+    "year": "2018",
+    "edition": "2018",
+    "file": "2018/tr_sov.csv",
+    "kind": "tr_sov",
+    "size_mb": 117.8,
+    "app_recognises_name": true,
+    "standard_name": "tr_sov.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "NSA",
+      "LEI_Code",
+      "Item",
+      "Label",
+      "Period",
+      "Country",
+      "Accounting_portfolio",
+      "Maturity",
+      "Amount",
+      "Footnote"
+    ],
+    "decimal": "dot",
+    "rows": 573808
+  },
+  {
+    "year": "2019",
+    "edition": "2019",
+    "file": "2019/SDD.xlsx",
+    "kind": "SDD",
+    "size_mb": 0.0,
+    "app_recognises_name": true,
+    "standard_name": "SDD.xlsx",
+    "sheets": [
+      {
+        "sheet": "SDD",
+        "header": [
+          "Collection",
+          "Category",
+          "Template",
+          "Item",
+          "Item_TR_2018",
+          "Item_TR_2017",
+          "Item_TR_2016",
+          "Item_TR_2015",
+          "Label"
+        ],
+        "rows": 294
+      }
+    ]
+  },
+  {
+    "year": "2019",
+    "edition": "2019",
+    "file": "2019/TR_Metadata.xlsx",
+    "kind": "TR_Metadata",
+    "size_mb": 0.1,
+    "app_recognises_name": true,
+    "standard_name": "TR_Metadata.xlsx",
+    "sheets": [
+      {
+        "sheet": "Bank list",
+        "header": [
+          "2019 EU-wide Transparency Exercise",
+          "For reference - previous exercises"
+        ],
+        "rows": 133
+      },
+      {
+        "sheet": "Dimensions used",
+        "header": [
+          "Group",
+          "Sheet",
+          "Common identifiers",
+          "Dimensions",
+          "Columns with reported values"
+        ],
+        "rows": 13
+      },
+      {
+        "sheet": "Portfolio",
+        "header": [
+          "Portfolio",
+          "Label"
+        ],
+        "rows": 8
+      },
+      {
+        "sheet": "Country",
+        "header": [
+          "Country",
+          "Label",
+          "ISO_code"
+        ],
+        "rows": 359
+      },
+      {
+        "sheet": "Exposure",
+        "header": [
+          "Exposure",
+          "Label"
+        ],
+        "rows": 42
+      },
+      {
+        "sheet": "Status",
+        "header": [
+          "Status",
+          "Label"
+        ],
+        "rows": 5
+      },
+      {
+        "sheet": "Perf_status",
+        "header": [
+          "Perf_Status",
+          "Label"
+        ],
+        "rows": 5
+      },
+      {
+        "sheet": "MKT_Modprod",
+        "header": [
+          "MKT_Modprod",
+          "Label"
+        ],
+        "rows": 5
+      },
+      {
+        "sheet": "MKT_Risk",
+        "header": [
+          "MKT_Risk",
+          "Label"
+        ],
+        "rows": 3
+      },
+      {
+        "sheet": "Accounting_portfolio",
+        "header": [
+          "Accounting_portfolio",
+          "Label"
+        ],
+        "rows": 6
+      },
+      {
+        "sheet": "Maturity",
+        "header": [
+          "Maturity",
+          "Label"
+        ],
+        "rows": 8
+      },
+      {
+        "sheet": "ASSETS_Stages",
+        "header": [
+          "ASSETS_Stages",
+          "Label"
+        ],
+        "rows": 4
+      },
+      {
+        "sheet": "ASSETS_FV",
+        "header": [
+          "ASSETS_FV",
+          "Label"
+        ],
+        "rows": 4
+      }
+    ]
+  },
+  {
+    "year": "2019",
+    "edition": "2019",
+    "file": "2019/tr_cre.csv",
+    "kind": "tr_cre",
+    "size_mb": 91.0,
+    "app_recognises_name": true,
+    "standard_name": "tr_cre.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "NSA",
+      "LEI_Code",
+      "Item",
+      "Label",
+      "Period",
+      "Portfolio",
+      "Country",
+      "Country_rank",
+      "Exposure",
+      "Status",
+      "Perf_Status",
+      "Amount",
+      "footnote"
+    ],
+    "decimal": "dot",
+    "rows": 537555
+  },
+  {
+    "year": "2019",
+    "edition": "2019",
+    "file": "2019/tr_mrk.csv",
+    "kind": "tr_mrk",
+    "size_mb": 3.9,
+    "app_recognises_name": true,
+    "standard_name": "tr_mrk.csv",
+    "encoding": "not utf-8 (cp1252?)",
+    "delimiter": ",",
+    "header": [
+      "NSA",
+      "LEI_Code",
+      "Item",
+      "Label",
+      "Period",
+      "Portfolio",
+      "MKT_Modprod",
+      "Mkt_risk",
+      "Amount",
+      "Footnote"
+    ],
+    "decimal": "dot",
+    "rows": 26112
+  },
+  {
+    "year": "2019",
+    "edition": "2019",
+    "file": "2019/tr_oth.csv",
+    "kind": "tr_oth",
+    "size_mb": 11.7,
+    "app_recognises_name": true,
+    "standard_name": "tr_oth.csv",
+    "encoding": "not utf-8 (cp1252?)",
+    "delimiter": ",",
+    "header": [
+      "NSA",
+      "LEI_Code",
+      "Item",
+      "Label",
+      "Period",
+      "ASSETS_FV",
+      "ASSETS_Stages",
+      "Amount",
+      "n_quarters",
+      "footnote"
+    ],
+    "decimal": "dot",
+    "rows": 78161
+  },
+  {
+    "year": "2019",
+    "edition": "2019",
+    "file": "2019/tr_sov_201812.csv",
+    "kind": "tr_sov",
+    "size_mb": 113.7,
+    "app_recognises_name": true,
+    "standard_name": "tr_sov_201812.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "NSA",
+      "LEI_Code",
+      "Item",
+      "Label",
+      "Period",
+      "Country",
+      "Accounting_portfolio",
+      "Maturity",
+      "Amount",
+      "Footnote"
+    ],
+    "decimal": "dot",
+    "rows": 550572
+  },
+  {
+    "year": "2019",
+    "edition": "2019",
+    "file": "2019/tr_sov_201906.csv",
+    "kind": "tr_sov",
+    "size_mb": 119.5,
+    "app_recognises_name": true,
+    "standard_name": "tr_sov_201906.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "NSA",
+      "LEI_Code",
+      "Item",
+      "Label",
+      "Period",
+      "Country",
+      "Accounting_portfolio",
+      "Maturity",
+      "Amount",
+      "Footnote"
+    ],
+    "decimal": "dot",
+    "rows": 563376
+  },
+  {
+    "year": "2020",
+    "edition": "2020",
+    "file": "2020/SDD.xlsx",
+    "kind": "SDD",
+    "size_mb": 0.0,
+    "app_recognises_name": true,
+    "standard_name": "SDD.xlsx",
+    "sheets": [
+      {
+        "sheet": "SDD",
+        "header": [
+          "Category",
+          "Template",
+          "Item",
+          "Item_TR_2019",
+          "Item_TR_2018",
+          "Item_TR_2017",
+          "Item_TR_2016",
+          "Item_TR_2015",
+          "Item_TR_2014",
+          "Label"
+        ],
+        "rows": 328
+      }
+    ]
+  },
+  {
+    "year": "2020",
+    "edition": "2020_2",
+    "file": "2020/SDD_2.xlsx",
+    "kind": "SDD",
+    "size_mb": 0.0,
+    "app_recognises_name": true,
+    "standard_name": "SDD.xlsx",
+    "sheets": [
+      {
+        "sheet": "SDD",
+        "header": [
+          "Dataset",
+          "Category",
+          "DERIVED_TEMPLATE",
+          "Item",
+          "Item_TR_2020S",
+          "Item_TR_2019",
+          "Item_TR_2018",
+          "Item_TR_2017",
+          "Item_TR_2016",
+          "Item_TR_2015",
+          "Item_TR_2014",
+          "Label"
+        ],
+        "rows": 347
+      }
+    ]
+  },
+  {
+    "year": "2020",
+    "edition": "2020",
+    "file": "2020/TR_Metadata.xlsx",
+    "kind": "TR_Metadata",
+    "size_mb": 0.1,
+    "app_recognises_name": true,
+    "standard_name": "TR_Metadata.xlsx",
+    "sheets": [
+      {
+        "sheet": "Banks list",
+        "header": [
+          "2020 Spring EU-wide Transparency Exercise",
+          "For reference - previous exercises"
+        ],
+        "rows": 129
+      },
+      {
+        "sheet": "Other Banks",
+        "header": [
+          "List of banks included in the aggregate \"All Other banks\"",
+          "Period included:"
+        ],
+        "rows": 26
+      },
+      {
+        "sheet": "Dimensions used",
+        "header": [
+          "Group",
+          "Sheet",
+          "Common identifiers",
+          "Dimensions",
+          "Columns with reported values"
+        ],
+        "rows": 15
+      },
+      {
+        "sheet": "Portfolio",
+        "header": [
+          "Portfolio",
+          "Label"
+        ],
+        "rows": 8
+      },
+      {
+        "sheet": "Country",
+        "header": [
+          "Country",
+          "Label",
+          "ISO_code"
+        ],
+        "rows": 359
+      },
+      {
+        "sheet": "Financial_instruments",
+        "header": [
+          "Financial_instruments",
+          "Label"
+        ],
+        "rows": 9
+      },
+      {
+        "sheet": "Exposure",
+        "header": [
+          "Exposure",
+          "Label"
+        ],
+        "rows": 42
+      },
+      {
+        "sheet": "Status",
+        "header": [
+          "Status",
+          "Label"
+        ],
+        "rows": 5
+      },
+      {
+        "sheet": "Perf_status",
+        "header": [
+          "Perf_Status",
+          "Label"
+        ],
+        "rows": 6
+      },
+      {
+        "sheet": "MKT_Modprod",
+        "header": [
+          "MKT_Modprod",
+          "Label"
+        ],
+        "rows": 5
+      },
+      {
+        "sheet": "MKT_Risk",
+        "header": [
+          "MKT_Risk",
+          "Label"
+        ],
+        "rows": 3
+      },
+      {
+        "sheet": "Accounting_portfolio",
+        "header": [
+          "Accounting_portfolio",
+          "Label"
+        ],
+        "rows": 6
+      },
+      {
+        "sheet": "Maturity",
+        "header": [
+          "Maturity",
+          "Label"
+        ],
+        "rows": 8
+      },
+      {
+        "sheet": "ASSETS_Stages",
+        "header": [
+          "ASSETS_Stages",
+          "Label"
+        ],
+        "rows": 4
+      },
+      {
+        "sheet": "ASSETS_FV",
+        "header": [
+          "ASSETS_FV",
+          "Label"
+        ],
+        "rows": 4
+      },
+      {
+        "sheet": "NACE_codes",
+        "header": [
+          "Nace_codes",
+          "Label"
+        ],
+        "rows": 20
+      },
+      {
+        "sheet": "Fin_end_year",
+        "header": [
+          "Fin_end_year",
+          "Label"
+        ],
+        "rows": 4
+      }
+    ]
+  },
+  {
+    "year": "2020",
+    "edition": "2020_2",
+    "file": "2020/TR_Metadata_2.xlsx",
+    "kind": "TR_Metadata",
+    "size_mb": 0.1,
+    "app_recognises_name": true,
+    "standard_name": "TR_Metadata.xlsx",
+    "sheets": [
+      {
+        "sheet": "Bank list",
+        "header": [
+          "2020  EU-wide Transparency Exercise"
+        ],
+        "rows": 137
+      },
+      {
+        "sheet": "Other Banks",
+        "header": [
+          "List of banks included in the aggregate \"All Other banks\"",
+          "Period included:"
+        ],
+        "rows": 7
+      },
+      {
+        "sheet": "Dimensions used",
+        "header": [
+          "Group",
+          "Sheet",
+          "Common identifiers",
+          "Dimensions",
+          "Columns with reported values"
+        ],
+        "rows": 17
+      },
+      {
+        "sheet": "Portfolio",
+        "header": [
+          "Portfolio",
+          "Label"
+        ],
+        "rows": 8
+      },
+      {
+        "sheet": "Country",
+        "header": [
+          "Country",
+          "Label",
+          "ISO_code"
+        ],
+        "rows": 359
+      },
+      {
+        "sheet": "Financial_instruments",
+        "header": [
+          "Financial_instruments",
+          "Label"
+        ],
+        "rows": 9
+      },
+      {
+        "sheet": "Exposure",
+        "header": [
+          "Exposure",
+          "Label"
+        ],
+        "rows": 51
+      },
+      {
+        "sheet": "Status",
+        "header": [
+          "Status",
+          "Label"
+        ],
+        "rows": 5
+      },
+      {
+        "sheet": "Perf_status",
+        "header": [
+          "Perf_Status",
+          "Label"
+        ],
+        "rows": 11
+      },
+      {
+        "sheet": "MKT_Modprod",
+        "header": [
+          "MKT_Modprod",
+          "Label"
+        ],
+        "rows": 5
+      },
+      {
+        "sheet": "MKT_Risk",
+        "header": [
+          "MKT_Risk",
+          "Label"
+        ],
+        "rows": 3
+      },
+      {
+        "sheet": "Accounting_portfolio",
+        "header": [
+          "Accounting_portfolio",
+          "Label"
+        ],
+        "rows": 6
+      },
+      {
+        "sheet": "Maturity",
+        "header": [
+          "Maturity",
+          "Label"
+        ],
+        "rows": 8
+      },
+      {
+        "sheet": "ASSETS_Stages",
+        "header": [
+          "ASSETS_Stages",
+          "Label"
+        ],
+        "rows": 4
+      },
+      {
+        "sheet": "ASSETS_FV",
+        "header": [
+          "ASSETS_FV",
+          "Label"
+        ],
+        "rows": 4
+      },
+      {
+        "sheet": "NACE_codes",
+        "header": [
+          "Nace_codes",
+          "Label"
+        ],
+        "rows": 20
+      },
+      {
+        "sheet": "Fin_end_year",
+        "header": [
+          "Fin_end_year",
+          "Label"
+        ],
+        "rows": 4
+      }
+    ]
+  },
+  {
+    "year": "2020",
+    "edition": "2020",
+    "file": "2020/tr_cre.csv",
+    "kind": "tr_cre",
+    "size_mb": 57.4,
+    "app_recognises_name": true,
+    "standard_name": "tr_cre.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "Portfolio",
+      "Country",
+      "Country_rank",
+      "Exposure",
+      "Status",
+      "Perf_Status",
+      "NACE_codes",
+      "Amount",
+      "footnote"
+    ],
+    "decimal": "dot",
+    "rows": 342927
+  },
+  {
+    "year": "2020",
+    "edition": "2020_2",
+    "file": "2020/tr_cre_2.csv",
+    "kind": "tr_cre",
+    "size_mb": 64.8,
+    "app_recognises_name": true,
+    "standard_name": "tr_cre.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "Portfolio",
+      "Country",
+      "Country_rank",
+      "Exposure",
+      "Status",
+      "Perf_Status",
+      "NACE_codes",
+      "Amount",
+      "footnote"
+    ],
+    "decimal": "dot",
+    "rows": 396232
+  },
+  {
+    "year": "2020",
+    "edition": "2020",
+    "file": "2020/tr_mrk.csv",
+    "kind": "tr_mrk",
+    "size_mb": 1.9,
+    "app_recognises_name": true,
+    "standard_name": "tr_mrk.csv",
+    "encoding": "not utf-8 (cp1252?)",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "Portfolio",
+      "MKT_Modprod",
+      "Mkt_risk",
+      "Amount",
+      "Footnote"
+    ],
+    "decimal": "dot",
+    "rows": 12852
+  },
+  {
+    "year": "2020",
+    "edition": "2020_2",
+    "file": "2020/tr_mrk_2.csv",
+    "kind": "tr_mrk",
+    "size_mb": 1.9,
+    "app_recognises_name": true,
+    "standard_name": "tr_mrk.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "Portfolio",
+      "MKT_Modprod",
+      "Mkt_risk",
+      "Amount",
+      "Footnote"
+    ],
+    "decimal": "dot",
+    "rows": 13668
+  },
+  {
+    "year": "2020",
+    "edition": "2020",
+    "file": "2020/tr_oth.csv",
+    "kind": "tr_oth",
+    "size_mb": 8.4,
+    "app_recognises_name": true,
+    "standard_name": "tr_oth.csv",
+    "encoding": "not utf-8 (cp1252?)",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "ASSETS_FV",
+      "ASSETS_Stages",
+      "Exposure",
+      "Financial_instruments",
+      "Amount",
+      "Fin_end_year",
+      "n_quarters",
+      "footnote"
+    ],
+    "decimal": "dot",
+    "rows": 50648
+  },
+  {
+    "year": "2020",
+    "edition": "2020_2",
+    "file": "2020/tr_oth_2.csv",
+    "kind": "tr_oth",
+    "size_mb": 8.3,
+    "app_recognises_name": true,
+    "standard_name": "tr_oth.csv",
+    "encoding": "not utf-8 (cp1252?)",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "ASSETS_FV",
+      "ASSETS_Stages",
+      "Exposure",
+      "Financial_instruments",
+      "Amount",
+      "Fin_end_year",
+      "n_quarters",
+      "footnote"
+    ],
+    "decimal": "dot",
+    "rows": 53526
+  },
+  {
+    "year": "2020",
+    "edition": "2020",
+    "file": "2020/tr_sov.csv",
+    "kind": "tr_sov",
+    "size_mb": 111.1,
+    "app_recognises_name": true,
+    "standard_name": "tr_sov.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "Country",
+      "Accounting_portfolio",
+      "Maturity",
+      "Amount",
+      "Footnote"
+    ],
+    "decimal": "dot",
+    "rows": 546304
+  },
+  {
+    "year": "2020",
+    "edition": "2020_2",
+    "file": "2020/tr_sov_2.csv",
+    "kind": "tr_sov",
+    "size_mb": 114.6,
+    "app_recognises_name": true,
+    "standard_name": "tr_sov.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "Country",
+      "Accounting_portfolio",
+      "Maturity",
+      "Amount",
+      "Footnote"
+    ],
+    "decimal": "dot",
+    "rows": 580448
+  },
+  {
+    "year": "2021",
+    "edition": "2021",
+    "file": "2021/SDD.xlsx",
+    "kind": "SDD",
+    "size_mb": 0.0,
+    "app_recognises_name": true,
+    "standard_name": "SDD.xlsx",
+    "sheets": [
+      {
+        "sheet": "SDD",
+        "header": [
+          "CSV",
+          "Category",
+          "Template",
+          "Item",
+          "Item_TR_2020A",
+          "Item_TR_2020S",
+          "Item_TR_2019",
+          "Item_TR_2018",
+          "Item_TR_2017",
+          "Item_TR_2016",
+          "Item_TR_2015",
+          "Item_TR_2014",
+          "Label"
+        ],
+        "rows": 357
+      }
+    ]
+  },
+  {
+    "year": "2021",
+    "edition": "2021",
+    "file": "2021/TR_Metadata.xlsx",
+    "kind": "TR_Metadata",
+    "size_mb": 0.1,
+    "app_recognises_name": true,
+    "standard_name": "TR_Metadata.xlsx",
+    "sheets": [
+      {
+        "sheet": "Banks list",
+        "header": [
+          "2021 EU-wide Transparency Exercise",
+          "For reference, previous exercises"
+        ],
+        "rows": 122
+      },
+      {
+        "sheet": "Other banks",
+        "header": [
+          "List of banks included in the aggregate \"All Other banks\"",
+          "Period included"
+        ],
+        "rows": 16
+      },
+      {
+        "sheet": "Dimensions used",
+        "header": [
+          "Group",
+          "Sheet",
+          "Common identifiers",
+          "Dimensions",
+          "Columns with reported values"
+        ],
+        "rows": 17
+      },
+      {
+        "sheet": "Portfolio",
+        "header": [
+          "Portfolio",
+          "Label"
+        ],
+        "rows": 8
+      },
+      {
+        "sheet": "Country",
+        "header": [
+          "Country",
+          "Label",
+          "ISO_code"
+        ],
+        "rows": 359
+      },
+      {
+        "sheet": "Financial_instruments",
+        "header": [
+          "Financial_instruments",
+          "Label"
+        ],
+        "rows": 9
+      },
+      {
+        "sheet": "Exposure",
+        "header": [
+          "Exposure",
+          "Label"
+        ],
+        "rows": 51
+      },
+      {
+        "sheet": "Status",
+        "header": [
+          "Status",
+          "Label"
+        ],
+        "rows": 5
+      },
+      {
+        "sheet": "Perf_status",
+        "header": [
+          "Perf_Status",
+          "Label"
+        ],
+        "rows": 11
+      },
+      {
+        "sheet": "MKT_Modprod",
+        "header": [
+          "MKT_Modprod",
+          "Label"
+        ],
+        "rows": 5
+      },
+      {
+        "sheet": "MKT_Risk",
+        "header": [
+          "MKT_Risk",
+          "Label"
+        ],
+        "rows": 3
+      },
+      {
+        "sheet": "Accounting_portfolio",
+        "header": [
+          "Accounting_portfolio",
+          "Label"
+        ],
+        "rows": 6
+      },
+      {
+        "sheet": "Maturity",
+        "header": [
+          "Maturity",
+          "Label"
+        ],
+        "rows": 8
+      },
+      {
+        "sheet": "ASSETS_Stages",
+        "header": [
+          "ASSETS_Stages",
+          "Label"
+        ],
+        "rows": 4
+      },
+      {
+        "sheet": "ASSETS_FV",
+        "header": [
+          "ASSETS_FV",
+          "Label"
+        ],
+        "rows": 4
+      },
+      {
+        "sheet": "NACE_codes",
+        "header": [
+          "Nace_codes",
+          "Label"
+        ],
+        "rows": 20
+      },
+      {
+        "sheet": "Fin_end_year",
+        "header": [
+          "Fin_end_year",
+          "Label"
+        ],
+        "rows": 4
+      }
+    ]
+  },
+  {
+    "year": "2021",
+    "edition": "2021",
+    "file": "2021/tr_cre.csv",
+    "kind": "tr_cre",
+    "size_mb": 139.8,
+    "app_recognises_name": true,
+    "standard_name": "tr_cre.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "Portfolio",
+      "Country",
+      "Country_rank",
+      "Exposure",
+      "Status",
+      "Perf_Status",
+      "NACE_codes",
+      "Amount",
+      "footnote"
+    ],
+    "decimal": "dot",
+    "rows": 802844
+  },
+  {
+    "year": "2021",
+    "edition": "2021",
+    "file": "2021/tr_mrk.csv",
+    "kind": "tr_mrk",
+    "size_mb": 3.3,
+    "app_recognises_name": true,
+    "standard_name": "tr_mrk.csv",
+    "encoding": "not utf-8 (cp1252?)",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "Portfolio",
+      "MKT_Modprod",
+      "Mkt_risk",
+      "Amount",
+      "Footnote"
+    ],
+    "decimal": "dot",
+    "rows": 23868
+  },
+  {
+    "year": "2021",
+    "edition": "2021",
+    "file": "2021/tr_oth.csv",
+    "kind": "tr_oth",
+    "size_mb": 14.8,
+    "app_recognises_name": true,
+    "standard_name": "tr_oth.csv",
+    "encoding": "not utf-8 (cp1252?)",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "ASSETS_FV",
+      "ASSETS_Stages",
+      "Exposure",
+      "Financial_instruments",
+      "Amount",
+      "Fin_end_year",
+      "n_quarters",
+      "footnote"
+    ],
+    "decimal": "dot",
+    "rows": 95307
+  },
+  {
+    "year": "2021",
+    "edition": "2021",
+    "file": "2021/tr_sov.csv",
+    "kind": "tr_sov",
+    "size_mb": 75.5,
+    "app_recognises_name": true,
+    "standard_name": "tr_sov.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "Country",
+      "Accounting_portfolio",
+      "Maturity",
+      "Amount",
+      "Footnote"
+    ],
+    "decimal": "dot",
+    "rows": 383635
+  },
+  {
+    "year": "2022",
+    "edition": "2022",
+    "file": "2022/SDD.xlsx",
+    "kind": "SDD",
+    "size_mb": 0.0,
+    "app_recognises_name": true,
+    "standard_name": "SDD.xlsx",
+    "sheets": [
+      {
+        "sheet": "SDD",
+        "header": [
+          "CSV",
+          "DERIVED_TEMPLATE",
+          "Item",
+          "Item_TR_2021",
+          "Item_TR_2020A",
+          "Item_TR_2020S",
+          "Item_TR_2019",
+          "Item_TR_2018",
+          "Item_TR_2017",
+          "Item_TR_2016",
+          "Item_ST_TR_16",
+          "Item_TR_2015",
+          "Item_TR_2014",
+          "Label"
+        ],
+        "rows": 345
+      }
+    ]
+  },
+  {
+    "year": "2022",
+    "edition": "2022",
+    "file": "2022/TR_Metadata.xlsx",
+    "kind": "TR_Metadata",
+    "size_mb": 0.1,
+    "app_recognises_name": true,
+    "standard_name": "TR_Metadata.xlsx",
+    "sheets": [
+      {
+        "sheet": "List of Institutions",
+        "header": [
+          "2022 EU-wide Transparency Exercise",
+          "For reference, previous exercises"
+        ],
+        "rows": 124
+      },
+      {
+        "sheet": "Other banks",
+        "header": [
+          "List of banks included in the aggregate \"All Other banks\"",
+          "Period included"
+        ],
+        "rows": 20
+      },
+      {
+        "sheet": "Dimensions used",
+        "header": [
+          "Group",
+          "Sheet",
+          "Common identifiers",
+          "Dimensions",
+          "Columns with reported values"
+        ],
+        "rows": 17
+      },
+      {
+        "sheet": "Portfolio",
+        "header": [
+          "Portfolio",
+          "Label"
+        ],
+        "rows": 8
+      },
+      {
+        "sheet": "Country",
+        "header": [
+          "Country",
+          "Label",
+          "ISO_code"
+        ],
+        "rows": 359
+      },
+      {
+        "sheet": "Financial_instruments",
+        "header": [
+          "Financial_instruments",
+          "Label"
+        ],
+        "rows": 9
+      },
+      {
+        "sheet": "Exposure",
+        "header": [
+          "Exposure",
+          "Label"
+        ],
+        "rows": 51
+      },
+      {
+        "sheet": "Status",
+        "header": [
+          "Status",
+          "Label"
+        ],
+        "rows": 5
+      },
+      {
+        "sheet": "Perf_status",
+        "header": [
+          "Perf_Status",
+          "Label"
+        ],
+        "rows": 11
+      },
+      {
+        "sheet": "MKT_Modprod",
+        "header": [
+          "MKT_Modprod",
+          "Label"
+        ],
+        "rows": 5
+      },
+      {
+        "sheet": "MKT_Risk",
+        "header": [
+          "MKT_Risk",
+          "Label"
+        ],
+        "rows": 3
+      },
+      {
+        "sheet": "Accounting_portfolio",
+        "header": [
+          "Accounting_portfolio",
+          "Label"
+        ],
+        "rows": 6
+      },
+      {
+        "sheet": "Maturity",
+        "header": [
+          "Maturity",
+          "Label"
+        ],
+        "rows": 8
+      },
+      {
+        "sheet": "ASSETS_Stages",
+        "header": [
+          "ASSETS_Stages",
+          "Label"
+        ],
+        "rows": 4
+      },
+      {
+        "sheet": "ASSETS_FV",
+        "header": [
+          "ASSETS_FV",
+          "Label"
+        ],
+        "rows": 4
+      },
+      {
+        "sheet": "NACE_codes",
+        "header": [
+          "Nace_codes",
+          "Label"
+        ],
+        "rows": 20
+      },
+      {
+        "sheet": "Fin_end_year",
+        "header": [
+          "Fin_end_year",
+          "Label"
+        ],
+        "rows": 4
+      }
+    ]
+  },
+  {
+    "year": "2022",
+    "edition": "2022",
+    "file": "2022/tr_cre.csv",
+    "kind": "tr_cre",
+    "size_mb": 118.3,
+    "app_recognises_name": true,
+    "standard_name": "tr_cre.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "Portfolio",
+      "Country",
+      "Country_rank",
+      "Exposure",
+      "Status",
+      "Perf_Status",
+      "NACE_codes",
+      "Amount",
+      "footnote"
+    ],
+    "decimal": "dot",
+    "rows": 683340
+  },
+  {
+    "year": "2022",
+    "edition": "2022",
+    "file": "2022/tr_mrk.csv",
+    "kind": "tr_mrk",
+    "size_mb": 3.6,
+    "app_recognises_name": true,
+    "standard_name": "tr_mrk.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "Portfolio",
+      "MKT_Modprod",
+      "Mkt_risk",
+      "Amount",
+      "Footnote"
+    ],
+    "decimal": "dot",
+    "rows": 23358
+  },
+  {
+    "year": "2022",
+    "edition": "2022",
+    "file": "2022/tr_oth.csv",
+    "kind": "tr_oth",
+    "size_mb": 16.1,
+    "app_recognises_name": true,
+    "standard_name": "tr_oth.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "ASSETS_FV",
+      "ASSETS_Stages",
+      "Exposure",
+      "Financial_instruments",
+      "Amount",
+      "Fin_end_year",
+      "n_quarters",
+      "footnote"
+    ],
+    "decimal": "dot",
+    "rows": 95914
+  },
+  {
+    "year": "2022",
+    "edition": "2022",
+    "file": "2022/tr_sov.csv",
+    "kind": "tr_sov",
+    "size_mb": 80.3,
+    "app_recognises_name": true,
+    "standard_name": "tr_sov.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "Country",
+      "Accounting_portfolio",
+      "Maturity",
+      "Amount",
+      "Footnote"
+    ],
+    "decimal": "dot",
+    "rows": 404005
+  },
+  {
+    "year": "2023",
+    "edition": "2023",
+    "file": "2023/SDD.xlsx",
+    "kind": "SDD",
+    "size_mb": 0.0,
+    "app_recognises_name": true,
+    "standard_name": "SDD.xlsx",
+    "sheets": [
+      {
+        "sheet": "SDD",
+        "header": [
+          "CSV",
+          "DERIVED_TEMPLATE",
+          "Item",
+          "Item_TR_2022",
+          "Item_TR_2021",
+          "Item_TR_2020A",
+          "Item_TR_2020S",
+          "Item_TR_2019",
+          "Item_TR_2018",
+          "Item_TR_2017",
+          "Item_TR_2016",
+          "Item_TR_2015",
+          "Item_TR_2014",
+          "Category",
+          "Label"
+        ],
+        "rows": 345
+      }
+    ]
+  },
+  {
+    "year": "2023",
+    "edition": "2023",
+    "file": "2023/TR_Metadata.xlsx",
+    "kind": "TR_Metadata",
+    "size_mb": 0.1,
+    "app_recognises_name": true,
+    "standard_name": "TR_Metadata.xlsx",
+    "sheets": [
+      {
+        "sheet": "List of Institutions",
+        "header": [
+          "2023 EU-wide Transparency Exercise",
+          "For reference, previous exercises"
+        ],
+        "rows": 125
+      },
+      {
+        "sheet": "Other banks",
+        "header": [
+          "List of banks included in the aggregate \"All Other banks\"",
+          "Period included"
+        ],
+        "rows": 18
+      },
+      {
+        "sheet": "Dimensions used",
+        "header": [
+          "Group",
+          "Sheet",
+          "Common identifiers",
+          "Dimensions",
+          "Columns with reported values"
+        ],
+        "rows": 17
+      },
+      {
+        "sheet": "Portfolio",
+        "header": [
+          "Portfolio",
+          "Label"
+        ],
+        "rows": 8
+      },
+      {
+        "sheet": "Country",
+        "header": [
+          "Country",
+          "Label",
+          "ISO_code"
+        ],
+        "rows": 359
+      },
+      {
+        "sheet": "Financial_instruments",
+        "header": [
+          "Financial_instruments",
+          "Label"
+        ],
+        "rows": 9
+      },
+      {
+        "sheet": "Exposure",
+        "header": [
+          "Exposure",
+          "Label"
+        ],
+        "rows": 51
+      },
+      {
+        "sheet": "Status",
+        "header": [
+          "Status",
+          "Label"
+        ],
+        "rows": 5
+      },
+      {
+        "sheet": "Perf_status",
+        "header": [
+          "Perf_Status",
+          "Label"
+        ],
+        "rows": 11
+      },
+      {
+        "sheet": "MKT_Modprod",
+        "header": [
+          "MKT_Modprod",
+          "Label"
+        ],
+        "rows": 5
+      },
+      {
+        "sheet": "MKT_Risk",
+        "header": [
+          "MKT_Risk",
+          "Label"
+        ],
+        "rows": 3
+      },
+      {
+        "sheet": "Accounting_portfolio",
+        "header": [
+          "Accounting_portfolio",
+          "Label"
+        ],
+        "rows": 6
+      },
+      {
+        "sheet": "Maturity",
+        "header": [
+          "Maturity",
+          "Label"
+        ],
+        "rows": 8
+      },
+      {
+        "sheet": "ASSETS_Stages",
+        "header": [
+          "ASSETS_Stages",
+          "Label"
+        ],
+        "rows": 4
+      },
+      {
+        "sheet": "ASSETS_FV",
+        "header": [
+          "ASSETS_FV",
+          "Label"
+        ],
+        "rows": 4
+      },
+      {
+        "sheet": "NACE_codes",
+        "header": [
+          "Nace_codes",
+          "Label"
+        ],
+        "rows": 20
+      },
+      {
+        "sheet": "Fin_end_year",
+        "header": [
+          "Fin_end_year",
+          "Label"
+        ],
+        "rows": 4
+      }
+    ]
+  },
+  {
+    "year": "2023",
+    "edition": "2023",
+    "file": "2023/tr_cre.csv",
+    "kind": "tr_cre",
+    "size_mb": 122.9,
+    "app_recognises_name": true,
+    "standard_name": "tr_cre.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "Portfolio",
+      "Country",
+      "Country_rank",
+      "Exposure",
+      "Status",
+      "Perf_Status",
+      "NACE_codes",
+      "Amount",
+      "Footnote",
+      "Row",
+      "Column",
+      "Sheet"
+    ],
+    "decimal": "dot",
+    "rows": 610325
+  },
+  {
+    "year": "2023",
+    "edition": "2023",
+    "file": "2023/tr_mrk.csv",
+    "kind": "tr_mrk",
+    "size_mb": 4.2,
+    "app_recognises_name": true,
+    "standard_name": "tr_mrk.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "Portfolio",
+      "MKT_Modprod",
+      "Mkt_risk",
+      "Amount",
+      "Footnote",
+      "Row",
+      "Column",
+      "Sheet"
+    ],
+    "decimal": "dot",
+    "rows": 24633
+  },
+  {
+    "year": "2023",
+    "edition": "2023",
+    "file": "2023/tr_oth.csv",
+    "kind": "tr_oth",
+    "size_mb": 18.0,
+    "app_recognises_name": true,
+    "standard_name": "tr_oth.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "ASSETS_FV",
+      "ASSETS_Stages",
+      "Exposure",
+      "Financial_instruments",
+      "Amount",
+      "Fin_end_year",
+      "n_quarters",
+      "Footnote",
+      "Row",
+      "Column",
+      "Sheet"
+    ],
+    "decimal": "dot",
+    "rows": 100223
+  },
+  {
+    "year": "2023",
+    "edition": "2023",
+    "file": "2023/tr_sov.csv",
+    "kind": "tr_sov",
+    "size_mb": 89.4,
+    "app_recognises_name": true,
+    "standard_name": "tr_sov.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "Country",
+      "Accounting_portfolio",
+      "Maturity",
+      "Amount",
+      "Footnote",
+      "Row",
+      "Column",
+      "Sheet"
+    ],
+    "decimal": "dot",
+    "rows": 421853
+  },
+  {
+    "year": "2024",
+    "edition": "2024",
+    "file": "2024/SDD.xlsx",
+    "kind": "SDD",
+    "size_mb": 0.1,
+    "app_recognises_name": true,
+    "standard_name": "SDD.xlsx",
+    "sheets": [
+      {
+        "sheet": "SDD",
+        "header": [
+          "For reference, previous exercises' items"
+        ],
+        "rows": 346
+      }
+    ]
+  },
+  {
+    "year": "2024",
+    "edition": "2024",
+    "file": "2024/TR_Metadata.xlsx",
+    "kind": "TR_Metadata",
+    "size_mb": 2.8,
+    "app_recognises_name": true,
+    "standard_name": "TR_Metadata.xlsx",
+    "sheets": [
+      {
+        "sheet": "List of Institutions",
+        "header": [
+          "2024 EU-wide Transparency Exercise",
+          "For reference, previous exercises"
+        ],
+        "rows": 125
+      },
+      {
+        "sheet": "Other banks",
+        "header": [
+          "List of banks included in the aggregate \"All Other banks\"",
+          "Period included"
+        ],
+        "rows": 16
+      },
+      {
+        "sheet": "Dimensions used",
+        "header": [
+          "Group",
+          "Sheet",
+          "Common identifiers",
+          "Dimensions",
+          "Columns with reported values"
+        ],
+        "rows": 17
+      },
+      {
+        "sheet": "Portfolio",
+        "header": [
+          "Portfolio",
+          "Label"
+        ],
+        "rows": 8
+      },
+      {
+        "sheet": "Country",
+        "header": [
+          "Country",
+          "Label",
+          "ISO_code"
+        ],
+        "rows": 359
+      },
+      {
+        "sheet": "Financial_instruments",
+        "header": [
+          "Financial_instruments",
+          "Label"
+        ],
+        "rows": 9
+      },
+      {
+        "sheet": "Exposure",
+        "header": [
+          "Exposure",
+          "Label"
+        ],
+        "rows": 51
+      },
+      {
+        "sheet": "Status",
+        "header": [
+          "Status",
+          "Label"
+        ],
+        "rows": 5
+      },
+      {
+        "sheet": "Perf_status",
+        "header": [
+          "Perf_Status",
+          "Label"
+        ],
+        "rows": 11
+      },
+      {
+        "sheet": "MKT_Modprod",
+        "header": [
+          "MKT_Modprod",
+          "Label"
+        ],
+        "rows": 5
+      },
+      {
+        "sheet": "MKT_Risk",
+        "header": [
+          "MKT_Risk",
+          "Label"
+        ],
+        "rows": 3
+      },
+      {
+        "sheet": "Accounting_portfolio",
+        "header": [
+          "Accounting_portfolio",
+          "Label"
+        ],
+        "rows": 6
+      },
+      {
+        "sheet": "Maturity",
+        "header": [
+          "Maturity",
+          "Label"
+        ],
+        "rows": 8
+      },
+      {
+        "sheet": "ASSETS_Stages",
+        "header": [
+          "ASSETS_Stages",
+          "Label"
+        ],
+        "rows": 4
+      },
+      {
+        "sheet": "ASSETS_FV",
+        "header": [
+          "ASSETS_FV",
+          "Label"
+        ],
+        "rows": 4
+      },
+      {
+        "sheet": "NACE_codes",
+        "header": [
+          "Nace_codes",
+          "Label"
+        ],
+        "rows": 20
+      },
+      {
+        "sheet": "Fin_end_year",
+        "header": [
+          "Fin_end_year",
+          "Label"
+        ],
+        "rows": 4
+      }
+    ]
+  },
+  {
+    "year": "2024",
+    "edition": "2024",
+    "file": "2024/tr_cre.csv",
+    "kind": "tr_cre",
+    "size_mb": 119.0,
+    "app_recognises_name": true,
+    "standard_name": "tr_cre.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "Portfolio",
+      "Country",
+      "Country_rank",
+      "Exposure",
+      "Status",
+      "Perf_Status",
+      "NACE_codes",
+      "Amount",
+      "Footnote",
+      "Row",
+      "Column",
+      "Sheet"
+    ],
+    "decimal": "dot",
+    "rows": 606922
+  },
+  {
+    "year": "2024",
+    "edition": "2024",
+    "file": "2024/tr_mrk.csv",
+    "kind": "tr_mrk",
+    "size_mb": 4.2,
+    "app_recognises_name": true,
+    "standard_name": "tr_mrk.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "Portfolio",
+      "MKT_Modprod",
+      "Mkt_risk",
+      "Amount",
+      "Footnote",
+      "Row",
+      "Column",
+      "Sheet"
+    ],
+    "decimal": "dot",
+    "rows": 24582
+  },
+  {
+    "year": "2024",
+    "edition": "2024",
+    "file": "2024/tr_oth.csv",
+    "kind": "tr_oth",
+    "size_mb": 18.0,
+    "app_recognises_name": true,
+    "standard_name": "tr_oth.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "ASSETS_FV",
+      "ASSETS_Stages",
+      "Exposure",
+      "Financial_instruments",
+      "Amount",
+      "Fin_end_year",
+      "n_quarters",
+      "Footnote",
+      "Row",
+      "Column",
+      "Sheet"
+    ],
+    "decimal": "dot",
+    "rows": 99324
+  },
+  {
+    "year": "2024",
+    "edition": "2024",
+    "file": "2024/tr_sov.csv",
+    "kind": "tr_sov",
+    "size_mb": 95.7,
+    "app_recognises_name": true,
+    "standard_name": "tr_sov.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "Country",
+      "Accounting_portfolio",
+      "Maturity",
+      "Amount",
+      "Footnote",
+      "Row",
+      "Column",
+      "Sheet"
+    ],
+    "decimal": "dot",
+    "rows": 438634
+  },
+  {
+    "year": "2025",
+    "edition": "2025",
+    "file": "2025/SDD.xlsx",
+    "kind": "SDD",
+    "size_mb": 0.1,
+    "app_recognises_name": true,
+    "standard_name": "SDD.xlsx",
+    "sheets": [
+      {
+        "sheet": "SDD",
+        "header": [
+          "For reference, previous exercises' items"
+        ],
+        "rows": 336
+      }
+    ]
+  },
+  {
+    "year": "2025",
+    "edition": "2025",
+    "file": "2025/TR_Metadata.xlsx",
+    "kind": "TR_Metadata",
+    "size_mb": 2.8,
+    "app_recognises_name": true,
+    "standard_name": "TR_Metadata.xlsx",
+    "sheets": [
+      {
+        "sheet": "List of Institutions",
+        "header": [
+          "2025 EU-wide Transparency Exercise",
+          "For reference, previous exercises"
+        ],
+        "rows": 121
+      },
+      {
+        "sheet": "Other banks",
+        "header": [
+          "List of banks included in the aggregate \"All Other banks\"",
+          "Period included"
+        ],
+        "rows": 18
+      },
+      {
+        "sheet": "Dimensions used",
+        "header": [
+          "Group",
+          "Sheet",
+          "Common identifiers",
+          "Dimensions",
+          "Columns with reported values"
+        ],
+        "rows": 16
+      },
+      {
+        "sheet": "Portfolio",
+        "header": [
+          "Portfolio",
+          "Label"
+        ],
+        "rows": 8
+      },
+      {
+        "sheet": "Country",
+        "header": [
+          "Country",
+          "Label",
+          "ISO_code"
+        ],
+        "rows": 359
+      },
+      {
+        "sheet": "Financial_instruments",
+        "header": [
+          "Financial_instruments",
+          "Label"
+        ],
+        "rows": 9
+      },
+      {
+        "sheet": "Exposure",
+        "header": [
+          "Exposure",
+          "Label"
+        ],
+        "rows": 52
+      },
+      {
+        "sheet": "Status",
+        "header": [
+          "Status",
+          "Label"
+        ],
+        "rows": 5
+      },
+      {
+        "sheet": "Perf_status",
+        "header": [
+          "Perf_Status",
+          "Label"
+        ],
+        "rows": 12
+      },
+      {
+        "sheet": "MKT_Modprod",
+        "header": [
+          "MKT_Modprod",
+          "Label"
+        ],
+        "rows": 5
+      },
+      {
+        "sheet": "MKT_Risk",
+        "header": [
+          "MKT_Risk",
+          "Label"
+        ],
+        "rows": 3
+      },
+      {
+        "sheet": "Accounting_portfolio",
+        "header": [
+          "Accounting_portfolio",
+          "Label"
+        ],
+        "rows": 6
+      },
+      {
+        "sheet": "Maturity",
+        "header": [
+          "Maturity",
+          "Label"
+        ],
+        "rows": 8
+      },
+      {
+        "sheet": "ASSETS_Stages",
+        "header": [
+          "ASSETS_Stages",
+          "Label"
+        ],
+        "rows": 4
+      },
+      {
+        "sheet": "ASSETS_FV",
+        "header": [
+          "ASSETS_FV",
+          "Label"
+        ],
+        "rows": 4
+      },
+      {
+        "sheet": "NACE_codes",
+        "header": [
+          "Nace_codes",
+          "Label"
+        ],
+        "rows": 20
+      },
+      {
+        "sheet": "Fin_end_year",
+        "header": [
+          "Fin_end_year",
+          "Label"
+        ],
+        "rows": 4
+      }
+    ]
+  },
+  {
+    "year": "2025",
+    "edition": "2025",
+    "file": "2025/tr_cre.csv",
+    "kind": "tr_cre",
+    "size_mb": 123.2,
+    "app_recognises_name": true,
+    "standard_name": "tr_cre.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "Portfolio",
+      "Country",
+      "Country_rank",
+      "Exposure",
+      "Status",
+      "Perf_Status",
+      "NACE_codes",
+      "Amount",
+      "Row",
+      "Column",
+      "Sheet"
+    ],
+    "decimal": "dot",
+    "rows": 648951
+  },
+  {
+    "year": "2025",
+    "edition": "2025",
+    "file": "2025/tr_mrk.csv",
+    "kind": "tr_mrk",
+    "size_mb": 3.8,
+    "app_recognises_name": true,
+    "standard_name": "tr_mrk.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "Portfolio",
+      "MKT_Modprod",
+      "Mkt_risk",
+      "Amount",
+      "Row",
+      "Column",
+      "Sheet"
+    ],
+    "decimal": "dot",
+    "rows": 23817
+  },
+  {
+    "year": "2025",
+    "edition": "2025",
+    "file": "2025/tr_oth.csv",
+    "kind": "tr_oth",
+    "size_mb": 15.1,
+    "app_recognises_name": true,
+    "standard_name": "tr_oth.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "ASSETS_FV",
+      "ASSETS_Stages",
+      "Exposure",
+      "Financial_instruments",
+      "Amount",
+      "Fin_end_year",
+      "n_quarters",
+      "Row",
+      "Column",
+      "Sheet"
+    ],
+    "decimal": "dot",
+    "rows": 91277
+  },
+  {
+    "year": "2025",
+    "edition": "2025",
+    "file": "2025/tr_sov.csv",
+    "kind": "tr_sov",
+    "size_mb": 91.0,
+    "app_recognises_name": true,
+    "standard_name": "tr_sov.csv",
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "header": [
+      "LEI_Code",
+      "NSA",
+      "Period",
+      "Item",
+      "Label",
+      "Country",
+      "Accounting_portfolio",
+      "Maturity",
+      "Amount",
+      "Row",
+      "Column",
+      "Sheet"
+    ],
+    "decimal": "dot",
+    "rows": 448334
+  }
+]

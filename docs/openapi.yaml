@@ -2008,7 +2008,7 @@ components:
           title: Max Upload Mb
           description: Largest accepted file, in MB
           examples:
-          - 100.0
+          - 170.0
         accepted_extensions:
           items:
             type: string

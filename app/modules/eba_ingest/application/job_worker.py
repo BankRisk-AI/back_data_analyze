@@ -9,7 +9,7 @@ class ImportWorker(Worker):
         self,
         storage_dir: str,
         schema: str = "public",
-        max_bytes: int = 100 * 1024 * 1024,
+        max_bytes: int = 170 * 1024 * 1024,
         poll_interval: float = 1.0,
         stale_after: int = 900,
     ):

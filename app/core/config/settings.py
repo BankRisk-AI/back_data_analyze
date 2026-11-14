@@ -35,7 +35,7 @@ def get_schema() -> str:
 
 
 def get_max_upload_bytes() -> int:
-    return int(float(os.getenv("EBA_MAX_MB", "100")) * 1024 * 1024)
+    return int(float(os.getenv("EBA_MAX_MB", "170")) * 1024 * 1024)
 
 
 def get_user_id() -> int | None:

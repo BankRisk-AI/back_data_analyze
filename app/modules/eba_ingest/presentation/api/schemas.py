@@ -63,7 +63,7 @@ class ImportSummary(BaseModel):
 
 
 class IngestConfig(BaseModel):
-    max_upload_mb: float = Field(description="Largest accepted file, in MB", examples=[100.0])
+    max_upload_mb: float = Field(description="Largest accepted file, in MB", examples=[170.0])
     accepted_extensions: list[str] = Field(examples=[[".csv", ".xlsx"]])
     authentication: bool = Field(default=False, description="False until the application has users")
 
