@@ -13,3 +13,4 @@ eba_data
 eba_prepared
 .prod
 prod
+data/panel_row_*.csv

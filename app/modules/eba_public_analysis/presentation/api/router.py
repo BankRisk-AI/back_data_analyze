@@ -8,7 +8,9 @@ from app.core.config import get_schema
 from app.modules.eba_public_analysis.application import analysis
 from app.modules.eba_public_analysis.domain import MAX_PAGE_SIZE
 from app.modules.eba_public_analysis.presentation.api.schemas import (
-    Aggregate, Histogram, Preview, Profile, PublicPeriod, Scatter,
+    Aggregate, BankList, CrossSection, Histogram, IndicatorSeries, PanelFeatures,
+    PanelSeries, Preview, Profile, PublicPeriod, ReportQuarter, ReportType,
+    ReportYear, Scatter,
 )
 
 TAG = "public-analysis"
@@ -65,5 +67,53 @@ def build_router(schema: str | None = None) -> APIRouter:
                        item_y: Annotated[str, Query(description="Indicator code for the y axis")],
                        period: Annotated[str, Query(description="YYYYMM period")]):
         return analysis.scatter(version_id, dataset, item_x, item_y, period, schema)
+
+    @router.get("/report-types", response_model=list[ReportType], operation_id="list_report_types",
+                summary="List report types and datasets", responses=problem_responses(422))
+    def list_report_types():
+        return analysis.report_types(schema)
+
+    @router.get("/report-types/{report_type}/years", response_model=list[ReportYear],
+                operation_id="list_report_type_years", summary="List years for a report type",
+                responses=problem_responses(422))
+    def list_report_type_years(report_type: str):
+        return analysis.report_years(report_type, schema)
+
+    @router.get("/report-types/{report_type}/years/{year}/quarters", response_model=list[ReportQuarter],
+                operation_id="list_report_type_quarters", summary="List quarters for a report type",
+                responses=problem_responses(422))
+    def list_report_type_quarters(report_type: str, year: Annotated[int, Path(ge=2000, le=2100)]):
+        return analysis.report_quarters(report_type, year, schema)
+
+    @router.get("/banks", response_model=BankList, operation_id="list_banks",
+                summary="List banks and panel coverage", responses=problem_responses(422))
+    def list_banks(page: Annotated[int, Query(ge=1)] = 1,
+                   page_size: Annotated[int, Query(ge=1, le=MAX_PAGE_SIZE)] = 50,
+                   country: str | None = None, search: str | None = None):
+        return analysis.banks(schema, page, page_size, country, search)
+
+    @router.get("/banks/{bank_id}/panel", response_model=PanelSeries,
+                operation_id="get_bank_panel", summary="Get all panel periods for a bank",
+                responses=problem_responses(404, 422))
+    def get_bank_panel(bank_id: int):
+        return analysis.bank_panel(bank_id, schema)
+
+    @router.get("/panel/cross-section", response_model=CrossSection,
+                operation_id="get_panel_cross_section", summary="Get a panel feature cross-section",
+                responses=problem_responses(404, 422))
+    def get_panel_cross_section(period: Annotated[str, Query(min_length=6, max_length=6)],
+                                feature: str, exclude_specialist: bool = False):
+        return analysis.cross_section(period, feature, schema, exclude_specialist)
+
+    @router.get("/panel/features", response_model=PanelFeatures,
+                operation_id="list_panel_features", summary="Describe panel features and flags")
+    def list_panel_features():
+        return analysis.feature_definitions()
+
+    @router.get("/indicators/{indicator_id}/series", response_model=IndicatorSeries,
+                operation_id="get_indicator_series", summary="Get a bank indicator series",
+                responses=problem_responses(404, 422))
+    def get_indicator_series(indicator_id: int, bank_id: Annotated[int, Query(ge=1)]):
+        return analysis.indicator_series(indicator_id, bank_id, schema)
 
     return router

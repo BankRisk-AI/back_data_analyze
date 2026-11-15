@@ -59,3 +59,68 @@ class Scatter(BaseModel):
     item_y: str
     period: str
     points: list[dict[str, Any]]
+
+
+class ReportType(BaseModel):
+    name: str
+    label: str
+    datasets: list[str]
+
+
+class ReportYear(BaseModel):
+    year: int
+
+
+class ReportQuarter(BaseModel):
+    period: str
+    quarter: str
+    reporting_date: str
+
+
+class BankSummary(BaseModel):
+    bank_id: int
+    lei: str
+    name: str | None
+    country: str | None
+    first_period: str | None
+    last_period: str | None
+    periods: int
+    specialist_institution: bool
+
+
+class BankList(BaseModel):
+    rows: list[BankSummary]
+    total: int
+    page: int
+    page_size: int
+
+
+class PanelSeries(BaseModel):
+    bank_id: int
+    periods: list[dict[str, Any]]
+
+
+class CrossSection(BaseModel):
+    period: str
+    feature: str
+    values: list[dict[str, Any]]
+
+
+class FeatureDefinition(BaseModel):
+    name: str
+    label: str
+    formula: str
+    unit: str
+    first_period: str
+    risk_direction: str
+
+
+class PanelFeatures(BaseModel):
+    features: list[FeatureDefinition]
+    flags: dict[str, str]
+
+
+class IndicatorSeries(BaseModel):
+    indicator_id: int
+    bank_id: int
+    rows: list[dict[str, Any]]

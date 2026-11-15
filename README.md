@@ -2,7 +2,7 @@
 
 EBA Data Explorer is a Python 3.12 FastAPI application backed by PostgreSQL.
 It preserves uploaded EBA files, validates them in staging, and promotes
-validated data atomically into the 13-table Chapter 4 schema.
+validated data atomically into the 15-table Chapter 4 schema.
 
 ## Setup
 
@@ -36,8 +36,11 @@ integration tests. It must contain edition directories such as
 
 Run performance benchmarks explicitly with `pytest -m slow`.
 
-The job flow is upload -> `validate` job (staging) -> POST validation
+The job flow is upload -> `stage` job (staging) -> POST validation
 (`validate_data`) -> POST load (`load`). The worker processes the queued jobs.
+Operational checks include `python -m app smoke` and `python -m app preflight`;
+the complete production load uses `python -m app import-all --target prod
+eba_prepared`.
 
 ## Tests
 

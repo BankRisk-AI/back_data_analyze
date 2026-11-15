@@ -1,0 +1,1316 @@
+edition: '2015'
+source: eba_prepared/2015/TR_Metadata.xlsx
+status: decoded
+dimensions:
+  Status:
+    '0':
+      label: No breakdown by status
+      normalised_key: null
+    '1':
+      label: Non defaulted assets
+      normalised_key: null
+    '2':
+      label: Defaulted assets
+      normalised_key: null
+  Perf_status:
+    '0':
+      label: No breakdown by Perf_status
+      normalised_key: null
+    '1':
+      label: Performing
+      normalised_key: null
+    '2':
+      label: Non Performing
+      normalised_key: null
+    '3':
+      label: Performing but past due >30 days and <=90 days
+      normalised_key: null
+    '4':
+      label: Non Performing and Defaulted
+      normalised_key: null
+  Maturity:
+    '0':
+      label: No breakdown by maturity
+      normalised_key: null
+    '1':
+      label: '[ 0 - 3M ]'
+      normalised_key: null
+    '2':
+      label: '[ 3M - 1Y ]'
+      normalised_key: null
+    '3':
+      label: '[ 1Y - 2Y ]'
+      normalised_key: null
+    '4':
+      label: '[ 2Y - 3Y ]'
+      normalised_key: null
+    '5':
+      label: '[3Y - 5Y ]'
+      normalised_key: null
+    '6':
+      label: '[5Y - 10Y ]'
+      normalised_key: null
+    '7':
+      label: '[10Y - more ]'
+      normalised_key: null
+    '8':
+      label: Total
+      normalised_key: null
+  Country:
+    '0':
+      label: No breakdown by Country
+      normalised_key: null
+    '1':
+      label: Austria
+      normalised_key: null
+    '2':
+      label: Belgium
+      normalised_key: null
+    '3':
+      label: Bulgaria
+      normalised_key: null
+    '4':
+      label: Cyprus
+      normalised_key: null
+    '5':
+      label: Czech Republic
+      normalised_key: null
+    '6':
+      label: Denmark
+      normalised_key: null
+    '7':
+      label: Estonia
+      normalised_key: null
+    '8':
+      label: Finland
+      normalised_key: null
+    '9':
+      label: France
+      normalised_key: null
+    '10':
+      label: Germany
+      normalised_key: null
+    '11':
+      label: Greece
+      normalised_key: null
+    '12':
+      label: Hungary
+      normalised_key: null
+    '13':
+      label: Iceland
+      normalised_key: null
+    '14':
+      label: Ireland
+      normalised_key: null
+    '15':
+      label: Italy
+      normalised_key: null
+    '16':
+      label: Latvia
+      normalised_key: null
+    '17':
+      label: Liechtenstein
+      normalised_key: null
+    '18':
+      label: Lithuania
+      normalised_key: null
+    '19':
+      label: Luxembourg
+      normalised_key: null
+    '20':
+      label: Malta
+      normalised_key: null
+    '21':
+      label: Netherlands
+      normalised_key: null
+    '22':
+      label: Norway
+      normalised_key: null
+    '23':
+      label: Poland
+      normalised_key: null
+    '24':
+      label: Portugal
+      normalised_key: null
+    '25':
+      label: Romania
+      normalised_key: null
+    '26':
+      label: Slovakia
+      normalised_key: null
+    '27':
+      label: Slovenia
+      normalised_key: null
+    '28':
+      label: Spain
+      normalised_key: null
+    '29':
+      label: Sweden
+      normalised_key: null
+    '30':
+      label: United Kingdom
+      normalised_key: null
+    '31':
+      label: Brazil
+      normalised_key: null
+    '32':
+      label: Chile
+      normalised_key: null
+    '33':
+      label: China
+      normalised_key: null
+    '34':
+      label: CROATIA
+      normalised_key: null
+    '35':
+      label: Hong Kong
+      normalised_key: null
+    '36':
+      label: India
+      normalised_key: null
+    '37':
+      label: Japan
+      normalised_key: null
+    '38':
+      label: Mexico
+      normalised_key: null
+    '39':
+      label: Peru
+      normalised_key: null
+    '40':
+      label: Russian Federation
+      normalised_key: null
+    '41':
+      label: Switzerland
+      normalised_key: null
+    '42':
+      label: Turkey
+      normalised_key: null
+    '43':
+      label: United States
+      normalised_key: null
+    '44':
+      label: International organisations
+      normalised_key: null
+    '50':
+      label: Afghanistan
+      normalised_key: null
+    '51':
+      label: Albania
+      normalised_key: null
+    '52':
+      label: Algeria
+      normalised_key: null
+    '53':
+      label: American Samoa
+      normalised_key: null
+    '54':
+      label: Andorra
+      normalised_key: null
+    '55':
+      label: Angola
+      normalised_key: null
+    '56':
+      label: Anguilla
+      normalised_key: null
+    '57':
+      label: Antigua and Barbuda
+      normalised_key: null
+    '58':
+      label: Argentina
+      normalised_key: null
+    '59':
+      label: Armenia
+      normalised_key: null
+    '60':
+      label: Aruba
+      normalised_key: null
+    '61':
+      label: Australia
+      normalised_key: null
+    '62':
+      label: Azerbaijan
+      normalised_key: null
+    '63':
+      label: Bahamas
+      normalised_key: null
+    '64':
+      label: Bahrain
+      normalised_key: null
+    '65':
+      label: Bangladesh
+      normalised_key: null
+    '66':
+      label: Barbados
+      normalised_key: null
+    '67':
+      label: Belarus
+      normalised_key: null
+    '68':
+      label: Belize
+      normalised_key: null
+    '69':
+      label: Benin
+      normalised_key: null
+    '70':
+      label: Bermuda
+      normalised_key: null
+    '71':
+      label: Bhutan
+      normalised_key: null
+    '72':
+      label: BOLIVIA_ PLURINATIONAL STATE OF
+      normalised_key: null
+    '73':
+      label: BONAIRE_ SINT EUSTATIUS AND SABA
+      normalised_key: null
+    '74':
+      label: BOSNIA AND HERZEGOVINA
+      normalised_key: null
+    '75':
+      label: Botswana
+      normalised_key: null
+    '76':
+      label: British Indian Ocean Territory
+      normalised_key: null
+    '77':
+      label: Brunei Darussalam
+      normalised_key: null
+    '78':
+      label: Burkina Faso
+      normalised_key: null
+    '79':
+      label: Burundi
+      normalised_key: null
+    '80':
+      label: Cambodia
+      normalised_key: null
+    '81':
+      label: Cameroon
+      normalised_key: null
+    '82':
+      label: Canada
+      normalised_key: null
+    '83':
+      label: Cape Verde
+      normalised_key: null
+    '84':
+      label: Cayman Islands
+      normalised_key: null
+    '85':
+      label: Central African Republic
+      normalised_key: null
+    '86':
+      label: Chad
+      normalised_key: null
+    '87':
+      label: Channel Islands
+      normalised_key: null
+    '88':
+      label: Colombia
+      normalised_key: null
+    '89':
+      label: Comoros
+      normalised_key: null
+    '90':
+      label: CONGO_ THE DEMOCRATIC REPUBLIC OF THE
+      normalised_key: null
+    '91':
+      label: CONGO
+      normalised_key: null
+    '92':
+      label: Cook Islands
+      normalised_key: null
+    '93':
+      label: Costa Rica
+      normalised_key: null
+    '94':
+      label: "C\xD4TE D'IVOIRE"
+      normalised_key: null
+    '95':
+      label: Cuba
+      normalised_key: null
+    '96':
+      label: "CURA\xC7AO"
+      normalised_key: null
+    '97':
+      label: Djibouti
+      normalised_key: null
+    '98':
+      label: Dominica
+      normalised_key: null
+    '99':
+      label: Dominican Republic
+      normalised_key: null
+    '100':
+      label: Ecuador
+      normalised_key: null
+    '101':
+      label: Egypt
+      normalised_key: null
+    '102':
+      label: El Salvador
+      normalised_key: null
+    '103':
+      label: Equatorial Guinea
+      normalised_key: null
+    '104':
+      label: Eritrea
+      normalised_key: null
+    '105':
+      label: Ethiopia
+      normalised_key: null
+    '106':
+      label: Faroe Islands
+      normalised_key: null
+    '107':
+      label: Falkland Islands (MALVINAS)
+      normalised_key: null
+    '108':
+      label: Fiji
+      normalised_key: null
+    '109':
+      label: French Guiana
+      normalised_key: null
+    '110':
+      label: French Polynesia
+      normalised_key: null
+    '111':
+      label: MACEDONIA_ THE FORMER YUGOSLAV REPUBLIC OF
+      normalised_key: null
+    '112':
+      label: Gabon
+      normalised_key: null
+    '113':
+      label: Gambia
+      normalised_key: null
+    '114':
+      label: Georgia
+      normalised_key: null
+    '115':
+      label: Ghana
+      normalised_key: null
+    '116':
+      label: Gibraltar
+      normalised_key: null
+    '117':
+      label: Greenland
+      normalised_key: null
+    '118':
+      label: Grenada
+      normalised_key: null
+    '119':
+      label: Guadeloupe
+      normalised_key: null
+    '120':
+      label: Guam
+      normalised_key: null
+    '121':
+      label: Guatemala
+      normalised_key: null
+    '122':
+      label: Guinea
+      normalised_key: null
+    '123':
+      label: Guinea-Bissau
+      normalised_key: null
+    '124':
+      label: Guyana
+      normalised_key: null
+    '125':
+      label: Haiti
+      normalised_key: null
+    '126':
+      label: Holy See (Vatican City State)
+      normalised_key: null
+    '127':
+      label: Honduras
+      normalised_key: null
+    '128':
+      label: Indonesia
+      normalised_key: null
+    '129':
+      label: IRAN_ ISLAMIC REPUBLIC OF
+      normalised_key: null
+    '130':
+      label: Iraq
+      normalised_key: null
+    '131':
+      label: Isle of Man
+      normalised_key: null
+    '132':
+      label: Israel
+      normalised_key: null
+    '133':
+      label: Jamaica
+      normalised_key: null
+    '134':
+      label: Jordan
+      normalised_key: null
+    '135':
+      label: Kazakhstan
+      normalised_key: null
+    '136':
+      label: Kenya
+      normalised_key: null
+    '137':
+      label: Kiribati
+      normalised_key: null
+    '138':
+      label: KOREA_ DEMOCRATIC PEOPLE'S REPUBLIC OF
+      normalised_key: null
+    '139':
+      label: KOREA_ REPUBLIC OF
+      normalised_key: null
+    '140':
+      label: Kosovo
+      normalised_key: null
+    '141':
+      label: Kuwait
+      normalised_key: null
+    '142':
+      label: Kyrgyzstan
+      normalised_key: null
+    '143':
+      label: LAO PEOPLE'S DEMOCRATIC REPUBLIC
+      normalised_key: null
+    '144':
+      label: Lebanon
+      normalised_key: null
+    '145':
+      label: Lesotho
+      normalised_key: null
+    '146':
+      label: Liberia
+      normalised_key: null
+    '147':
+      label: Libya
+      normalised_key: null
+    '148':
+      label: Macao
+      normalised_key: null
+    '149':
+      label: Madagascar
+      normalised_key: null
+    '150':
+      label: Malawi
+      normalised_key: null
+    '151':
+      label: Malaysia
+      normalised_key: null
+    '152':
+      label: Maldives
+      normalised_key: null
+    '153':
+      label: Mali
+      normalised_key: null
+    '154':
+      label: Marshall Islands
+      normalised_key: null
+    '155':
+      label: Martinique
+      normalised_key: null
+    '156':
+      label: Mauritania
+      normalised_key: null
+    '157':
+      label: Mauritius
+      normalised_key: null
+    '158':
+      label: Mayotte
+      normalised_key: null
+    '159':
+      label: MICRONESIA_ FEDERATED STATES OF
+      normalised_key: null
+    '160':
+      label: MOLDOVA_ REPUBLIC OF
+      normalised_key: null
+    '161':
+      label: Monaco
+      normalised_key: null
+    '162':
+      label: Mongolia
+      normalised_key: null
+    '163':
+      label: Montenegro
+      normalised_key: null
+    '164':
+      label: Montserrat
+      normalised_key: null
+    '165':
+      label: Morocco
+      normalised_key: null
+    '166':
+      label: Mozambique
+      normalised_key: null
+    '167':
+      label: Myanmar
+      normalised_key: null
+    '168':
+      label: Namibia
+      normalised_key: null
+    '169':
+      label: Nauru
+      normalised_key: null
+    '170':
+      label: Nepal
+      normalised_key: null
+    '171':
+      label: New Caledonia
+      normalised_key: null
+    '172':
+      label: New Zealand
+      normalised_key: null
+    '173':
+      label: Nicaragua
+      normalised_key: null
+    '174':
+      label: Niger
+      normalised_key: null
+    '175':
+      label: Nigeria
+      normalised_key: null
+    '176':
+      label: Niue
+      normalised_key: null
+    '177':
+      label: Northern Mariana Islands
+      normalised_key: null
+    '178':
+      label: Oman
+      normalised_key: null
+    '179':
+      label: Pakistan
+      normalised_key: null
+    '180':
+      label: Palau
+      normalised_key: null
+    '181':
+      label: Panama
+      normalised_key: null
+    '182':
+      label: Papua New Guinea
+      normalised_key: null
+    '183':
+      label: Paraguay
+      normalised_key: null
+    '184':
+      label: Philippines
+      normalised_key: null
+    '185':
+      label: Pitcairn
+      normalised_key: null
+    '186':
+      label: Puerto Rico
+      normalised_key: null
+    '187':
+      label: Qatar
+      normalised_key: null
+    '188':
+      label: "R\xC9UNION"
+      normalised_key: null
+    '189':
+      label: Rwanda
+      normalised_key: null
+    '190':
+      label: SAINT HELENA_ ASCENSION AND TRISTAN DA CUNHA
+      normalised_key: null
+    '191':
+      label: Saint Kitts and Nevis
+      normalised_key: null
+    '192':
+      label: Saint Lucia
+      normalised_key: null
+    '193':
+      label: SAINT MARTIN (FRENCH PART)
+      normalised_key: null
+    '194':
+      label: Saint Vincent and the Grenadines
+      normalised_key: null
+    '195':
+      label: SAINT PIERRE AND MIQUELON
+      normalised_key: null
+    '196':
+      label: Samoa
+      normalised_key: null
+    '197':
+      label: San Marino
+      normalised_key: null
+    '198':
+      label: Sao Tome and Principe
+      normalised_key: null
+    '199':
+      label: Saudi Arabia
+      normalised_key: null
+    '200':
+      label: Senegal
+      normalised_key: null
+    '201':
+      label: Serbia
+      normalised_key: null
+    '202':
+      label: Seychelles
+      normalised_key: null
+    '203':
+      label: Sierra Leone
+      normalised_key: null
+    '204':
+      label: Singapore
+      normalised_key: null
+    '205':
+      label: SINT MAARTEN (DUTCH PART)
+      normalised_key: null
+    '206':
+      label: Solomon Islands
+      normalised_key: null
+    '207':
+      label: Somalia
+      normalised_key: null
+    '208':
+      label: South Africa
+      normalised_key: null
+    '209':
+      label: South Sudan
+      normalised_key: null
+    '210':
+      label: Sri Lanka
+      normalised_key: null
+    '211':
+      label: Sudan
+      normalised_key: null
+    '212':
+      label: Suriname
+      normalised_key: null
+    '213':
+      label: SVALBARD AND JAN MAYEN
+      normalised_key: null
+    '214':
+      label: Swaziland
+      normalised_key: null
+    '215':
+      label: SYRIAN ARAB REPUBLIC
+      normalised_key: null
+    '216':
+      label: TAIWAN_ PROVINCE OF CHINA
+      normalised_key: null
+    '217':
+      label: Tajikistan
+      normalised_key: null
+    '218':
+      label: TANZANIA_ UNITED REPUBLIC OF
+      normalised_key: null
+    '219':
+      label: Thailand
+      normalised_key: null
+    '220':
+      label: Timor-Leste
+      normalised_key: null
+    '221':
+      label: Togo
+      normalised_key: null
+    '222':
+      label: Tokelau
+      normalised_key: null
+    '223':
+      label: Tonga
+      normalised_key: null
+    '224':
+      label: Trinidad and Tobago
+      normalised_key: null
+    '225':
+      label: Tunisia
+      normalised_key: null
+    '226':
+      label: Turkmenistan
+      normalised_key: null
+    '227':
+      label: Turks and Caicos Islands
+      normalised_key: null
+    '228':
+      label: Tuvalu
+      normalised_key: null
+    '229':
+      label: Uganda
+      normalised_key: null
+    '230':
+      label: Ukraine
+      normalised_key: null
+    '231':
+      label: United Arab Emirates
+      normalised_key: null
+    '232':
+      label: United States Minor Outlying Islands
+      normalised_key: null
+    '233':
+      label: Uruguay
+      normalised_key: null
+    '234':
+      label: Uzbekistan
+      normalised_key: null
+    '235':
+      label: Vanuatu
+      normalised_key: null
+    '236':
+      label: VENEZUELA_ BOLIVARIAN REPUBLIC OF
+      normalised_key: null
+    '237':
+      label: VIET NAM
+      normalised_key: null
+    '238':
+      label: WALLIS AND FUTUNA
+      normalised_key: null
+    '239':
+      label: West Bank and Gaza
+      normalised_key: null
+    '240':
+      label: Western Sahara
+      normalised_key: null
+    '241':
+      label: Yemen
+      normalised_key: null
+    '242':
+      label: Zambia
+      normalised_key: null
+    '243':
+      label: Zimbabwe
+      normalised_key: null
+    '244':
+      label: Other
+      normalised_key: null
+    '245':
+      label: Other Central and eastern Europe countries non EEA
+      normalised_key: null
+    '246':
+      label: Middle East
+      normalised_key: null
+    '247':
+      label: Latin America and the Caribbean
+      normalised_key: null
+    '248':
+      label: Africa
+      normalised_key: null
+    '249':
+      label: Other advanced economies non EEA
+      normalised_key: null
+    '250':
+      label: NORFOLK ISLAND
+      normalised_key: null
+    '251':
+      label: PALESTINIAN TERRITORY_ OCCUPIED
+      normalised_key: null
+    '252':
+      label: "SAINT BARTH\xC9LEMY"
+      normalised_key: null
+    '253':
+      label: SOUTH GEORGIA AND THE SOUTH SANDWICH ISLANDS
+      normalised_key: null
+    '254':
+      label: VIRGIN ISLANDS_ BRITISH
+      normalised_key: null
+    '255':
+      label: VIRGIN ISLANDS_ U.S.
+      normalised_key: null
+    '256':
+      label: "\xC5LAND ISLANDS"
+      normalised_key: null
+    '257':
+      label: ANTARCTICA
+      normalised_key: null
+    '258':
+      label: BOUVET ISLAND
+      normalised_key: null
+    '259':
+      label: CHRISTMAS ISLAND
+      normalised_key: null
+    '260':
+      label: COCOS (KEELING) ISLANDS
+      normalised_key: null
+    '261':
+      label: FRENCH SOUTHERN TERRITORIES
+      normalised_key: null
+    '262':
+      label: GUERNSEY
+      normalised_key: null
+    '263':
+      label: HEARD ISLAND AND MCDONALD ISLANDS
+      normalised_key: null
+    '264':
+      label: JERSEY
+      normalised_key: null
+    '701':
+      label: "Banque Centrale des \xC9tats de l\u2019Afrique de l\u2019Ouest (BCEAO)"
+      normalised_key: null
+    '702':
+      label: "CASDB (Central African States\u2019 Development Bank)"
+      normalised_key: null
+    '703':
+      label: African Development Fund
+      normalised_key: null
+    '704':
+      label: Asian Development Fund
+      normalised_key: null
+    '705':
+      label: "Fonds sp\xE9cial unifi\xE9 de d\xE9veloppement"
+      normalised_key: null
+    '706':
+      label: CABEI (Central American Bank for Economic Integration)
+      normalised_key: null
+    '707':
+      label: ADC (Andean Development Corporation)
+      normalised_key: null
+    '708':
+      label: Other International Organisations (financial institutions)
+      normalised_key: null
+    '709':
+      label: "Banque des \xC9tats de l\u2019Afrique centrale (BEAC)"
+      normalised_key: null
+    '710':
+      label: "Communaut\xE9 \xC9conomique et Mon\xE9taire de l\u2019Afrique Centrale\
+        \ (CEMAC)"
+      normalised_key: null
+    '711':
+      label: Eastern Caribbean Currency Union (ECCU)
+      normalised_key: null
+    '712':
+      label: Other International Financial Organisations n.i.e.
+      normalised_key: null
+    '713':
+      label: Other International Organisations (non-financial institutions)
+      normalised_key: null
+    '714':
+      label: NATO (North Atlantic Treaty Organisation)
+      normalised_key: null
+    '715':
+      label: Council of Europe
+      normalised_key: null
+    '716':
+      label: ICRC (International Committee of the Red Cross)
+      normalised_key: null
+    '717':
+      label: ESA (European Space Agency)
+      normalised_key: null
+    '718':
+      label: EPO (European Patent Office)
+      normalised_key: null
+    '719':
+      label: EUROCONTROL (European Organisation for the Safety of Air Navigation)
+      normalised_key: null
+    '720':
+      label: EUTELSAT (European Telecommunications Satellite Organisation)
+      normalised_key: null
+    '721':
+      label: West African Economic and Monetary Union (WAEMU)
+      normalised_key: null
+    '722':
+      label: INTELSAT (International Telecommunications Satellite Organisation)
+      normalised_key: null
+    '723':
+      label: "EBU/UER (European Broadcasting Union/Union europ\xE9enne de radio-t\xE9\
+        l\xE9vis"
+      normalised_key: null
+    '724':
+      label: EUMETSAT (European Organisation for the Exploitation of Meteorological
+      normalised_key: null
+    '725':
+      label: ESO (European Southern Observatory)
+      normalised_key: null
+    '726':
+      label: ECMWF (European Centre for Medium-Range Weather Forecasts)
+      normalised_key: null
+    '727':
+      label: EMBL (European Molecular Biology Laboratory)
+      normalised_key: null
+    '728':
+      label: CERN (European Organisation for Nuclear Research)
+      normalised_key: null
+    '729':
+      label: IOM (International Organisation for Migration)
+      normalised_key: null
+    '730':
+      label: Islamic Development Bank (IDB)
+      normalised_key: null
+    '731':
+      label: Eurasian Development Bank (EDB)
+      normalised_key: null
+    '732':
+      label: Paris Club Creditor Institutions
+      normalised_key: null
+    '733':
+      label: Council of Europe Development Bank (CEB)
+      normalised_key: null
+    '734':
+      label: Other International Non-Financial Organisations n.i.e.
+      normalised_key: null
+    '735':
+      label: International Organisations excluding European Union Institutions
+      normalised_key: null
+    '736':
+      label: International Union of Credit and Investment Insurers
+      normalised_key: null
+    '737':
+      label: Multilateral Lending Agencies
+      normalised_key: null
+    '738':
+      label: International organisations (as pseudo geographic area)
+      normalised_key: null
+    '739':
+      label: United Nations organisations
+      normalised_key: null
+    '740':
+      label: IMF (International Monetary Fund)
+      normalised_key: null
+    '741':
+      label: WTO (World Trade Organisation)
+      normalised_key: null
+    '742':
+      label: IBRD (International Bank for Reconstruction and Development)
+      normalised_key: null
+    '743':
+      label: IDA (International Development Association)
+      normalised_key: null
+    '744':
+      label: Other UN Organisations (includes 1H_ 1J-1T)
+      normalised_key: null
+    '745':
+      label: UNESCO (United Nations Educational_ Scientific and Cultural Organisati
+      normalised_key: null
+    '746':
+      label: FAO (Food and Agriculture Organisation)
+      normalised_key: null
+    '747':
+      label: WHO (World Health Organisation)
+      normalised_key: null
+    '748':
+      label: IFAD (International Fund for Agricultural Development)
+      normalised_key: null
+    '749':
+      label: IFC (International Finance Corporation)
+      normalised_key: null
+    '750':
+      label: MIGA (Multilateral Investment Guarantee Agency)
+      normalised_key: null
+    '751':
+      label: "UNICEF (United Nations Children\u2019s Fund)"
+      normalised_key: null
+    '752':
+      label: UNHCR (United Nations High Commissioner for Refugees)
+      normalised_key: null
+    '753':
+      label: UNRWA (United Nations Relief and Works Agency for Palestine)
+      normalised_key: null
+    '754':
+      label: IAEA (International Atomic Energy Agency)
+      normalised_key: null
+    '755':
+      label: ILO (International Labour Organisation)
+      normalised_key: null
+    '756':
+      label: ITU (International Telecommunication Union)
+      normalised_key: null
+    '757':
+      label: Rest of UN Organisations n.i.e.
+      normalised_key: null
+    '758':
+      label: European Union Institutions_ Organs and Organisms (excluding ECB)
+      normalised_key: null
+    '759':
+      label: EMS (European Monetary System)
+      normalised_key: null
+    '760':
+      label: EIB (European Investment Bank)
+      normalised_key: null
+    '761':
+      label: EC (European Commission)
+      normalised_key: null
+    '762':
+      label: EDF (European Development Fund)
+      normalised_key: null
+    '763':
+      label: European Central Bank
+      normalised_key: null
+    '764':
+      label: EIF (European Investment Fund)
+      normalised_key: null
+    '765':
+      label: ECSC (European Coal and Steel Community)
+      normalised_key: null
+    '766':
+      label: Neighbourhood Investment Facility
+      normalised_key: null
+    '767':
+      label: FEMIP (Facility for Euro-Mediterranean Investment and Partnership)
+      normalised_key: null
+    '768':
+      label: Other EU Institutions_ Organs and Organisms covered by the General bud
+      normalised_key: null
+    '769':
+      label: European Parliament
+      normalised_key: null
+    '770':
+      label: Council of the European Union
+      normalised_key: null
+    '771':
+      label: Court of Justice
+      normalised_key: null
+    '772':
+      label: Court of Auditors
+      normalised_key: null
+    '773':
+      label: European Council
+      normalised_key: null
+    '774':
+      label: Economic and Social Committee
+      normalised_key: null
+    '775':
+      label: Committee of the Regions
+      normalised_key: null
+    '776':
+      label: EU-Africa Infrastructure Trust Fund
+      normalised_key: null
+    '777':
+      label: European Stability Mechanism (ESM)
+      normalised_key: null
+    '778':
+      label: Joint Committee of the European Supervisory Authorities (ESAs)
+      normalised_key: null
+    '779':
+      label: All the European Union Institutions financed via the EU Budget
+      normalised_key: null
+    '780':
+      label: All the European Union Institutions not financed via the EU Budget
+      normalised_key: null
+    '781':
+      label: All the European Union Institutions
+      normalised_key: null
+    '782':
+      label: Other small European Union Institutions (Ombudsman_ Data Protection Su
+      normalised_key: null
+    '783':
+      label: OECD (Organisation for Economic Co-operation and Development)
+      normalised_key: null
+    '784':
+      label: BIS (Bank for International Settlements)
+      normalised_key: null
+    '785':
+      label: IADB (Inter-American Development Bank)
+      normalised_key: null
+    '786':
+      label: AfDB (African Development Bank)
+      normalised_key: null
+    '787':
+      label: AsDB (Asian Development Bank)
+      normalised_key: null
+    '788':
+      label: EBRD (European Bank for Reconstruction and Development)
+      normalised_key: null
+    '789':
+      label: IIC (Inter-American Investment Corporation)
+      normalised_key: null
+    '790':
+      label: NIB (Nordic Investment Bank)
+      normalised_key: null
+    '791':
+      label: Eastern Caribbean Central Bank (ECCB)
+      normalised_key: null
+    '792':
+      label: IBEC (International Bank for Economic Co-operation)
+      normalised_key: null
+    '793':
+      label: IIB (International Investment Bank)
+      normalised_key: null
+    '794':
+      label: CDB (Caribbean Development Bank)
+      normalised_key: null
+    '795':
+      label: AMF (Arab Monetary Fund)
+      normalised_key: null
+    '796':
+      label: "BADEA (Banque arabe pour le d\xE9veloppement \xE9conomique en Afrique)"
+      normalised_key: null
+    '901':
+      label: Countries not relevant for MKR purposes
+      normalised_key: null
+    '902':
+      label: Not applicable/All geographical areas
+      normalised_key: null
+    '903':
+      label: Other Countries
+      normalised_key: null
+  Exposure:
+    '0':
+      label: Total / No breakdown
+      normalised_key: null
+    '101':
+      label: Central banks
+      normalised_key: null
+    '102':
+      label: General governments
+      normalised_key: null
+    '103':
+      label: Central governments or central banks
+      normalised_key: null
+    '104':
+      label: Regional governments or local authorities
+      normalised_key: null
+    '105':
+      label: Public sector entities
+      normalised_key: null
+    '106':
+      label: Multilateral Development Banks
+      normalised_key: null
+    '107':
+      label: International Organisations
+      normalised_key: null
+    '201':
+      label: Credit institutions
+      normalised_key: null
+    '202':
+      label: Financial corporations other than credit institutions
+      normalised_key: null
+    '203':
+      label: Institutions
+      normalised_key: null
+    '204':
+      label: Institutions without a short-term credit assessment
+      normalised_key: null
+    '301':
+      label: Non-financial corporations
+      normalised_key: null
+    '302':
+      label: Corporates - SME
+      normalised_key: null
+    '303':
+      label: Corporates
+      normalised_key: null
+    '304':
+      label: Corporates - Specialised Lending
+      normalised_key: null
+    '305':
+      label: Corporates other than specialised lending
+      normalised_key: null
+    '306':
+      label: Corporates without a short-term credit assessment
+      normalised_key: null
+    '307':
+      label: Institutions and corporates with a short-term credit assessment
+      normalised_key: null
+    '308':
+      label: Corporates - Real estate. Commercial
+      normalised_key: null
+    '401':
+      label: Households
+      normalised_key: null
+    '402':
+      label: Real estate. Residential
+      normalised_key: null
+    '403':
+      label: Credit for consumption
+      normalised_key: null
+    '404':
+      label: Retail
+      normalised_key: null
+    '405':
+      label: Retail - SME
+      normalised_key: null
+    '406':
+      label: "Retail \u2013 Secured by real estate property"
+      normalised_key: null
+    '407':
+      label: "Retail \u2013 Secured by real estate property - SME"
+      normalised_key: null
+    '408':
+      label: "Retail \u2013 Secured by real estate property - NON SME"
+      normalised_key: null
+    '409':
+      label: "Retail \u2013 Qualifying Revolving"
+      normalised_key: null
+    '410':
+      label: "Retail \u2013 Other Retail"
+      normalised_key: null
+    '411':
+      label: "Retail \u2013 Other Retail - SME"
+      normalised_key: null
+    '412':
+      label: "Retail \u2013 Other Retail - NON SME"
+      normalised_key: null
+    '501':
+      label: Secured by mortgages on immovable property
+      normalised_key: null
+    '502':
+      label: Secured by mortgages on immovable property - SME
+      normalised_key: null
+    '601':
+      label: Exposures in default
+      normalised_key: null
+    '602':
+      label: Items associated with particularly high risk
+      normalised_key: null
+    '603':
+      label: Covered bonds
+      normalised_key: null
+    '604':
+      label: Claims on institutions and corporate with a short-term credit assessment
+      normalised_key: null
+    '605':
+      label: Claims in the form of CIU
+      normalised_key: null
+    '606':
+      label: Equity exposures
+      normalised_key: null
+    '607':
+      label: Other items
+      normalised_key: null
+    '608':
+      label: Securitisation
+      normalised_key: null
+  Portfolio:
+    '0':
+      label: Total / No breakdown by portfolio
+      normalised_key: null
+    '1':
+      label: SA
+      normalised_key: null
+    '2':
+      label: IRB
+      normalised_key: null
+    '3':
+      label: F-IRB
+      normalised_key: null
+    '4':
+      label: A-IRB
+      normalised_key: null
+    '5':
+      label: IM
+      normalised_key: null
+    '6':
+      label: Fixed rate portfolio
+      normalised_key: null
+    '7':
+      label: Floating rate portfolio
+      normalised_key: null
+  MKT_modprod:
+    '0':
+      label: No breakdown by MKT_Modprod
+      normalised_key: null
+    '1':
+      label: Traded debt instruments
+      normalised_key: null
+    '2':
+      label: Equities
+      normalised_key: null
+    '3':
+      label: Foreign Exchange risk
+      normalised_key: null
+    '4':
+      label: Commodity risk
+      normalised_key: null
+  MKT_risk:
+    '0':
+      label: No breakdown by MKT_Risk
+      normalised_key: null
+    '1':
+      label: General risk
+      normalised_key: null
+    '2':
+      label: Specific risk
+      normalised_key: null

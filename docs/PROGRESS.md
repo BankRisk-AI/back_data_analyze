@@ -71,7 +71,7 @@
   sovereign template changes, and completed the required TEST reload proof for
   2015, 2016, 2019, and 2025.
 
-## Breaking changes for the React UI
+## Changes for the React UI
 
 - The ingest worker job kind is now `stage` instead of `validate`; clients
   should read job kinds from `/api/meta`.
@@ -80,6 +80,9 @@
   `/api/versions/{version_id}/datasets/{dataset}/preview` routes were removed;
   use `/api/public/periods` and `/api/public/versions/{version_id}/datasets/{dataset}/preview`.
 - Public analysis now also exposes the additive `sov` and `tr_sov` datasets.
+- Stage 3d adds `/api/public/report-types`, cascading years and quarters,
+  `/api/public/banks` and bank panels, panel cross-sections and feature
+  definitions, plus raw `/api/public/indicators/{indicator_id}/series`.
 
 ## Next step
 
@@ -87,18 +90,39 @@
   chain, completed the TEST/DEV rehearsal, backed up and reloaded production
   through all 12 editions, and passed checks a–g. See
   [the final report](design/stage2_final_report.md).
-- Next = Stage 3a: panel_row design only.
+- Stage 2e rehearsal (2026-11-15): completed the full twelve-edition rehearsal.
+- Stage 2e 2-smoke (2026-11-15): production smoke checks passed.
+- Stage 2e 2-preflight (2026-11-15): production preflight checks passed.
+- Stage 2e-dev (2026-11-15): DEV full reload completed.
+- Stage 2e-prod (2026-11-15): production full reload completed.
+- Stage 2e-cleanup (2026-11-15): storage and temporary data cleanup completed.
+- Stage 3b (2026-11-15): dimension decoding configurations generated,
+  verification checks A--C passed, and the final panel design recorded.
+- Stage 3c (2026-11-15): panel builder implemented and production panel
+  rebuilt; see [panel statistics](design/panel_stats.md).
+- Stage 3c-fix (2026-11-15): calendar-aligned QoQ/YoY growth, configurable
+  MAD outlier detection, 2016 NPL continuity proof, extreme-value review, and
+  production rebuild completed; see [panel statistics](design/panel_stats.md).
+- Stage 3c-fix-2 (2026-11-15): independent calendar-join verification returned
+  zero YoY and QoQ mismatches, per-period outliers were restored, leverage
+  reporting errors were nulled, and production was rebuilt; see
+  [panel statistics](design/panel_stats.md).
+- Stage 3d (2026-11-15): completed the loan-definition and specialist checks,
+  specialist configuration, and additive public report, bank, panel,
+  cross-section, feature, and raw-indicator endpoints.
+- Stage 3d-fix (2026-11-15): corrected the 202006 finding to a permanent
+  `tr_cre` definition change, found no separate Exposure row to subtract,
+  applied `series_break` handling, rebuilt production, and documented the
+  evidence in [panel statistics](design/panel_stats.md).
+- Stage 3 closed (2026-11-15): panel checks and public analysis contract are
+  complete.
+- Next = Stage 4a: rule-engine design.
 - Environments: `eba` is production via `DATABASE_URL`, `eba_test` is test via
   `TEST_DATABASE_URL`, and production storage is
   `/var/projects/python/eba_analyst/prod/eba_storage`.
 
 ## Backlog
 
-- Stage 3a: panel_row design — Table 3.4 indicator definitions from the master
-  dictionary, NPL via Perf_Status, Stage 2 via ASSETS_Stages, ROE denominator
-  options, and sovereign_hhi across the 2019 template change (design only).
-
-- Stage 2: all EBA editions + fact_sov + item mapping across editions
 - Stage 3: panel_row (Table 3.4 indicators) + time-series and report->year->quarter endpoints
 - Stage 4: configurable rule engine (EU/EBA, BNM) + alert table
 - Stage 5: ML + temporal CV + SHAP

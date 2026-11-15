@@ -1,0 +1,28 @@
+- lei: R1IO4YJ0O79SMWVCHB58
+  name: Banque centrale de compensation
+  type: central counterparty
+  reason: Median leverage and clearing-bank profile.
+- lei: 213800EUDXECGWMKKR98
+  name: Commbank Europe Ltd
+  type: custody bank
+  reason: Median leverage above 0.25 and specialist banking model.
+- lei: EV2XZWMLLXF2QRX0CD47
+  name: Kommuninvest - Grupp
+  type: public funding agency
+  reason: Median CET1 ratio above 0.5 and public-sector funding mandate.
+- lei: 529900HEKOENJHPNN480
+  name: Kuntarahoitus Oyj
+  type: public funding agency
+  reason: Median CET1 ratio above 0.5 and public-sector funding mandate.
+- lei: RNVZOEETEJ32KW0QXS82
+  name: State Street Bank Luxembourg S.C.A.
+  type: custody bank
+  reason: Median leverage above 0.25 and custody-bank profile.
+- lei: MMYX0N4ZEZ13Z4XCG897
+  name: THE BANK OF NEW YORK MELLON
+  type: custody bank
+  reason: Median CET1 ratio above 0.5 and custody-bank profile.
+- lei: 969500TVVZM86W7W5I94
+  name: C.R.H. - Caisse de refinancement de l'habitat
+  type: covered-bond/refinancing institution
+  reason: Specialist covered-bond refinancing institution with an exceptional leverage observation.

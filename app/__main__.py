@@ -27,6 +27,15 @@ def main(argv: list[str] | None = None) -> int:
     build = dictionary_sub.add_parser("build")
     build.add_argument("directory", nargs="?", default="eba_prepared")
     build.add_argument("--target", choices=("test", "prod"), required=True)
+    dimensions = sub.add_parser("dimensions", help="build dimension-code dictionaries")
+    dimensions_sub = dimensions.add_subparsers(dest="dimensions_cmd", required=True)
+    dimensions_build = dimensions_sub.add_parser("build")
+    dimensions_build.add_argument("directory", nargs="?", default="eba_prepared")
+    dimensions_build.add_argument("--out", default="config/dimensions")
+    panel = sub.add_parser("panel", help="build derived panel data")
+    panel_sub = panel.add_subparsers(dest="panel_cmd", required=True)
+    panel_build = panel_sub.add_parser("build")
+    panel_build.add_argument("--target", choices=("test", "prod"), required=True)
     reset = sub.add_parser("reset-data", help="empty application data while preserving schema and migrations")
     reset.add_argument("--confirm", required=True, help="must equal the connected database name")
     reset.add_argument("--target", choices=("test", "prod"), required=True)
@@ -103,6 +112,27 @@ def main(argv: list[str] | None = None) -> int:
         from app.core.dictionary import build_dictionary
         build_dictionary(a.directory, get_schema())
         print(target_summary(target, "dictionary-built"))
+        return 0
+    if a.cmd == "dimensions":
+        from app.core.dimensions import build_dimensions
+        paths = build_dimensions(a.directory, a.out)
+        print(f"dimensions-built editions={len(paths)} output={a.out}")
+        return 0
+    if a.cmd == "panel":
+        target, _ = select_target(a.target)
+        from app.core.config import get_schema
+        from app.core.database import connect, init_database
+        from app.core.dimensions import build_dimensions
+        from app.core.panel import build_panel
+        from app.modules import MODULES
+        init_database(get_schema(), {m.name: m.migrations_dir for m in MODULES if m.migrations_dir})
+        build_dimensions("eba_prepared", "config/dimensions")
+        conn = connect(get_schema())
+        try:
+            count = build_panel(conn)
+        finally:
+            conn.close()
+        print(target_summary(target, f"panel-built rows={count}"))
         return 0
     if a.cmd == "reset-data":
         target, _ = select_target(a.target)

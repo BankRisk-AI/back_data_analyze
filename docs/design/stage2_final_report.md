@@ -39,8 +39,7 @@ the same database because both historical targets resolved to `eba`.
 Checks **a–e** all pass: 36 unique active periods; reconciliation is
 accounted for by aggregate rows, exact duplicates, and four decision rows;
 expected bank counts; all three capital series have 36 points and one ID;
-dictionary result and two decisions/four rows; and DEV fact counts match TEST
-per edition and table. The first load took 2390.60 seconds and the production
+dictionary result and two decisions/four rows. The first load took 2390.60 seconds and the production
 reload took 2207.61 seconds.
 
 Known gaps remain D2, D3, D4, sovereign coverage for 2015–2018, Stage 2 /
@@ -53,7 +52,8 @@ Phase 0 was empty. Migrations `core/001_baseline` through
 `audit_log`, preserved `audit_log` and `app_user`, and left zero resettable
 rows. All 12 editions loaded successfully oldest-first.
 
-Checks **f–g** pass for the second load: fact, bank, indicator, and mapping
+Checks **f–g** pass for the second load: DEV fact counts match TEST per
+edition and table; fact, bank, indicator, and mapping
 counts match the first load, and the 36 values in each capital series match
 because both targets are the same `eba` database. The database is
 approximately 2,173 MB.

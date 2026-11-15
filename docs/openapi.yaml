@@ -1323,6 +1323,268 @@ paths:
           content:
             application/problem+json:
               schema: *id001
+  /api/public/report-types:
+    get:
+      tags:
+      - public-analysis
+      summary: List report types and datasets
+      operationId: list_report_types
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ReportType'
+                type: array
+                title: Response List Report Types
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
+  /api/public/report-types/{report_type}/years:
+    get:
+      tags:
+      - public-analysis
+      summary: List years for a report type
+      operationId: list_report_type_years
+      parameters:
+      - name: report_type
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Report Type
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReportYear'
+                title: Response List Report Type Years
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
+  /api/public/report-types/{report_type}/years/{year}/quarters:
+    get:
+      tags:
+      - public-analysis
+      summary: List quarters for a report type
+      operationId: list_report_type_quarters
+      parameters:
+      - name: report_type
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Report Type
+      - name: year
+        in: path
+        required: true
+        schema:
+          type: integer
+          maximum: 2100
+          minimum: 2000
+          title: Year
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReportQuarter'
+                title: Response List Report Type Quarters
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
+  /api/public/banks:
+    get:
+      tags:
+      - public-analysis
+      summary: List banks and panel coverage
+      operationId: list_banks
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+          title: Page
+      - name: page_size
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 1000
+          minimum: 1
+          default: 50
+          title: Page Size
+      - name: country
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Country
+      - name: search
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Search
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankList'
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
+  /api/public/banks/{bank_id}/panel:
+    get:
+      tags:
+      - public-analysis
+      summary: Get all panel periods for a bank
+      operationId: get_bank_panel
+      parameters:
+      - name: bank_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Bank Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PanelSeries'
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema: *id001
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
+  /api/public/panel/cross-section:
+    get:
+      tags:
+      - public-analysis
+      summary: Get a panel feature cross-section
+      operationId: get_panel_cross_section
+      parameters:
+      - name: period
+        in: query
+        required: true
+        schema:
+          type: string
+          minLength: 6
+          maxLength: 6
+          title: Period
+      - name: feature
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Feature
+      - name: exclude_specialist
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+          title: Exclude Specialist
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CrossSection'
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema: *id001
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
+  /api/public/panel/features:
+    get:
+      tags:
+      - public-analysis
+      summary: Describe panel features and flags
+      operationId: list_panel_features
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PanelFeatures'
+  /api/public/indicators/{indicator_id}/series:
+    get:
+      tags:
+      - public-analysis
+      summary: Get a bank indicator series
+      operationId: get_indicator_series
+      parameters:
+      - name: indicator_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Indicator Id
+      - name: bank_id
+        in: query
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+          title: Bank Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IndicatorSeries'
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema: *id001
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
 components:
   schemas:
     Aggregate:
@@ -1385,6 +1647,74 @@ components:
       - numeric
       - non_numeric
       title: AmountSummary
+    BankList:
+      properties:
+        rows:
+          items:
+            $ref: '#/components/schemas/BankSummary'
+          type: array
+          title: Rows
+        total:
+          type: integer
+          title: Total
+        page:
+          type: integer
+          title: Page
+        page_size:
+          type: integer
+          title: Page Size
+      type: object
+      required:
+      - rows
+      - total
+      - page
+      - page_size
+      title: BankList
+    BankSummary:
+      properties:
+        bank_id:
+          type: integer
+          title: Bank Id
+        lei:
+          type: string
+          title: Lei
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        country:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Country
+        first_period:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: First Period
+        last_period:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Last Period
+        periods:
+          type: integer
+          title: Periods
+        specialist_institution:
+          type: boolean
+          title: Specialist Institution
+      type: object
+      required:
+      - bank_id
+      - lei
+      - name
+      - country
+      - first_period
+      - last_period
+      - periods
+      - specialist_institution
+      title: BankSummary
     Body_create_import:
       properties:
         files:
@@ -1476,6 +1806,26 @@ components:
       - nulls
       - null_pct
       title: ColumnProfile
+    CrossSection:
+      properties:
+        period:
+          type: string
+          title: Period
+        feature:
+          type: string
+          title: Feature
+        values:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Values
+      type: object
+      required:
+      - period
+      - feature
+      - values
+      title: CrossSection
     DatasetSummary:
       properties:
         file_id:
@@ -1526,6 +1876,35 @@ components:
       required:
       - dropped
       title: DroppedStaging
+    FeatureDefinition:
+      properties:
+        name:
+          type: string
+          title: Name
+        label:
+          type: string
+          title: Label
+        formula:
+          type: string
+          title: Formula
+        unit:
+          type: string
+          title: Unit
+        first_period:
+          type: string
+          title: First Period
+        risk_direction:
+          type: string
+          title: Risk Direction
+      type: object
+      required:
+      - name
+      - label
+      - formula
+      - unit
+      - first_period
+      - risk_direction
+      title: FeatureDefinition
     FileModel:
       properties:
         name:
@@ -2011,6 +2390,26 @@ components:
       - error
       - has_staging
       title: ImportSummary
+    IndicatorSeries:
+      properties:
+        indicator_id:
+          type: integer
+          title: Indicator Id
+        bank_id:
+          type: integer
+          title: Bank Id
+        rows:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Rows
+      type: object
+      required:
+      - indicator_id
+      - bank_id
+      - rows
+      title: IndicatorSeries
     IngestConfig:
       properties:
         max_upload_mb:
@@ -2359,6 +2758,39 @@ components:
       - rows
       title: PairModel
       description: A (year, quarter) found in the Period column of a data file.
+    PanelFeatures:
+      properties:
+        features:
+          items:
+            $ref: '#/components/schemas/FeatureDefinition'
+          type: array
+          title: Features
+        flags:
+          additionalProperties:
+            type: string
+          type: object
+          title: Flags
+      type: object
+      required:
+      - features
+      - flags
+      title: PanelFeatures
+    PanelSeries:
+      properties:
+        bank_id:
+          type: integer
+          title: Bank Id
+        periods:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Periods
+      type: object
+      required:
+      - bank_id
+      - periods
+      title: PanelSeries
     PeriodInfo:
       properties:
         period:
@@ -2750,6 +3182,51 @@ components:
       - processing
       - failed_last_24h
       title: QueueState
+    ReportQuarter:
+      properties:
+        period:
+          type: string
+          title: Period
+        quarter:
+          type: string
+          title: Quarter
+        reporting_date:
+          type: string
+          title: Reporting Date
+      type: object
+      required:
+      - period
+      - quarter
+      - reporting_date
+      title: ReportQuarter
+    ReportType:
+      properties:
+        name:
+          type: string
+          title: Name
+        label:
+          type: string
+          title: Label
+        datasets:
+          items:
+            type: string
+          type: array
+          title: Datasets
+      type: object
+      required:
+      - name
+      - label
+      - datasets
+      title: ReportType
+    ReportYear:
+      properties:
+        year:
+          type: integer
+          title: Year
+      type: object
+      required:
+      - year
+      title: ReportYear
     RuleInfo:
       properties:
         id:

@@ -1,0 +1,35 @@
+edition: '2016'
+source: eba_prepared/2016/TR_Metadata.xlsx
+status: partial
+dimensions:
+  Perf_status:
+    '0':
+      label: No breakdown
+    '2':
+      label: Non Performing
+proofs:
+  perf_status:
+    status: proven_by_continuity
+    total_code: '0'
+    npl_code: '2'
+    common_banks: 78
+    comparisons:
+    - reference_period: '201506'
+      target_period: '201606'
+      spearman: 0.986166
+      median_absolute_difference: 0.005127
+    - reference_period: '201612'
+      target_period: '201606'
+      spearman: 0.993121
+      median_absolute_difference: 0.003749
+    thresholds: spearman >= 0.90 and median absolute difference <= 0.05
+    reason: Code 2 tracks the non-performing category continuously against adjacent
+      decoded periods; the missing code 1 prevents within-period additivity only.
+  sovereign:
+    status: proven_by_additivity
+    total_item: '1820801'
+    country_item: '1820802'
+    total_country_code: '0'
+    banks_periods: 178
+    within_tolerance: 178
+    tolerance: max(0.5% of total, 0.5 currency units)
