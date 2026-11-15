@@ -1,9 +1,10 @@
-"""The processing module on the ORIGINAL 2020 EBA files (skipped when they are not available; set EBA_REAL_DIR).
+"""The processing module on the prepared 2020A EBA files (skipped when the layout is unavailable).
 The expected numbers were measured on these files with an independent SQL check."""
 import os
 import time
 
 import pytest
+from pathlib import Path
 
 from app.modules.eba_ingest import ingest
 from app.modules.eba_processing.application import analytics as A
@@ -11,11 +12,13 @@ from app.modules.eba_processing.application import datasets as D
 from app.modules.eba_processing.application import validation as V
 from app.modules.eba_processing.domain import Filters
 
-REAL = os.environ.get("EBA_REAL_DIR", "/mnt/user-data/uploads")
-FILES = ["tr_oth_2.csv", "tr_cre_2.csv", "tr_mrk_2.csv"]
-pytestmark = pytest.mark.skipif(not all(os.path.exists(os.path.join(REAL, f)) for f in FILES), reason="original EBA files not found")
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+REAL = os.path.join(os.environ.get("EBA_REAL_DIR") or str(PROJECT_ROOT / "eba_prepared"), "2020A")
+FILES = ["tr_oth.csv", "tr_cre.csv", "tr_mrk.csv"]
+pytestmark = pytest.mark.skipif(not os.path.isdir(REAL), reason="EBA_REAL_DIR prepared layout not found")
 
 
+@pytest.mark.slow
 def test_original_2020_files(db):
     rep = ingest([os.path.join(REAL, f) for f in FILES], db.storage, schema=db.schema)
     imp = rep.import_id

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import time
+import re
 from dataclasses import dataclass
 
 from app.core.config import get_schema
@@ -27,6 +28,7 @@ from app.shared.staging import staging_identifier, staging_qualified
 
 Emit = "callable[[str, int], None]"
 logger = get_logger(__name__)
+_GROUPED_AMOUNT = re.compile(r"^[+-]?\d{1,3}(?:,\d{3})+(?:\.\d+)?$")
 
 
 @dataclass
@@ -71,8 +73,8 @@ def inspect_file(f: repo.SourceFileRow) -> Inspection:
         if not is_xlsx:
             rep.reason = f"{ftype} must be an .xlsx workbook"
         elif ftype == "TR_Metadata":
-            rep.recognised = "Bank list" in readers.xlsx_sheet_names(f.stored_path)
-            rep.reason = None if rep.recognised else "no sheet named 'Bank list'"
+            rep.recognised = readers.xlsx_bank_list_sheet(f.stored_path) is not None
+            rep.reason = None if rep.recognised else "no worksheet has a header containing 'LEI_code'"
         else:
             header = readers.xlsx_header(f.stored_path)
             rep.recognised = "Item" in header and "Dataset" in header
@@ -83,7 +85,28 @@ def inspect_file(f: repo.SourceFileRow) -> Inspection:
 def stage_file(cur, insp: Inspection) -> None:
     started = time.perf_counter()
     rep = insp.report
-    rep.rows = staging.create_and_copy(cur, rep.file_id, insp.columns, insp.rows, rep.name)
+    columns = list(insp.columns or [])
+    rows = insp.rows
+    if "label" not in columns:
+        label_at = columns.index("amount") if "amount" in columns else len(columns)
+        columns.insert(label_at, "label")
+        rows = (list(row[:label_at]) + [""] + list(row[label_at:]) for row in rows)
+    if "amount" in columns:
+        amount_at = columns.index("amount")
+        normalised = 0
+        def normalise_amount(row):
+            nonlocal normalised
+            row = list(row)
+            if amount_at >= len(row):
+                return row
+            value = str(row[amount_at] or "").strip()
+            if _GROUPED_AMOUNT.fullmatch(value):
+                row[amount_at] = value.replace(",", "")
+                normalised += 1
+            return row
+        rows = (normalise_amount(row) for row in rows)
+    rep.rows = staging.create_and_copy(cur, rep.file_id, columns, rows, rep.name)
+    rep.normalised_amounts = normalised if "amount" in columns else 0
     rep.staging_table = staging_qualified(rep.file_id)
     fill_period_report(cur, staging_identifier(rep.file_id), rep)
     rep.seconds = round(time.perf_counter() - started, 2)

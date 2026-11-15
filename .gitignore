@@ -4,6 +4,12 @@ __pycache__/
 *.pyc
 .pytest_cache/
 storage/
+storage_test/
+backups/
 .idea
 .eba_data
 eba_data
+.eba_prepared
+eba_prepared
+.prod
+prod

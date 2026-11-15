@@ -1,0 +1,49 @@
+decisions:
+  - id: 2020s-2020501-bng-exclude
+    edition: 2020S
+    file_type: tr_cre
+    lei: 529900GGYMNGRQTDOO93
+    period: "201912"
+    item: "2020501"
+    dimensions:
+      portfolio: "1"
+      country: "0"
+      country_rank: "0"
+      exposure: "0"
+      status: "0"
+      perf_status: "0"
+      nace_codes: "0"
+    action: exclude
+    reason: "conflicting duplicate amounts in the EBA file (identical difference 1553.15); neither value can be justified, both excluded"
+    source: "recommendation of AI"
+    decided_by: inv
+    decided_on: "2026-11-14"
+  - id: 2020s-2020502-bng-exclude
+    edition: 2020S
+    file_type: tr_cre
+    lei: 529900GGYMNGRQTDOO93
+    period: "201912"
+    item: "2020502"
+    dimensions:
+      portfolio: "1"
+      country: "0"
+      country_rank: "0"
+      exposure: "303"
+      status: "0"
+      perf_status: "0"
+      nace_codes: "0"
+    action: exclude
+    reason: "conflicting duplicate amounts in the EBA file (identical difference 1553.15); neither value can be justified, both excluded"
+    source: "recommendation of AI"
+    decided_by: inv
+    decided_on: "2026-11-14"
+item_links:
+  - id: 2015-oth-150130-tier1-capital
+    edition: "2015"
+    dataset: oth
+    source_item: "150130"
+    indicator: "2520133"
+    reason: "1501xx codes belong to the 2015 capital template; 2015 leverage codes are 1510xx and leverage ratio 151003 is published directly."
+    source: "owner decision, Stage 2d"
+    decided_by: owner
+    decided_on: "2026-11-14"

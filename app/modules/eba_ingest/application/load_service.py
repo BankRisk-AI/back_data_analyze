@@ -14,11 +14,13 @@ from psycopg2.errors import UniqueViolation
 from psycopg2.extras import Json
 
 from app.core.config import get_schema
+from app.core.data_decisions import DataDecision, load_data_decisions
 from app.core.database import connect
 from app.core.exceptions import AppError
+from app.core.preflight import collision_check
 from app.modules.eba_ingest.infrastructure.database import repositories as repo
 from app.shared.staging import staging_identifier
-from app.shared.sql.predicates import aggregate_rows_predicate, blank_text, numeric_amount
+from app.shared.sql.predicates import NUMBER_REGEX, aggregate_rows_predicate, blank_text, numeric_amount
 
 LOAD_KIND = "load"
 class LoadError(AppError):
@@ -63,7 +65,7 @@ def _check_load_status(cur, import_id: int) -> None:
 
     cur.execute(
         """SELECT count(*) FROM source_file
-           WHERE import_id=%s AND file_type IN ('tr_oth','tr_cre','tr_mrk')
+           WHERE import_id=%s            AND file_type IN ('tr_oth','tr_cre','tr_mrk','tr_sov')
              AND to_regclass(%s || '.f' || file_id) IS NULL""",
         (import_id, "staging"),
     )
@@ -119,6 +121,22 @@ def _reference_files(cur, import_id: int) -> dict[str, str]:
     return {kind: path for kind, path in cur.fetchall() if kind in {"SDD", "TR_Metadata"}}
 
 
+def _decision_condition(decision: DataDecision, columns: list[str], cur):
+    values = {"lei_code": decision.lei, "period": decision.period, "item": decision.item, **decision.dimensions}
+    parts, params = [], []
+    for column, value in values.items():
+        if column not in columns:
+            raise LoadError(f"data decision {decision.id} references missing column {column}")
+        parts.append(sql.SQL("btrim({}) = %s").format(sql.Identifier(column)))
+        params.append(value)
+    if decision.action == "keep_amount":
+        if "amount" not in columns or decision.amount is None:
+            raise LoadError(f"data decision {decision.id} requires an amount")
+        parts.append(sql.SQL("btrim(amount) = %s").format(sql.Identifier("amount")))
+        params.append(decision.amount)
+    return sql.SQL(" AND ").join(parts), params
+
+
 def _sdd(path: str, edition: str | None, file_groups: set[str]):
     headers, rows = _header_rows(_workbook_rows(path))
     if not headers:
@@ -148,7 +166,12 @@ def _sdd(path: str, edition: str | None, file_groups: set[str]):
 def _metadata(path: str):
     if not path:
         return []
-    rows = list(_workbook_rows(path, "Bank list"))
+    from app.modules.eba_ingest.infrastructure.readers.readers import xlsx_bank_list_sheet
+
+    sheet = xlsx_bank_list_sheet(path)
+    if sheet is None:
+        return []
+    rows = list(_workbook_rows(path, sheet))
     header_at = next((i for i, r in enumerate(rows) if "lei_code" in [_norm(x) for x in r]), None)
     if header_at is None:
         return []
@@ -162,7 +185,8 @@ def _metadata(path: str):
             continue
         previous = {record[k].strip() for k in headers if k.startswith("lei_code_") and record.get(k, "").strip()}
         previous.discard(lei)
-        out.append((lei, record.get("name") or None, record.get("country", "")[:2] or None,
+        out.append((lei, record.get("name") or record.get("bank_name") or None,
+                    (record.get("country") or record.get("country_code") or "")[:2] or None,
                     str(record.get("finrep", "")).lower().startswith("yes"), sorted(previous)))
     return out
 
@@ -180,17 +204,21 @@ def _load(cur, import_id: int, emit):
                 (import_id, Json({"edition": head[1]})))
     cur.execute("SELECT file_id, file_type, file_name FROM source_file WHERE import_id = %s ORDER BY file_id", (import_id,))
     files = cur.fetchall()
-    data = [(fid, typ, name) for fid, typ, name in files if typ in {"tr_oth", "tr_cre", "tr_mrk"}]
+    data = [(fid, typ, name) for fid, typ, name in files if typ in {"tr_oth", "tr_cre", "tr_mrk", "tr_sov"}]
     if not data:
-        raise LoadError("no tr_oth, tr_cre or tr_mrk data files")
+        raise LoadError("no recognised EBA data files")
     paths = _reference_files(cur, import_id)
-    sdd_map, label_map = _sdd(paths["SDD"], head[1], {x[1] for x in data}) if "SDD" in paths else ({}, {})
+    cur.execute("SELECT file_type, sha256 FROM source_file WHERE import_id=%s", (import_id,))
+    source_hashes = dict(cur.fetchall())
     timings["reference_files"] = round(time.perf_counter() - phase_started, 2)
     phase_started = time.perf_counter()
-    target_tables = {"tr_oth": "fact_oth", "tr_cre": "fact_cre", "tr_mrk": "fact_mrk"}
+    target_tables = {"tr_oth": "fact_oth", "tr_cre": "fact_cre", "tr_mrk": "fact_mrk", "tr_sov": "fact_sov"}
     source_only = {"lei_code", "nsa", "period", "item", "label"}
+    source_column_map = {"row": "source_row", "column": "source_column", "sheet": "source_sheet"}
     target_columns: dict[str, list[str]] = {}
     staging_columns: dict[int, list[str]] = {}
+    decision_exclusions: dict[int, list[tuple[sql.Composable, list]]] = defaultdict(list)
+    applied_decisions: list[tuple[str, int]] = []
     for fid, typ, name in data:
         table = staging_identifier(fid)
         cur.execute(sql.SQL("SELECT * FROM {} LIMIT 0").format(table))
@@ -203,9 +231,39 @@ def _load(cur, import_id: int, emit):
             (target_tables[typ],),
         )
         target_columns[typ] = [r[0] for r in cur.fetchall()]
-        unknown = [c for c in columns if c not in source_only and c not in target_columns[typ]]
+        unknown = [c for c in columns if c not in source_only and c not in source_column_map and c not in target_columns[typ]]
         if unknown:
             raise LoadError(f"schema-mismatch: {', '.join(unknown)}")
+    edition = str(head[1] or "").strip()
+    for decision in load_data_decisions():
+        matching = [(fid, typ) for fid, typ, _ in data if typ == decision.file_type]
+        if not matching:
+            continue
+        for fid, _ in matching:
+            required = {"lei_code", "period", "item", *decision.dimensions}
+            if not required.issubset(staging_columns[fid]):
+                continue
+            condition, params = _decision_condition(decision, staging_columns[fid], cur)
+            table = staging_identifier(fid)
+            cur.execute(sql.SQL("SELECT count(*) FROM {} WHERE ").format(table) + condition, params)
+            count = cur.fetchone()[0]
+            if count == 0:
+                continue
+            expected = 2 if decision.action == "exclude" else 1
+            if count != expected:
+                raise LoadError(f"data decision {decision.id} matched {count} rows; expected {expected}")
+            if decision.action == "exclude":
+                decision_exclusions[fid].append((condition, params))
+                applied_decisions.append((decision.id, count))
+            else:
+                raise LoadError(f"data decision action {decision.action} is not implemented")
+
+    collisions = collision_check(cur, import_id)
+    if collisions:
+        counts = Counter(row["class"] for row in collisions)
+        detail = ", ".join(f"class {key}={value}" for key, value in sorted(counts.items()))
+        tables = ", ".join(sorted({row["fact_table"] for row in collisions}))
+        raise LoadError(f"preflight-collisions: {detail}; duplicate-facts: {tables}; no facts inserted")
 
     emit("resolving banks and indicators", 10)
     for lei, name, country, finrep, previous in _metadata(paths.get("TR_Metadata", "")):
@@ -234,6 +292,25 @@ def _load(cur, import_id: int, emit):
     non_aggregate = aggregate_rows_predicate()
     for fid, typ, _ in data:
         table = staging_identifier(fid)
+        exclusions = decision_exclusions.get(fid, [])
+        if not exclusions:
+            for decision in load_data_decisions():
+                if decision.file_type != typ:
+                    continue
+                required = {"lei_code", "period", "item", *decision.dimensions}
+                if not required.issubset(staging_columns[fid]):
+                    continue
+                condition, params = _decision_condition(decision, staging_columns[fid], cur)
+                cur.execute(sql.SQL("SELECT count(*) FROM {} WHERE ").format(table) + condition, params)
+                if cur.fetchone()[0] == 2 and decision.action == "exclude":
+                    exclusions.append((condition, params))
+        exclusion_sql = sql.SQL("")
+        exclusion_params = []
+        if exclusions:
+            exclusion_sql = sql.SQL(" AND NOT (") + sql.SQL(" OR ").join(
+                sql.SQL("(") + condition + sql.SQL(")") for condition, _ in exclusions
+            ) + sql.SQL(")")
+            exclusion_params = [value for _, params in exclusions for value in params]
         cur.execute(sql.SQL("""
             WITH source_leis AS (
                 SELECT DISTINCT btrim(s.lei_code) AS lei
@@ -273,7 +350,8 @@ def _load(cur, import_id: int, emit):
     indicator_cache.update({code: indicator_id for indicator_id, code in cur.fetchall()})
     versions = {}
     resolution = Counter()
-    quality = defaultdict(dict)
+    quality = defaultdict(lambda: {"files": [], "rows_staged": 0, "aggregate_rows_excluded": 0,
+                                   "rows_loaded": 0, "amount_sum": 0.0})
     for fid, typ, name in data:
         table = staging_identifier(fid)
         cur.execute(sql.SQL("SELECT DISTINCT btrim(period) FROM {} WHERE NOT {}").format(table, sql.SQL(non_aggregate)))
@@ -302,44 +380,54 @@ def _load(cur, import_id: int, emit):
                         [value for key, value in versions.items() for value in (key[0], key[1], value)])
 
         group = typ.replace("tr_", "")
-        cur.execute(sql.SQL("SELECT btrim(item), coalesce(btrim(label), ''), count(*) FROM {} WHERE NOT {} GROUP BY 1,2")
-                    .format(table, sql.SQL(non_aggregate)))
+        label_expr = sql.SQL("btrim(label)") if "label" in staging_columns[fid] else sql.SQL("NULL")
+        cur.execute(sql.SQL("SELECT btrim(item), coalesce({}, ''), count(*) FROM {} WHERE NOT {} GROUP BY 1,2")
+                    .format(label_expr, table, sql.SQL(non_aggregate)))
         for item, label, count in cur.fetchall():
             item, label = item or "", label or ""
-            info = sdd_map.get(item)
-            method = "sdd" if info else "label"
-            if not info:
-                std = label_map.get((group, label))
-                info = sdd_map.get(std) if std else None
-            if not info:
-                method = "own"
-                std = item
-                info = {"label": label or item, "group": group, "category": "Unclassified"}
+            cur.execute("""SELECT indicator_id, method
+                           FROM indicator_code_map
+                           WHERE edition_label=%s AND dataset=%s AND source_item=%s""",
+                        (edition, group, item))
+            mapped = cur.fetchone()
+            if mapped and mapped[0] is None:
+                raise LoadError(f"ambiguous item mapping: {edition}/{group}/{item}")
+            if mapped:
+                indicator, method = mapped
+                resolution[method] += count
             else:
-                std = info.get("std_code", item)
-            resolution[method] += count
-            indicator = indicator_cache.get(std)
-            if indicator is None:
-                cur.execute("""INSERT INTO indicator(std_code,label,report_type,file_group,aggregation_rule)
-                               VALUES (%s,%s,%s,%s,%s) ON CONFLICT (std_code) DO NOTHING
-                               RETURNING indicator_id""",
-                            (std, info["label"], info.get("category") or "Unclassified", group,
-                             "ratio" if "ratio" in info["label"].lower() else "flow" if info.get("category") == "P&L" else "stock"))
-                indicator_row = cur.fetchone()
-                if indicator_row is None:
-                    cur.execute("SELECT indicator_id FROM indicator WHERE std_code=%s", (std,))
-                    indicator_row = cur.fetchone()
-                indicator = indicator_row[0]
-                indicator_cache[std] = indicator
+                method = "unmapped"
+                std = item
+                indicator = indicator_cache.get(std)
+                if indicator is None:
+                    cur.execute("""INSERT INTO indicator(std_code,label,report_type,file_group,aggregation_rule,
+                                   first_seen_edition,last_seen_edition)
+                                   VALUES (%s,%s,%s,%s,%s,%s,%s)
+                                   ON CONFLICT (std_code) DO UPDATE SET label=EXCLUDED.label
+                                   RETURNING indicator_id""",
+                                (std, label or item, "Unclassified", group, "stock", edition, edition))
+                    row = cur.fetchone()
+                    if row is None:
+                        cur.execute("SELECT indicator_id FROM indicator WHERE std_code=%s", (std,))
+                        row = cur.fetchone()
+                    indicator = row[0]
+                    indicator_cache[std] = indicator
+                cur.execute("""INSERT INTO indicator_code_map
+                               (edition_label,dataset,source_item,source_label,indicator_id,method,sdd_file_sha256)
+                               VALUES (%s,%s,%s,%s,%s,'unmapped',%s)
+                               ON CONFLICT (edition_label,dataset,source_item) DO NOTHING""",
+                            (edition, group, item, label, indicator, source_hashes.get("SDD")))
+                resolution[method] += count
             cur.execute("INSERT INTO tmp_load_items(file_group,item,label,indicator_id) VALUES (%s,%s,%s,%s) ON CONFLICT DO NOTHING",
                         (group, item, label, indicator))
 
         columns = staging_columns[fid]
-        allowed = [c for c in target_columns[typ] if c in columns]
-        fields = ["version_id", "bank_id", "indicator_id"] + allowed
+        allowed = [(source_column_map.get(c, c), c) for c in columns
+                   if source_column_map.get(c, c) in target_columns[typ]]
+        fields = ["version_id", "bank_id", "indicator_id"] + [target for target, _ in allowed]
         expressions = ["tv.version_id", "tb.bank_id", "ti.indicator_id"]
-        for column in allowed:
-            quoted = sql.Identifier(column).as_string(cur)
+        for column, source in allowed:
+            quoted = sql.Identifier(source).as_string(cur)
             if column == "amount":
                 expressions.append(numeric_amount(quoted))
             elif column == "n_quarters":
@@ -347,11 +435,47 @@ def _load(cur, import_id: int, emit):
             else:
                 expressions.append(blank_text(quoted))
         quarter_expr = "((substring(btrim(s.period), 5, 2)::integer - 1) / 3 + 1)"
+        duplicate_ignored = {"label", "footnote", "row", "column", "sheet",
+                             "source_row", "source_column", "source_sheet"}
+        duplicate_key = [c for c in columns if c not in duplicate_ignored]
+        conflict_key = [c for c in duplicate_key if c != "amount"]
+        conflict_columns = sql.SQL(", ").join(sql.Identifier(c) for c in conflict_key)
+        if "amount" in columns and conflict_key and typ != "tr_cre":
+            cur.execute(sql.SQL("""
+                SELECT count(*) FROM (
+                    SELECT {}
+                    FROM {}
+                    WHERE NOT {} {}
+                    GROUP BY {}
+                    HAVING count(DISTINCT CASE WHEN btrim(amount) ~ %s
+                                               THEN btrim(amount)::numeric::text
+                                               ELSE btrim(amount) END) > 1
+                ) conflicts
+            """).format(conflict_columns, table, sql.SQL(non_aggregate),
+                        exclusion_sql, conflict_columns),
+                        [*exclusion_params, NUMBER_REGEX])
+            conflict_count = cur.fetchone()[0]
+            if conflict_count:
+                raise LoadError(f"duplicate-facts: {target_tables[typ]}")
+        duplicate_columns = sql.SQL(", ").join(sql.Identifier(c) for c in duplicate_key)
+        duplicate_order = sql.SQL(", ").join(
+            sql.SQL(f"CASE WHEN btrim(s.amount) ~ '{NUMBER_REGEX}' THEN btrim(s.amount)::numeric::text ELSE btrim(s.amount) END")
+            if c == "amount" else sql.SQL("btrim(s.{})").format(sql.Identifier(c))
+            for c in duplicate_key
+        )
+        source = sql.SQL("(SELECT DISTINCT ON ({}) s.* FROM {} s ORDER BY {}, s.ctid) s").format(
+            duplicate_order, table, duplicate_order
+        )
+        cur.execute(sql.SQL("SELECT count(*), coalesce(sum(amount), 0) FROM {} WHERE version_id IN ({})").format(
+            sql.Identifier(target_tables[typ]),
+            sql.SQL(", ").join(sql.Placeholder() for _ in versions),
+        ), tuple(versions.values()))
+        prior_loaded, prior_amount = cur.fetchone()
         cur.execute("SET LOCAL enable_nestloop = off")
         cur.execute(sql.SQL("""
             INSERT INTO {} ({})
             SELECT {}
-            FROM {} s
+            FROM {}
             JOIN tmp_load_versions tv
               ON tv.year = substring(btrim(s.period), 1, 4)::integer
              AND tv.quarter = {}
@@ -359,28 +483,39 @@ def _load(cur, import_id: int, emit):
             JOIN tmp_load_items ti
               ON ti.file_group = {}
              AND ti.item = coalesce(btrim(s.item), '')
-             AND ti.label = coalesce(btrim(s.label), '')
+             AND ti.label = coalesce({}, '')
             WHERE NOT {}
+            ON CONFLICT DO NOTHING
         """).format(sql.Identifier(target_tables[typ]),
                     sql.SQL(", ").join(map(sql.Identifier, fields)),
                     sql.SQL(", ").join(sql.SQL(expression) for expression in expressions),
-                    table, sql.SQL(quarter_expr), sql.Literal(group), sql.SQL(non_aggregate)))
+                    source, sql.SQL(quarter_expr), sql.Literal(group),
+                    sql.SQL("btrim(s.label)") if "label" in staging_columns[fid] else sql.SQL("NULL"),
+                    sql.SQL(non_aggregate), exclusion_sql), exclusion_params)
         emit(f"loaded {name}", 70)
-        cur.execute(sql.SQL("""
-            SELECT count(*), count(*) FILTER (WHERE NOT {}),
-                   coalesce(sum({}) FILTER (WHERE NOT {}), 0)
-            FROM {}
-        """).format(sql.SQL(non_aggregate), sql.SQL(numeric_amount("amount")),
-                    sql.SQL(non_aggregate), table))
-        staged, loaded, amount_sum = cur.fetchone()
-        quality[typ] = {"file": name, "rows_staged": staged, "aggregate_rows_excluded": staged - loaded,
-                        "rows_loaded": loaded, "amount_sum": float(amount_sum)}
+        cur.execute(sql.SQL("SELECT count(*) FROM {} WHERE version_id IN ({})").format(
+            sql.Identifier(target_tables[typ]),
+            sql.SQL(", ").join(sql.Placeholder() for _ in versions),
+        ), tuple(versions.values()))
+        loaded = cur.fetchone()[0] - prior_loaded
+        cur.execute(sql.SQL("SELECT coalesce(sum(amount), 0) FROM {} WHERE version_id IN ({})").format(
+            sql.Identifier(target_tables[typ]),
+            sql.SQL(", ").join(sql.Placeholder() for _ in versions),
+        ), tuple(versions.values()))
+        amount_sum = cur.fetchone()[0] - prior_amount
+        cur.execute(sql.SQL("SELECT count(*) FROM {}").format(table))
+        staged = cur.fetchone()[0]
+        quality[typ]["files"].append(name)
+        quality[typ]["rows_staged"] += staged
+        quality[typ]["aggregate_rows_excluded"] += staged - loaded
+        quality[typ]["rows_loaded"] += loaded
+        quality[typ]["amount_sum"] += float(amount_sum)
     timings["fact_inserts"] = round(time.perf_counter() - phase_started, 2)
     phase_started = time.perf_counter()
     for key, version_id in versions.items():
         cur.execute("UPDATE dataset_version SET quality=%s WHERE version_id=%s", (Json({"validation": {}, "files": list(quality.values())}), version_id))
     for typ, report in quality.items():
-        view = {"tr_oth": "v_tr_oth", "tr_cre": "v_tr_cre", "tr_mrk": "v_tr_mrk"}[typ]
+        view = {"tr_oth": "v_tr_oth", "tr_cre": "v_tr_cre", "tr_mrk": "v_tr_mrk", "tr_sov": "v_tr_sov"}[typ]
         cur.execute(f"SELECT count(*), coalesce(sum(amount),0), count(*) FILTER (WHERE amount IS NULL) FROM {view} v JOIN dataset_version d USING (version_id) WHERE d.import_id=%s", (import_id,))
         actual_rows, actual_sum, actual_empty = cur.fetchone()
         tolerance = max(1e-6, abs(report["amount_sum"]) * 1e-12)
@@ -388,6 +523,9 @@ def _load(cur, import_id: int, emit):
             raise LoadError(f"load-mismatch in {report['file']}")
     timings["post_checks"] = round(time.perf_counter() - phase_started, 2)
     cur.execute("INSERT INTO decision_log(import_id,step,detail) VALUES (%s,'item_resolution',%s)", (import_id, Json({"counts": dict(resolution)})))
+    for decision_id, rows_affected in applied_decisions:
+        cur.execute("INSERT INTO decision_log(import_id,step,detail) VALUES (%s,'data_decision',%s)",
+                    (import_id, Json({"id": decision_id, "rows_affected": rows_affected})))
     cur.execute("UPDATE import_batch SET status='loaded' WHERE import_id=%s", (import_id,))
     return list(versions.values()), timings
 
@@ -429,7 +567,7 @@ def run_load(import_id: int, schema: str | None = None, emit=None) -> None:
         failed_conn.close()
         if isinstance(exc, UniqueViolation):
             constraint = getattr(exc.diag, "constraint_name", "") or ""
-            table = next((name for name in ("fact_oth", "fact_cre", "fact_mrk") if name in constraint), "fact")
+            table = next((name for name in ("fact_oth", "fact_cre", "fact_mrk", "fact_sov") if name in constraint), "fact")
             raise LoadError(f"duplicate-facts: {table}") from exc
         raise
     finally:

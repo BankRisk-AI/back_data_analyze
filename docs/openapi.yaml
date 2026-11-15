@@ -1010,9 +1010,11 @@ paths:
           - oth
           - cre
           - mrk
+          - sov
           - tr_oth
           - tr_cre
           - tr_mrk
+          - tr_sov
           type: string
           description: Public dataset or tr_ alias
           title: Dataset
@@ -1072,9 +1074,11 @@ paths:
           - oth
           - cre
           - mrk
+          - sov
           - tr_oth
           - tr_cre
           - tr_mrk
+          - tr_sov
           type: string
           description: Public dataset or tr_ alias
           title: Dataset
@@ -1117,9 +1121,11 @@ paths:
           - oth
           - cre
           - mrk
+          - sov
           - tr_oth
           - tr_cre
           - tr_mrk
+          - tr_sov
           type: string
           description: Public dataset or tr_ alias
           title: Dataset
@@ -1189,9 +1195,11 @@ paths:
           - oth
           - cre
           - mrk
+          - sov
           - tr_oth
           - tr_cre
           - tr_mrk
+          - tr_sov
           type: string
           description: Public dataset or tr_ alias
           title: Dataset
@@ -1265,9 +1273,11 @@ paths:
           - oth
           - cre
           - mrk
+          - sov
           - tr_oth
           - tr_cre
           - tr_mrk
+          - tr_sov
           type: string
           description: Public dataset or tr_ alias
           title: Dataset
@@ -2702,6 +2712,9 @@ components:
         rows_mrk:
           type: integer
           title: Rows Mrk
+        rows_sov:
+          type: integer
+          title: Rows Sov
       type: object
       required:
       - version_id
@@ -2712,6 +2725,7 @@ components:
       - rows_oth
       - rows_cre
       - rows_mrk
+      - rows_sov
       title: PublicPeriod
     QueueState:
       properties:

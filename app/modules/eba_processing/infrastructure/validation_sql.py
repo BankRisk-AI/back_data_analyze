@@ -7,6 +7,7 @@ from psycopg2 import sql
 
 from app.modules.eba_processing.domain import ANNOTATION_COLUMNS, LABEL_COLUMN, MAX_EXAMPLES, MEASURE_COLUMN, RULES_BY_ID, ValidationIssue
 from app.modules.eba_processing.infrastructure.datasets import Dataset
+from app.core.data_decisions import decision_matches_row, load_data_decisions
 from app.shared.sql.predicates import NUMBER_REGEX, aggregate_rows_predicate, blank_text, numeric_amount
 
 AGG = aggregate_rows_predicate()
@@ -17,9 +18,13 @@ VALID_PERIOD = f"COALESCE({MONTH} BETWEEN 1 AND 12, false)"
 NUM = numeric_amount("amount")
 
 
-def _issue(rule_id: str, affected: int, detail: str = "", examples: list[dict] | None = None) -> ValidationIssue:
+def _issue(rule_id: str, affected: int, detail: str = "", examples: list[dict] | None = None,
+           severity: str | None = None, passed: bool | None = None) -> ValidationIssue:
     r = RULES_BY_ID[rule_id]
-    return ValidationIssue(rule=r.id, title=r.title, severity=r.severity, passed=affected == 0, affected_rows=affected, detail=detail, examples=(examples or [])[:MAX_EXAMPLES])
+    return ValidationIssue(rule=r.id, title=r.title, severity=severity or r.severity,
+                           passed=affected == 0 if passed is None else passed,
+                           affected_rows=affected, detail=detail,
+                           examples=(examples or [])[:MAX_EXAMPLES])
 
 
 def _count_and_examples(cur, ds: Dataset, condition: str, cols: list[str], params: tuple = ()) -> tuple[int, list[dict]]:
@@ -45,14 +50,62 @@ def v01(cur, ds):
 def v02(cur, ds):
     ident = [c for c in ds.columns if c not in (LABEL_COLUMN, MEASURE_COLUMN, *ANNOTATION_COLUMNS)]
     cols = sql.SQL(", ").join(sql.Identifier(c) for c in ident)
-    cur.execute(sql.SQL("SELECT count(*), COALESCE(sum(c), 0) FROM (SELECT count(*) AS c FROM {} GROUP BY ").format(ds.table) + cols + sql.SQL(" HAVING count(*) > 1) d"))
-    groups, rows = cur.fetchone()
-    examples = []
-    if groups:
-        cur.execute(sql.SQL("SELECT ") + cols + sql.SQL(", count(*) AS copies FROM {} GROUP BY ").format(ds.table) + cols + sql.SQL(" HAVING count(*) > 1 ORDER BY copies DESC LIMIT %s"), (MAX_EXAMPLES,))
-        names = [d[0] for d in cur.description]
-        examples = [dict(zip(names, r)) for r in cur.fetchall()]
-    return _issue("V02", int(rows), f"{groups} identities appear more than once, in {rows} rows" if groups else "", examples)
+    canonical_amount = f"CASE WHEN amount ~ '{NUMBER_REGEX}' THEN amount::numeric::text ELSE amount END"
+    duplicate_query = (
+        sql.SQL("SELECT count(*) FILTER (WHERE amounts = 1), "
+                "COALESCE(sum(c) FILTER (WHERE amounts = 1), 0), "
+                "count(*) FILTER (WHERE amounts > 1), "
+                "COALESCE(sum(c) FILTER (WHERE amounts > 1), 0) "
+                "FROM (SELECT count(*) AS c, count(DISTINCT ")
+        + sql.SQL(canonical_amount)
+        + sql.SQL(") AS amounts FROM {} GROUP BY ").format(ds.table)
+        + cols
+        + sql.SQL(" HAVING count(*) > 1) d")
+    )
+    cur.execute(sql.SQL("SELECT ") + cols + sql.SQL(", count(*) AS copies, count(DISTINCT ")
+                + sql.SQL(canonical_amount) + sql.SQL(") AS amounts FROM {} GROUP BY ").format(ds.table)
+                + cols + sql.SQL(" HAVING count(*) > 1 ORDER BY copies DESC"))
+    names = [d[0] for d in cur.description]
+    groups = [dict(zip(names, r)) for r in cur.fetchall()]
+    exact = [g for g in groups if g["amounts"] == 1]
+    conflicts = [g for g in groups if g["amounts"] > 1]
+    decisions = [d for d in load_data_decisions() if d.edition == _edition(cur, ds.import_id) and d.file_type == ds.file_type]
+    resolved = []
+    unresolved = []
+    for group in conflicts:
+        decision = next((d for d in decisions if decision_matches_row(d, group)), None)
+        (resolved if decision else unresolved).append((group, decision))
+    exact_rows = sum(g["copies"] for g in exact)
+    resolved_rows = sum(g["copies"] for g, _ in resolved)
+    conflict_rows = sum(g["copies"] for g, _ in unresolved)
+    if unresolved:
+        examples = [g for g, _ in unresolved[:MAX_EXAMPLES]]
+    elif exact:
+        examples = exact[:MAX_EXAMPLES]
+    else:
+        examples = [g for g, _ in resolved[:MAX_EXAMPLES]]
+    if unresolved:
+        detail = f"{len(unresolved)} identities have conflicting amounts, in {conflict_rows} rows"
+        if resolved:
+            detail += f"; {len(resolved)} identities ({resolved_rows} rows) resolved by decision " + ", ".join(d.id for _, d in resolved)
+        if exact:
+            detail += f"; {len(exact)} exact-duplicate identities ({exact_rows} rows) are retained as info"
+        return _issue("V02", int(conflict_rows), detail, examples, severity="error")
+    if conflicts:
+        ids = ", ".join(d.id for _, d in resolved)
+        return _issue("V02", int(resolved_rows),
+                      f"{len(conflicts)} conflicting identities ({resolved_rows} rows) resolved by decision {ids}; excluded at load",
+                      examples, severity="info")
+    if exact:
+        return _issue("V02", int(exact_rows),
+                      f"{len(exact)} identities have exact duplicate amounts, in {exact_rows} rows; one copy is retained as info",
+                      examples, severity="info")
+    return _issue("V02", 0)
+
+
+def _edition(cur, import_id: int) -> str:
+    cur.execute("SELECT edition_label FROM import_batch WHERE import_id=%s", (import_id,))
+    return cur.fetchone()[0] or ""
 
 
 def v03(cur, ds):

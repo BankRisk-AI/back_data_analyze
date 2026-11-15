@@ -11,7 +11,6 @@ REQUIRED_COLUMNS = (
     "nsa",
     "period",
     "item",
-    "label",
     "amount",
 )
 

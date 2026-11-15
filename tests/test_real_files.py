@@ -1,4 +1,4 @@
-"""Integration test on the ORIGINAL 2020 EBA files. Skipped when the folder is not available (set EBA_REAL_DIR)."""
+"""Integration test on the prepared 2020A EBA files."""
 import os, time, pytest
 from app.modules.eba_ingest import ingest
 from app.modules.eba_ingest.application.load_service import run_load
@@ -7,12 +7,10 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
-REAL = Path(
-    os.getenv("EBA_REAL_DIR", str(PROJECT_ROOT / "eba_data"))
-)
+REAL = Path(os.getenv("EBA_REAL_DIR") or str(PROJECT_ROOT / "eba_prepared")) / "2020A"
 
-FILES = ["tr_oth_2.csv", "tr_cre_2.csv", "tr_mrk_2.csv", "SDD_2.xlsx", "TR_Metadata_2.xlsx"]
-pytestmark = pytest.mark.skipif(not all(os.path.exists(os.path.join(REAL, f)) for f in FILES), reason="original EBA files not found")
+FILES = ["tr_oth.csv", "tr_cre.csv", "tr_mrk.csv", "SDD.xlsx", "TR_Metadata.xlsx"]
+pytestmark = pytest.mark.skipif(not REAL.is_dir(), reason="EBA_REAL_DIR prepared layout not found")
 
 
 def test_original_2020_files_exist():
@@ -23,10 +21,11 @@ def test_original_2020_files_exist():
     ]
 
     assert not missing, (
-        f"Missing EBA 2020 files in {REAL}: {missing}"
+        f"Missing prepared 2020A files in {REAL}: {missing}"
     )
 
 
+@pytest.mark.slow
 def test_original_2020_files(db):
     started = time.perf_counter()
     r = ingest([os.path.join(REAL, f) for f in FILES], db.storage, user_id=1, edition_label="2020", schema=db.schema)

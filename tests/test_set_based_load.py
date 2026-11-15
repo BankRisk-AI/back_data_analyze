@@ -3,6 +3,7 @@ import time
 import pytest
 from openpyxl import Workbook
 
+from app.core.preflight import collision_check
 from app.modules.eba_ingest import ingest
 from app.modules.eba_ingest.application.load_service import LoadError, run_load
 
@@ -74,7 +75,21 @@ def test_set_based_load_matches_expected_facts_and_resolution_counts(db):
         "SELECT detail->'counts' FROM decision_log WHERE import_id=%s AND step='item_resolution'",
         (report.import_id,),
     )
-    assert db.cur.fetchone()[0] == {"sdd": 8}
+    assert db.cur.fetchone()[0] == {"unmapped": 8}
+
+
+def test_full_data_decisions_are_applied_before_collision_check(db):
+    data = db.dir / "tr_cre_decision.csv"
+    data.write_text(
+        "LEI_Code,NSA,Period,Item,Label,Portfolio,Country,Country_rank,Exposure,Status,Perf_status,NACE_codes,Amount\n"
+        "529900GGYMNGRQTDOO93,NL,201912,2020501,Original Exposure,1,0,0,0,0,0,0,10\n"
+        "529900GGYMNGRQTDOO93,NL,201912,2020501,Original Exposure,1,0,0,0,0,0,0,20\n"
+        "529900GGYMNGRQTDOO93,NL,201912,2020502,Original Exposure,1,0,0,303,0,0,0,30\n"
+        "529900GGYMNGRQTDOO93,NL,201912,2020502,Original Exposure,1,0,0,303,0,0,0,40\n",
+        encoding="utf-8",
+    )
+    report = ingest([str(data)], db.storage, user_id=1, edition_label="2020S", schema=db.schema)
+    assert collision_check(db.cur, report.import_id) == []
 
 
 def test_previous_lei_resolves_without_creating_a_bank_and_blank_values_are_null(db):

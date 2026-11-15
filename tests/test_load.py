@@ -43,7 +43,7 @@ def test_validated_import_is_promoted_and_staging_is_dropped(db):
     db.cur.execute("SELECT to_regclass(%s)", (f"staging.f{report.files[0].file_id}",))
     assert db.cur.fetchone() == (None,)
     db.cur.execute("SELECT lei_code, item, amount FROM v_tr_cre")
-    assert db.cur.fetchone() == (lei_code, "STD1", 12.5)
+    assert db.cur.fetchone() == (lei_code, "I1", 12.5)
     try:
         run_load(report.import_id, db.schema)
     except LoadError as exc:

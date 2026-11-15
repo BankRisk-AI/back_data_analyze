@@ -8,6 +8,9 @@ from app.modules.eba_ingest.domain import (
 )
 from app.modules.eba_ingest.domain.services.file_detector import classify_name, normalise_header, missing_required
 from app.modules.eba_ingest.infrastructure.storage.storage import store
+from app.modules.eba_ingest.application.load_service import _metadata
+from app.modules.eba_ingest.infrastructure.readers.readers import xlsx_bank_list_sheet
+from app.modules.eba_processing.application.validation import run_validation
 from conftest import write_csv, HEADER
 
 ROWS = ["AAAAAAAAAAAAAAAAAAAA,DE,202003,2020140,CET1 ratio,0.15,", "BBBBBBBBBBBBBBBBBBBB,FR,202003,2020140,CET1 ratio,0.12,",
@@ -19,7 +22,7 @@ def count(h, table): h.cur.execute(f"SELECT count(*) FROM {table}"); return h.cu
 def test_names_and_headers():
     assert [classify_name(n) for n in ["tr_oth_2.csv", "TR_CRE.xlsx", "tr_mrk.csv", "tr_sov_x.csv", "SDD_2.xlsx", "TR_Metadata_2.xlsx", "notes.txt"]] == ["tr_oth", "tr_cre", "tr_mrk", "tr_sov", "SDD", "TR_Metadata", None]
     assert normalise_header(["LEI_Code", " Period ", "Fin end year"]) == ["lei_code", "period", "fin_end_year"]
-    assert missing_required(["lei_code", "period"]) == ["nsa", "item", "label", "amount"]
+    assert missing_required(["lei_code", "period"]) == ["nsa", "item", "amount"]
     with pytest.raises(ValueError): normalise_header(["a", "A"])
 
 def test_encoding_detection_and_immutable_storage(tmp_path):
@@ -41,6 +44,78 @@ def test_small_csv_is_staged_with_periods_and_aggregate(db):
     db.cur.execute("SELECT status, edition_label, created_by FROM import_batch"); assert db.cur.fetchall() == [("uploaded", "2020", 1)]
     db.cur.execute("SELECT file_type, encoding, sha256 FROM source_file"); ft, enc, sha = db.cur.fetchone(); assert (ft, enc, len(sha)) == ("tr_oth", "cp1252", 64)
     assert count(db, "job") == 1 and count(db, "decision_log") == 1 and count(db, "audit_log") == 1
+
+def test_label_less_csv_stages_and_validates(db):
+    p = db.dir / "tr_oth_no_label.csv"
+    p.write_text("LEI_Code,NSA,Period,Item,Amount\nAAAAAAAAAAAAAAAAAAAA,DE,202003,2020140,0.15\n", encoding="cp1252")
+    report = run(db, [str(p)])
+    file = report.files[0]
+    assert file.recognised and file.rows == 1
+    db.cur.execute(f"SELECT label FROM staging.f{file.file_id}")
+    assert db.cur.fetchone() == (None,)
+    validation = run_validation(report.import_id, db.schema)
+    assert validation.can_proceed
+
+def test_grouped_thousands_amount_is_normalised(db):
+    p = db.dir / "tr_oth_grouped_amount.csv"
+    p.write_text(
+        "LEI_Code,NSA,Period,Item,Label,Amount\n"
+        "AAAAAAAAAAAAAAAAAAAA,DE,202003,2020140,Ratio,\"1,234.50\"\n",
+        encoding="cp1252",
+    )
+    report = run(db, [str(p)])
+    file = report.files[0]
+    db.cur.execute(f"SELECT amount FROM staging.f{file.file_id}")
+    assert db.cur.fetchone() == ("1234.50",)
+    assert run_validation(report.import_id, db.schema).can_proceed
+
+def test_amount_normalisation_accepts_only_thousands_grouping(db):
+    values = ["74,672.4857", "1,234,567", "-1,000.5", "1,5", "12,34"]
+    paths = []
+    for index, value in enumerate(values):
+        path = db.dir / f"tr_oth_amount_{index}.csv"
+        path.write_text(
+            "LEI_Code,NSA,Period,Item,Label,Amount\n"
+            f"AAAAAAAAAAAAAAAAAAAA,DE,202003,I{index},Item,\"{value}\"\n",
+            encoding="cp1252",
+        )
+        paths.append(str(path))
+    report = run(db, paths)
+    got = []
+    for file in report.files:
+        db.cur.execute(f"SELECT amount FROM staging.f{file.file_id}")
+        got.append(db.cur.fetchone()[0])
+    assert got == ["74672.4857", "1234567", "-1000.5", "1,5", "12,34"]
+    assert [file.normalised_amounts for file in report.files] == [1, 1, 1, 0, 0]
+
+@pytest.mark.parametrize("sheet", ["Bank list", "Banks list", "List of Institutions", "List of Financial Institutions"])
+def test_metadata_reader_finds_bank_list_sheet_and_previous_leis(tmp_path, sheet):
+    path = tmp_path / f"{sheet.replace(' ', '_')}.xlsx"
+    wb = Workbook()
+    ws = wb.active
+    ws.title = sheet
+    ws.append(["title row"])
+    ws.append(["LEI_Code", "Name", "Country", "Finrep", "LEI_Code_TR16", "LEI_Code_used_for_2014_stress_test"])
+    ws.append(["AAAAAAAAAAAAAAAAAAAA", "Bank", "DE", "Yes", "BBBBBBBBBBBBBBBBBBBB", "CCCCCCCCCCCCCCCCCCCC"])
+    wb.save(path)
+    assert xlsx_bank_list_sheet(str(path)) == sheet
+    assert _metadata(str(path)) == [(
+        "AAAAAAAAAAAAAAAAAAAA", "Bank", "DE", True,
+        ["BBBBBBBBBBBBBBBBBBBB", "CCCCCCCCCCCCCCCCCCCC"],
+    )]
+
+def test_metadata_reader_accepts_2015_bank_name(tmp_path):
+    path = tmp_path / "TR_Metadata.xlsx"
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Institutions"
+    ws.append(["title row"])
+    ws.append(["LEI_Code", "Bank_Name", "Country_Code"])
+    ws.append(["AAAAAAAAAAAAAAAAAAAA", "Legacy Bank", "DE"])
+    wb.save(path)
+    assert _metadata(str(path)) == [(
+        "AAAAAAAAAAAAAAAAAAAA", "Legacy Bank", "DE", False, [],
+    )]
 
 def test_same_file_twice_in_one_upload_is_refused(db):
     p = write_csv(db.dir / "tr_oth_x.csv", ROWS)
@@ -83,7 +158,7 @@ def test_xlsx_data_file_gives_the_same_staging_as_csv(db):
     db.cur.execute(f"SELECT period, item FROM staging.f{f.file_id} LIMIT 1"); assert db.cur.fetchone() == ("202003", "2020140")   # not 202003.0
 
 def test_workbooks_are_checked_by_content(db):
-    wb = Workbook(); wb.active.title = "Bank list"; wb.save(db.dir / "TR_Metadata_x.xlsx")
+    wb = Workbook(); wb.active.title = "Bank list"; wb.active.append(["LEI_Code", "Name"]); wb.save(db.dir / "TR_Metadata_x.xlsx")
     wb2 = Workbook(); wb2.active.append(["Dataset", "Item"]); wb2.save(db.dir / "SDD_x.xlsx"); bad = Workbook(); bad.active.append(["foo"]); bad.save(db.dir / "SDD_bad.xlsx")
     p = write_csv(db.dir / "tr_oth_x.csv", ROWS)
     r = run(db, [p, str(db.dir / "TR_Metadata_x.xlsx"), str(db.dir / "SDD_x.xlsx"), str(db.dir / "SDD_bad.xlsx")])

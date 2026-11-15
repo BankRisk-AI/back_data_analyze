@@ -11,7 +11,7 @@ from app.modules.eba_ingest.domain.services.file_detector import classify_name
 from app.modules.eba_ingest.infrastructure.database import repositories as repo
 from app.modules.eba_ingest.infrastructure.storage.storage import store
 
-DEFAULT_MAX_BYTES = 170 * 1024 * 1024           # NFR-12: above the largest supported source file
+DEFAULT_MAX_BYTES = 200 * 1024 * 1024           # NFR-12: above the largest supported source file
 
 
 @dataclass(frozen=True)

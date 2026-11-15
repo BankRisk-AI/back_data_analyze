@@ -26,7 +26,7 @@ def query(schema, text, params=()):
 
 
 def test_a_new_database_gets_every_migration_once(schema):
-    expected = ["core/001_baseline", "core/002_job_heartbeat", "core/003_chapter4_views", "core/004_fact_unique", "core/005_job_attempts", "core/006_job_kind_stage"]
+    expected = ["core/001_baseline", "core/002_job_heartbeat", "core/003_chapter4_views", "core/004_fact_unique", "core/005_job_attempts", "core/006_job_kind_stage", "core/007_fact_source_location", "core/008_fact_sov", "core/009_indicator_code_map"]
     assert migrate(schema) == expected
     assert migrate(schema) == []                                                              # idempotent
     assert [r[0] for r in query(schema, "SELECT version FROM schema_migrations ORDER BY version")] == expected
@@ -47,7 +47,7 @@ def test_a_database_created_before_migrations_existed_is_adopted_not_recreated(s
         cur.execute((CORE_DIR / "001_baseline.sql").read_text(encoding="utf-8"))                      # as the old init_db did
         cur.execute("INSERT INTO import_batch(status) VALUES ('uploaded')")
     conn.close()
-    assert migrate(schema) == ["core/002_job_heartbeat", "core/003_chapter4_views", "core/004_fact_unique", "core/005_job_attempts", "core/006_job_kind_stage"]  # 001 is recorded, not run again
+    assert migrate(schema) == ["core/002_job_heartbeat", "core/003_chapter4_views", "core/004_fact_unique", "core/005_job_attempts", "core/006_job_kind_stage", "core/007_fact_source_location", "core/008_fact_sov", "core/009_indicator_code_map"]  # 001 is recorded, not run again
     assert query(schema, "SELECT count(*) FROM import_batch") == [(1,)]                               # data kept
 
 
@@ -106,3 +106,28 @@ def test_fact_unique_migration_rejects_duplicate_groups(schema):
         )
     with pytest.raises(psycopg2.Error, match="fact_oth contains 1 duplicate groups"):
         migrate(schema)
+
+def test_source_location_migration_is_idempotent_and_views_expose_locations(schema):
+    migrate(schema)
+    assert migrate(schema) == []
+    columns = {
+        r[0] for r in query(
+            schema,
+            "SELECT column_name FROM information_schema.columns WHERE table_name = 'fact_oth'",
+        )
+    }
+    assert {"source_row", "source_column", "source_sheet"} <= columns
+    view_columns = {
+        r[0] for r in query(
+            schema,
+            "SELECT column_name FROM information_schema.columns WHERE table_name = 'v_tr_oth'",
+        )
+    }
+    assert {"row", "column", "sheet"} <= view_columns
+
+def test_fact_sov_migration_is_idempotent_and_view_exists(schema):
+    migrate(schema)
+    assert migrate(schema) == []
+    assert query(schema, "SELECT to_regclass(%s)", (f"{schema}.fact_sov",)) == [("fact_sov",)]
+    columns = {r[0] for r in query(schema, "SELECT column_name FROM information_schema.columns WHERE table_name = 'v_tr_sov'")}
+    assert {"country", "accounting_portfolio", "maturity", "row", "column", "sheet"} <= columns

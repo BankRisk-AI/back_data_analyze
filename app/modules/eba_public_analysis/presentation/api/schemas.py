@@ -11,6 +11,7 @@ class PublicPeriod(BaseModel):
     rows_oth: int
     rows_cre: int
     rows_mrk: int
+    rows_sov: int
 
 
 class Preview(BaseModel):

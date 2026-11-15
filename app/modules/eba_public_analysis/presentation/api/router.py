@@ -12,7 +12,7 @@ from app.modules.eba_public_analysis.presentation.api.schemas import (
 )
 
 TAG = "public-analysis"
-Dataset = Literal["oth", "cre", "mrk", "tr_oth", "tr_cre", "tr_mrk"]
+Dataset = Literal["oth", "cre", "mrk", "sov", "tr_oth", "tr_cre", "tr_mrk", "tr_sov"]
 AggregateFunction = Literal["sum", "avg", "min", "max", "count"]
 
 

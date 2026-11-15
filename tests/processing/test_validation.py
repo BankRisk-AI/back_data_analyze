@@ -35,7 +35,7 @@ def test_every_rule_finds_exactly_what_was_planted(db):
     failed = {k for k, v in i.items() if v["status"] == "failed"}
     assert failed == {"V01", "V02", "V03", "V04", "V05", "V06", "V07", "V08", "V09", "V10", "V11", "V12"} and i["V13"]["status"] == "passed"
     assert i["V01"]["affected_rows"] == 1 and i["V01"]["examples"][0]["lei_code"] == "LEI00000000000000108"
-    assert i["V02"]["affected_rows"] == 2 and "1 identities" in i["V02"]["detail"] and i["V02"]["examples"][0]["copies"] == 2
+    assert i["V02"]["affected_rows"] == 2 and "conflicting amounts" in i["V02"]["detail"] and i["V02"]["examples"][0]["copies"] == 2
     assert i["V03"]["affected_rows"] == 1 and i["V03"]["examples"][0]["amount"] == "abc"
     assert i["V04"]["affected_rows"] == 1
     assert i["V05"]["affected_rows"] == 2 and {e["period"] for e in i["V05"]["examples"]} == {"2020", "202013"}
@@ -49,6 +49,13 @@ def test_every_rule_finds_exactly_what_was_planted(db):
     sev = {k: v["severity"] for k, v in i.items()}
     assert (rep.errors, rep.warnings, rep.infos) == (5, 4, 3) and sev["V02"] == "error" and sev["V09"] == "warning" and sev["V11"] == "info" and not rep.can_proceed
     assert all(len(v["examples"]) <= 5 for v in i.values())
+
+def test_exact_duplicate_is_informational(db):
+    rows = banks(2)
+    rows.append(rows[0])
+    imp, _ = stage(db, rows)
+    issue = issues(V.run_validation(imp, db.schema))["V02"]
+    assert issue["severity"] == "info" and issue["affected_rows"] == 2
 
 
 def test_status_follows_the_result_and_the_report_is_stored(db):

@@ -34,10 +34,11 @@ def periods(schema: str) -> list[dict]:
                                   (SELECT count(*) FROM fact_oth WHERE version_id=v.version_id),
                                   (SELECT count(*) FROM fact_cre WHERE version_id=v.version_id),
                                   (SELECT count(*) FROM fact_mrk WHERE version_id=v.version_id)
+                                  ,(SELECT count(*) FROM fact_sov WHERE version_id=v.version_id)
                            FROM dataset_version v WHERE is_active
                            ORDER BY year, quarter, version_no""")
             return [{"version_id": r[0], "year": r[1], "quarter": r[2], "period_end": r[3].isoformat(),
-                     "import_id": r[4], "rows_oth": r[5], "rows_cre": r[6], "rows_mrk": r[7]} for r in cur.fetchall()]
+                     "import_id": r[4], "rows_oth": r[5], "rows_cre": r[6], "rows_mrk": r[7], "rows_sov": r[8]} for r in cur.fetchall()]
     finally:
         conn.close()
 

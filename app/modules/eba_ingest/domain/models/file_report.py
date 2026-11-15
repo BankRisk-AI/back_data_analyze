@@ -21,6 +21,7 @@ class FileReport:
 
     rows: int | None = None
     aggregate_rows: int | None = None
+    normalised_amounts: int = 0
     columns: list[str] | None = None
 
     reason: str | None = None
