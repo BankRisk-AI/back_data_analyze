@@ -254,6 +254,10 @@ version and must rebuild all affected rows plus every dependent growth row.
 - Stage 2 begins in 201809 and is not applicable before IFRS 9.
 - Sovereign data is semi-annual even while the main panel becomes quarterly.
 - The leverage series has gaps for 201512 and 201606.
+- NPL before 202006 uses a wider denominator because the `tr_cre` loans and
+  advances scope changed from 202006. The published facts do not expose an
+  adjustment row; the median scale is about 11%, so affected values retain
+  the `series_break` flag rather than being restated.
 
 ## Feature flags
 

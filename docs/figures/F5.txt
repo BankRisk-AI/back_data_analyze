@@ -1,0 +1,1 @@
+Banks per period; bar colour indicates frequency and labels identify the EBA edition.

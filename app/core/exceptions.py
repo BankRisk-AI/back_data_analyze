@@ -23,3 +23,9 @@ class InvalidParameter(AppError):
     kind = "invalid-parameter"
     status = 422
     title = "Invalid parameter"
+
+
+class BadRequestError(AppError):
+    kind = "bad-request"
+    status = 400
+    title = "Bad request"

@@ -1,0 +1,40 @@
+crosswalks:
+  - group_id: bank_of_cyprus
+    status: proposed
+    members:
+      - lei: PQ0RAP85KK9Z75ONZW93
+        name: Bank of Cyprus Public Company Limited
+        active_from: "2014-12"
+        active_to: "2016-06"
+      - lei: 635400L14KNHZXPUZM19
+        name: Bank of Cyprus Holdings Public Limited Company
+        active_from: "2016-12"
+        active_to: "2025-06"
+    reason: Corporate holding change at the 2016 hive-down boundary.
+    evidence: "201606 to 201612; Cyprus; loans 34244.514 to 31983.509 (-6.6%); successor previous_leis is PQ0RAP85KK9Z75ONZW93."
+  - group_id: bpifrance
+    status: proposed
+    members:
+      - lei: 969500FYSB4IT3QWYB65
+        name: Bpifrance S.A. (Banque Publique d’Investissement)
+        active_from: "2014-12"
+        active_to: "2020-06"
+      - lei: 969500STN7T9MRUMJ267
+        name: Bpifrance
+        active_from: "2020-09"
+        active_to: "2025-06"
+    reason: Same public investment bank with a reporting-name and LEI change.
+    evidence: "202006 to 202009; France; loans 57374.02594 to 57364.94294 (-0.0%)."
+  - group_id: magyar_bankholding
+    status: proposed
+    members:
+      - lei: 529900J3WLMSUC78RN75
+        name: Magyar Bankholding
+        active_from: "2014-12"
+        active_to: "2021-06"
+      - lei: 3H0Q3U74FVFED2SHZT16
+        name: MBH bankcsoport
+        active_from: "2021-09"
+        active_to: "2025-06"
+    reason: Same Hungarian banking group after consolidation and reporting-name change.
+    evidence: "202106 to 202109; Hungary; loans 14345.36746 to 14617.67512 (+1.9%)."

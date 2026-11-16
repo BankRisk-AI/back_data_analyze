@@ -1,0 +1,10 @@
+version: 1
+description: Curated distress-event catalogue; no events populated yet.
+event_schema:
+  event_id: required unique string
+  bank_lei: required 20-character LEI
+  event_date: required ISO-8601 date
+  event_type: required controlled event label
+  source: required citation or URL
+  notes: optional curation note
+events: []

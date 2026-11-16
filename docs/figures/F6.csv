@@ -1,0 +1,71 @@
+bank,period,capital,asset_quality,profitability,dynamics,final
+Piraeus,201512,0,2,2,0,3
+Piraeus,201606,0,2,2,0,3
+Piraeus,201612,0,2,2,0,3
+Piraeus,201706,0,2,2,0,3
+Piraeus,201712,0,2,2,0,3
+Piraeus,201806,1,2,2,2,3
+Piraeus,201809,1,2,2,0,3
+Piraeus,201812,1,2,2,0,3
+Piraeus,201903,1,2,2,0,3
+Piraeus,201906,1,2,2,0,3
+Piraeus,201909,1,2,2,0,3
+Piraeus,201912,1,2,2,0,3
+Piraeus,202003,1,2,2,0,3
+Piraeus,202006,1,2,2,0,3
+Piraeus,202009,1,2,2,0,3
+Piraeus,202012,1,2,2,0,3
+Piraeus,202103,1,2,2,0,3
+Piraeus,202106,2,2,2,2,3
+Piraeus,202109,2,2,2,2,3
+Piraeus,202112,1,2,2,2,3
+Piraeus,202203,1,2,0,0,1
+Piraeus,202206,1,2,0,0,1
+Piraeus,202209,1,2,0,0,1
+Piraeus,202212,1,2,0,0,1
+Piraeus,202303,1,2,0,0,1
+Piraeus,202306,1,2,0,0,1
+Piraeus,202309,1,2,0,0,1
+Piraeus,202312,1,1,0,0,1
+Piraeus,202403,1,1,0,0,1
+Piraeus,202406,1,1,0,0,1
+Piraeus,202409,1,1,0,0,1
+Piraeus,202412,1,1,0,0,1
+Piraeus,202503,1,1,0,0,1
+Piraeus,202506,1,0,0,0,0
+BNP Paribas,201412,2,1,2,0,3
+BNP Paribas,201506,2,2,0,0,3
+BNP Paribas,201512,1,2,1,0,1
+BNP Paribas,201606,1,2,0,0,1
+BNP Paribas,201612,1,1,1,0,1
+BNP Paribas,201706,1,1,1,0,1
+BNP Paribas,201712,1,1,1,0,1
+BNP Paribas,201806,1,1,1,0,1
+BNP Paribas,201809,1,1,1,0,1
+BNP Paribas,201812,1,1,1,0,1
+BNP Paribas,201903,1,1,1,0,1
+BNP Paribas,201906,1,1,1,0,1
+BNP Paribas,201909,1,1,1,0,1
+BNP Paribas,201912,1,1,1,0,1
+BNP Paribas,202003,1,1,2,0,1
+BNP Paribas,202006,1,1,1,0,1
+BNP Paribas,202009,1,1,1,0,1
+BNP Paribas,202012,1,1,1,0,1
+BNP Paribas,202103,1,1,1,0,1
+BNP Paribas,202106,1,1,1,0,1
+BNP Paribas,202109,1,1,1,0,1
+BNP Paribas,202112,1,1,1,0,1
+BNP Paribas,202203,1,1,1,0,1
+BNP Paribas,202206,1,0,1,0,1
+BNP Paribas,202209,1,0,0,0,0
+BNP Paribas,202212,1,0,1,0,1
+BNP Paribas,202303,1,0,0,0,0
+BNP Paribas,202306,1,0,0,0,0
+BNP Paribas,202309,1,0,0,0,0
+BNP Paribas,202312,1,0,0,0,0
+BNP Paribas,202403,1,0,0,0,0
+BNP Paribas,202406,1,0,0,0,0
+BNP Paribas,202409,1,0,0,0,0
+BNP Paribas,202412,1,0,0,0,0
+BNP Paribas,202503,1,0,0,0,0
+BNP Paribas,202506,1,0,0,0,0

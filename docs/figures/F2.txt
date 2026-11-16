@@ -1,0 +1,1 @@
+Shares of evaluated non-specialist alert levels; specialists are excluded.

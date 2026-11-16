@@ -1585,6 +1585,212 @@ paths:
           content:
             application/problem+json:
               schema: *id001
+  /api/public/alerts/profiles:
+    get:
+      tags:
+      - public-analysis
+      summary: List evaluated alert profiles
+      operationId: list_alert_profiles
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/AlertProfile'
+                type: array
+                title: Response List Alert Profiles
+  /api/public/alerts/summary:
+    get:
+      tags:
+      - public-analysis
+      summary: Summarize alerts by period
+      operationId: summarize_alerts
+      parameters:
+      - name: profile
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Profile name, full SHA, or unique SHA prefix (8+ characters)
+          title: Profile
+        description: Profile name, full SHA, or unique SHA prefix (8+ characters)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertSummaryResponse'
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema: *id001
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
+  /api/public/alerts:
+    get:
+      tags:
+      - public-analysis
+      summary: List alerts for a period
+      operationId: list_alerts
+      parameters:
+      - name: period
+        in: query
+        required: true
+        schema:
+          type: string
+          minLength: 6
+          maxLength: 6
+          title: Period
+      - name: profile
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Profile name, full SHA, or unique SHA prefix (8+ characters)
+          title: Profile
+        description: Profile name, full SHA, or unique SHA prefix (8+ characters)
+      - name: level
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Level
+      - name: exclude_specialist
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: true
+          title: Exclude Specialist
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+          title: Page
+      - name: page_size
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 1000
+          minimum: 1
+          default: 50
+          title: Page Size
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertListResponse'
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema: *id001
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
+  /api/public/banks/{bank_id}/alerts:
+    get:
+      tags:
+      - public-analysis
+      summary: Get a bank alert timeline
+      operationId: get_bank_alerts
+      parameters:
+      - name: bank_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+          title: Bank Id
+      - name: profile
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Profile name, full SHA, or unique SHA prefix (8+ characters)
+          title: Profile
+        description: Profile name, full SHA, or unique SHA prefix (8+ characters)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankAlerts'
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema: *id001
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
+  /api/public/alerts/{alert_id}:
+    get:
+      tags:
+      - public-analysis
+      summary: Get alert details
+      operationId: get_alert
+      parameters:
+      - name: alert_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+          title: Alert Id
+      - name: profile
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Profile name, full SHA, or unique SHA prefix (8+ characters)
+          title: Profile
+        description: Profile name, full SHA, or unique SHA prefix (8+ characters)
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertDetail'
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema: *id001
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
 components:
   schemas:
     Aggregate:
@@ -1619,6 +1825,217 @@ components:
       - function
       - value
       title: Aggregate
+    AlertDetail:
+      properties:
+        alert_id:
+          type: integer
+          title: Alert Id
+        bank_id:
+          type: integer
+          title: Bank Id
+        version_id:
+          type: integer
+          title: Version Id
+        period:
+          type: string
+          title: Period
+        level:
+          type: string
+          title: Level
+        score:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Score
+        reason:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Reason
+        family_scores:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Family Scores
+        rules:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Rules
+        profile_name:
+          type: string
+          title: Profile Name
+        profile_version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Profile Version
+        profile_sha256:
+          type: string
+          title: Profile Sha256
+      type: object
+      required:
+      - alert_id
+      - bank_id
+      - version_id
+      - period
+      - level
+      - score
+      - reason
+      - family_scores
+      - rules
+      - profile_name
+      - profile_version
+      - profile_sha256
+      title: AlertDetail
+    AlertListItem:
+      properties:
+        alert_id:
+          type: integer
+          title: Alert Id
+        bank_id:
+          type: integer
+          title: Bank Id
+        lei:
+          type: string
+          title: Lei
+        bank_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Bank Name
+        period:
+          type: string
+          title: Period
+        level:
+          type: string
+          title: Level
+        reason:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Reason
+        family_scores:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Family Scores
+      type: object
+      required:
+      - alert_id
+      - bank_id
+      - lei
+      - bank_name
+      - period
+      - level
+      - reason
+      - family_scores
+      title: AlertListItem
+    AlertListResponse:
+      properties:
+        rows:
+          items:
+            $ref: '#/components/schemas/AlertListItem'
+          type: array
+          title: Rows
+        total:
+          type: integer
+          title: Total
+        page:
+          type: integer
+          title: Page
+        page_size:
+          type: integer
+          title: Page Size
+      type: object
+      required:
+      - rows
+      - total
+      - page
+      - page_size
+      title: AlertListResponse
+    AlertProfile:
+      properties:
+        profile_name:
+          type: string
+          title: Profile Name
+        version:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Version
+        sha:
+          type: string
+          title: Sha
+        frozen:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Frozen
+        created_at:
+          type: string
+          title: Created At
+        rule_count:
+          type: integer
+          title: Rule Count
+        families:
+          items:
+            type: string
+          type: array
+          title: Families
+      type: object
+      required:
+      - profile_name
+      - version
+      - sha
+      - frozen
+      - created_at
+      - rule_count
+      - families
+      title: AlertProfile
+    AlertSummary:
+      properties:
+        period:
+          type: string
+          title: Period
+        counts:
+          additionalProperties:
+            type: integer
+          type: object
+          title: Counts
+        shares:
+          additionalProperties:
+            type: number
+          type: object
+          title: Shares
+      type: object
+      required:
+      - period
+      - counts
+      - shares
+      title: AlertSummary
+    AlertSummaryResponse:
+      properties:
+        profile_name:
+          type: string
+          title: Profile Name
+        profile_sha256:
+          type: string
+          title: Profile Sha256
+        periods:
+          items:
+            $ref: '#/components/schemas/AlertSummary'
+          type: array
+          title: Periods
+      type: object
+      required:
+      - profile_name
+      - profile_sha256
+      - periods
+      title: AlertSummaryResponse
     AmountSummary:
       properties:
         numeric:
@@ -1647,6 +2064,22 @@ components:
       - numeric
       - non_numeric
       title: AmountSummary
+    BankAlerts:
+      properties:
+        bank_id:
+          type: integer
+          title: Bank Id
+        rows:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Rows
+      type: object
+      required:
+      - bank_id
+      - rows
+      title: BankAlerts
     BankList:
       properties:
         rows:

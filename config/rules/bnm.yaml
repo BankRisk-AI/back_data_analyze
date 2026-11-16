@@ -1,0 +1,183 @@
+profile: bnm
+version: 1
+description: BNM profile skeleton; thresholds require owner-supplied regulations.
+defaults:
+  composite_logic: family_max
+  weights: unused
+  null_input: not_evaluated
+  specialist_institution:
+    relative_rules: exclude
+    composite_score: exclude
+  series_break:
+    trend: not_evaluated_if_comparison_touches_break
+    threshold_scaling: false
+  frequency:
+    trend_4_periods: calendar_alignment
+rules:
+  - id: cet1_regulatory_min
+    type: level
+    feature: cet1_ratio
+    condition: below
+    threshold: null
+    severity: red
+    weight: null
+    source: regulation
+    status: to_verify
+  - id: tier1_regulatory_min
+    type: level
+    feature: tier1_ratio
+    condition: below
+    threshold: null
+    severity: red
+    weight: null
+    source: regulation
+    status: to_verify
+  - id: tier1_dashboard_band
+    type: level
+    feature: tier1_ratio
+    condition: band
+    bands: null
+    threshold: null
+    severity: amber
+    weight: null
+    source: regulation
+    status: to_verify
+  - id: total_capital_regulatory_min
+    type: level
+    feature: total_capital_ratio
+    condition: below
+    threshold: null
+    severity: red
+    weight: null
+    source: regulation
+    status: to_verify
+  - id: leverage_regulatory_min
+    type: level
+    feature: leverage_ratio
+    condition: below
+    threshold: null
+    severity: red
+    weight: null
+    source: regulation
+    status: to_verify
+  - id: cet1_buffer_warning
+    type: level
+    feature: cet1_ratio
+    condition: below
+    threshold: null
+    severity: amber
+    weight: null
+    source: regulation
+    status: to_verify
+  - id: cet1_supervisory_low
+    type: level
+    feature: cet1_ratio
+    condition: below
+    threshold: null
+    severity: amber
+    weight: null
+    source: guideline
+    status: to_verify
+  - id: npl_high
+    type: level
+    feature: npl_ratio
+    condition: above
+    threshold: null
+    severity: amber
+    weight: null
+    source: regulation
+    status: to_verify
+  - id: npl_dashboard_band
+    type: level
+    feature: npl_ratio
+    condition: band
+    threshold: null
+    bands: null
+    severity: amber
+    weight: null
+    source: regulation
+    status: to_verify
+  - id: rocet1_supervisory_low
+    type: level
+    feature: roe_annualised
+    condition: below
+    threshold: null
+    severity: amber
+    weight: null
+    source: guideline
+    status: to_verify
+  - id: leverage_supervisory_low
+    type: level
+    feature: leverage_ratio
+    condition: below
+    threshold: null
+    severity: amber
+    weight: null
+    source: guideline
+    status: to_verify
+  - id: cet1_yoy_drop
+    type: trend
+    feature: cet1_ratio
+    condition: decrease_over
+    periods: 4
+    threshold: null
+    severity: amber
+    weight: null
+    source: regulation
+    status: to_verify
+  - id: npl_yoy_rise
+    type: trend
+    feature: npl_ratio
+    condition: increase_over
+    periods: 4
+    threshold: null
+    severity: amber
+    weight: null
+    source: regulation
+    status: to_verify
+  - id: negative_rocet1_persistence
+    type: persistence
+    feature: roe_annualised
+    condition: below
+    threshold: null
+    consecutive_periods: 2
+    severity: amber
+    weight: null
+    source: regulation
+    status: to_verify
+  - id: high_npl_persistence
+    type: persistence
+    feature: npl_ratio
+    condition: above
+    threshold: null
+    consecutive_periods: 2
+    severity: amber
+    weight: null
+    source: regulation
+    status: to_verify
+  - id: npl_worst_decile
+    type: relative
+    feature: npl_ratio
+    condition: worst_decile
+    percentile: null
+    severity: amber
+    weight: null
+    source: regulation
+    status: to_verify
+  - id: cet1_worst_decile
+    type: relative
+    feature: cet1_ratio
+    condition: worst_decile
+    percentile: null
+    severity: amber
+    weight: null
+    source: regulation
+    status: to_verify
+  - id: composite_alert
+    type: composite_score
+    condition: weighted_sum
+    severity: alert_level
+    weights_from: rules
+    cutoffs: null
+    source: regulation
+    status: to_verify

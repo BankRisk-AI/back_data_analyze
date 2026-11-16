@@ -36,6 +36,16 @@ def main(argv: list[str] | None = None) -> int:
     panel_sub = panel.add_subparsers(dest="panel_cmd", required=True)
     panel_build = panel_sub.add_parser("build")
     panel_build.add_argument("--target", choices=("test", "prod"), required=True)
+    rules = sub.add_parser("rules", help="evaluate a version-controlled rule profile")
+    rules_sub = rules.add_subparsers(dest="rules_cmd", required=True)
+    rules_evaluate = rules_sub.add_parser("evaluate")
+    rules_evaluate.add_argument("--profile", required=True)
+    rules_evaluate.add_argument("--target", choices=("test", "prod"), required=True)
+    figures = sub.add_parser("figures", help="generate reproducible analysis figures")
+    figures.add_argument("--target", choices=("test", "prod"), required=True)
+    figures.add_argument("--out", required=True)
+    figures.add_argument("--lang", choices=("en", "ro"), default="en")
+    figures.add_argument("--only", help="comma-separated figure IDs, for example F1,F3")
     reset = sub.add_parser("reset-data", help="empty application data while preserving schema and migrations")
     reset.add_argument("--confirm", required=True, help="must equal the connected database name")
     reset.add_argument("--target", choices=("test", "prod"), required=True)
@@ -133,6 +143,33 @@ def main(argv: list[str] | None = None) -> int:
         finally:
             conn.close()
         print(target_summary(target, f"panel-built rows={count}"))
+        return 0
+    if a.cmd == "rules" and a.rules_cmd == "evaluate":
+        target, _ = select_target(a.target)
+        from app.core.config import get_schema
+        from app.core.database import connect, init_database
+        from app.core.rules import evaluate_profile
+        from app.modules import MODULES
+        init_database(get_schema(), {m.name: m.migrations_dir for m in MODULES if m.migrations_dir})
+        profile_path = Path("config/rules") / f"{a.profile}.yaml"
+        if not profile_path.is_file():
+            raise SystemExit(f"profile does not exist: {profile_path}")
+        conn = connect(get_schema())
+        try:
+            count = evaluate_profile(conn, profile_path, a.profile)
+        finally:
+            conn.close()
+        print(target_summary(target, f"rules-evaluated profile={a.profile} rows={count}"))
+        return 0
+    if a.cmd == "figures":
+        target, _ = select_target(a.target)
+        from app.figures import generate
+        only = [item.strip().upper() for item in a.only.split(",") if item.strip()] if a.only else None
+        try:
+            count = generate(target, a.out, a.lang, only)
+        except ValueError as exc:
+            raise SystemExit(str(exc)) from exc
+        print(target_summary(target, f"figures-generated count={count} out={a.out}"))
         return 0
     if a.cmd == "reset-data":
         target, _ = select_target(a.target)

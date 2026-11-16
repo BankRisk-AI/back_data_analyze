@@ -1,0 +1,221 @@
+profile: eu_eba
+version: "1.0"
+frozen: true
+description: Draft EBA-style prudential and panel-risk rules; owner review required.
+defaults:
+  composite_logic: family_max
+  weights: unused
+  null_input: not_evaluated
+  specialist_institution:
+    relative_rules: exclude
+    composite_score: exclude
+  series_break:
+    npl_level: evaluate_with_known_limitation
+    trend: not_evaluated_if_comparison_touches_break
+    threshold_scaling: false
+  frequency:
+    trend_4_periods: calendar_alignment
+    pre_201809: semi_annual
+  alert_levels:
+    green: 0
+    amber: 1
+    red: 3
+  sources:
+    capital_regulation: Regulation (EU) No 575/2013, Articles 92 and 465
+    buffer_regulation: Directive 2013/36/EU, Article 129
+    risk_dashboard: EBA Risk Dashboard, risk indicators
+rules:
+  - id: cet1_regulatory_min
+    type: level
+    feature: cet1_ratio
+    condition: below
+    threshold: 0.045
+    severity: red
+    weight: 5
+    source: regulation
+    status: verified
+  - id: tier1_regulatory_min
+    type: level
+    feature: tier1_ratio
+    condition: below
+    threshold: 0.06
+    severity: red
+    weight: 5
+    source: regulation
+    status: verified
+  - id: tier1_dashboard_band
+    type: level
+    feature: tier1_ratio
+    condition: band
+    bands:
+      green: {above: 0.15}
+      amber: {min: 0.12, max: 0.15}
+      red: {below: 0.12}
+    severity: amber
+    weight: 1
+    source: EBA Risk Dashboard Q3 2025, heatmap buckets (share of total assets)
+    status: verified
+  - id: total_capital_regulatory_min
+    type: level
+    feature: total_capital_ratio
+    condition: below
+    threshold: 0.08
+    severity: red
+    weight: 5
+    source: regulation
+    status: verified
+  - id: leverage_regulatory_min
+    type: level
+    feature: leverage_ratio
+    condition: below
+    threshold: 0.03
+    severity: red
+    weight: 5
+    source: regulation
+    status: verified
+  - id: cet1_buffer_warning
+    type: level
+    feature: cet1_ratio
+    condition: below
+    threshold: 0.07
+    severity: amber
+    weight: 2
+    source: regulation
+    status: verified
+    note: 4.5% minimum plus 2.5% capital conservation buffer; simplified warning proxy.
+  - id: cet1_supervisory_low
+    type: level
+    feature: cet1_ratio
+    condition: band
+    bands:
+      green: {above: 0.14}
+      amber: {min: 0.11, max: 0.14}
+      red: {below: 0.11}
+    severity: amber
+    weight: 1
+    source: EBA Risk Dashboard Q3 2025, heatmap buckets (share of total assets)
+    status: verified
+  - id: npl_high
+    type: level
+    feature: npl_ratio
+    condition: above
+    threshold: 0.05
+    severity: amber
+    weight: 2
+    source: EBA Risk Dashboard Q3 2025, heatmap buckets (share of total assets)
+    status: verified
+  - id: npl_dashboard_band
+    type: level
+    feature: npl_ratio
+    condition: band
+    bands:
+      green: {below: 0.03}
+      amber: {min: 0.03, max: 0.08}
+      red: {above: 0.08}
+    severity: amber
+    weight: 1
+    source: EBA Risk Dashboard Q3 2025, heatmap buckets (share of total assets)
+    status: verified
+  - id: leverage_supervisory_low
+    type: level
+    feature: leverage_ratio
+    condition: band
+    bands:
+      green: {above: 0.08}
+      amber: {min: 0.05, max: 0.08}
+      red: {below: 0.05}
+    severity: amber
+    weight: 1
+    source: EBA Risk Dashboard Q3 2025, heatmap buckets (share of total assets)
+    status: verified
+  - id: rocet1_supervisory_low
+    type: level
+    feature: roe_annualised
+    condition: band
+    bands:
+      green: {above: 0.1200144743}
+      amber: {min: 0.0720086846, max: 0.1200144743}
+      red: {below: 0.0720086846}
+    severity: amber
+    weight: 1
+    source: EBA Risk Dashboard Q3 2025, heatmap buckets (share of total assets)
+    status: verified
+    note: Accounting ROE 6% and 10% multiplied by 1.2001447434.
+  - id: cet1_yoy_drop
+    type: trend
+    feature: cet1_ratio
+    condition: decrease_over
+    periods: 4
+    threshold: 0.02
+    severity: amber
+    weight: 2
+    source: publication
+    status: to_verify
+  - id: npl_yoy_rise
+    type: trend
+    feature: npl_ratio
+    condition: increase_over
+    periods: 4
+    threshold: 0.01
+    severity: amber
+    weight: 2
+    source: publication
+    status: to_verify
+  - id: negative_rocet1_persistence
+    type: persistence
+    feature: roe_annualised
+    condition: below
+    threshold: 0.0
+    consecutive_periods: 2
+    severity: amber
+    weight: 2
+    source: publication
+    status: to_verify
+  - id: high_npl_persistence
+    type: persistence
+    feature: npl_ratio
+    condition: above
+    threshold: 0.05
+    consecutive_periods: 2
+    severity: amber
+    weight: 2
+    source: guideline
+    status: to_verify
+  - id: npl_worst_decile
+    type: relative
+    feature: npl_ratio
+    condition: worst_decile
+    percentile: 0.90
+    severity: amber
+    weight: 1
+    source: publication
+    status: to_verify
+  - id: cet1_worst_decile
+    type: relative
+    feature: cet1_ratio
+    condition: worst_decile
+    percentile: 0.10
+    severity: amber
+    weight: 1
+    source: publication
+    status: to_verify
+  - id: composite_alert
+    type: composite_score
+    condition: weighted_sum
+    severity: alert_level
+    weights_from: rules
+    cutoffs:
+      green: 0
+      amber: 2
+      red: 5
+    source: publication
+    status: to_verify
+conversion:
+  accounting_roe_to_rocet1:
+    ratio: equity_divided_by_cet1
+    statistic: median
+    value: 1.2001447434
+    iqr: [1.1151567110, 1.3135999112]
+    observations: 2382
+    measured_on: prod
+    period: 2020A-2025S

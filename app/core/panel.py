@@ -16,7 +16,7 @@ FLAG_NAMES = {
     "template_gap", "not_reported_this_period", "fiscal_year_assumed",
     "denominator_missing", "fiscal_year_mismatch", "no_prior_period",
     "bank_entry_exit", "lei_change", "identity_crosswalk", "missing_sector",
-    "outlier",
+    "outlier", "group_crosswalk",
     "extreme_growth", "implausible_value", "specialist_institution",
     "series_break",
 }
@@ -27,6 +27,17 @@ def _specialist_leis(root: Path) -> set[str]:
     if not path.exists():
         return set()
     return {str(item["lei"]).strip() for item in yaml.safe_load(path.read_text(encoding="utf-8")) or []}
+
+
+def _approved_crosswalks(root: Path) -> dict[str, str]:
+    path = root / "bank_crosswalk.yaml"
+    data = yaml.safe_load(path.read_text(encoding="utf-8")) if path.exists() else {}
+    result = {}
+    for item in (data or {}).get("crosswalks", []):
+        if item.get("status") == "approved":
+            for member in item.get("members", []):
+                result[str(member["lei"]).strip()] = item["group_id"]
+    return result
 
 
 FEATURES = (
@@ -146,6 +157,7 @@ def build_panel(conn, dimensions_root: str | Path = "config/dimensions",
     """Rebuild ``panel_row`` from active versions in one transaction."""
     dimensions = Path(dimensions_root)
     specialist_leis = _specialist_leis(Path(dictionary_root))
+    crosswalk_leis = _approved_crosswalks(Path(dictionary_root))
     provenance = {
         "active_version_ids": [],
         "configuration_sha256": _config_hash(Path(dictionary_root)),
@@ -181,8 +193,16 @@ def build_panel(conn, dimensions_root: str | Path = "config/dimensions",
             quarter_by_version = {row[0]: row[3] for row in versions}
             edition_by_version = {row[0]: row[4] for row in versions}
             cur.execute("SELECT bank_id, lei FROM bank")
+            bank_leis = {bank_id: lei.strip() for bank_id, lei in cur.fetchall()}
+            bank_groups = {bank_id: crosswalk_leis.get(lei) for bank_id, lei in bank_leis.items()}
+            for row in rows:
+                group_id = bank_groups.get(row["bank_id"])
+                row["continuity_key"] = group_id or row["bank_id"]
+                if group_id:
+                    for feature in FEATURES:
+                        _add_flag(row["_flags"], feature, "group_crosswalk")
             specialist_banks = {
-                bank_id for bank_id, lei in cur.fetchall() if lei.strip() in specialist_leis
+                bank_id for bank_id, lei in bank_leis.items() if lei in specialist_leis
             }
             for row in rows:
                 if row["bank_id"] in specialist_banks:
@@ -331,11 +351,11 @@ def build_panel(conn, dimensions_root: str | Path = "config/dimensions",
                     x[3] or 0 for x in total_loans if x[9] in total_codes
                 )
             # Continuity-derived features.
-            ordered = sorted(rows, key=lambda x: (x["bank_id"], period_by_version[x["version_id"]]))
+            ordered = sorted(rows, key=lambda x: (x["continuity_key"], period_by_version[x["version_id"]]))
             previous = {}
             by_period = {
-                (row["bank_id"], (period_by_version[row["version_id"]].year,
-                                  period_by_version[row["version_id"]].month)): row
+                (row["continuity_key"], (period_by_version[row["version_id"]].year,
+                                         period_by_version[row["version_id"]].month)): row
                 for row in rows
             }
 
@@ -343,7 +363,7 @@ def build_panel(conn, dimensions_root: str | Path = "config/dimensions",
                 return _subtract_months(period, years * 12 + months)
 
             for row in ordered:
-                bank = row["bank_id"]
+                bank = row["continuity_key"]
                 prior = previous.get(bank)
                 period = period_by_version[row["version_id"]]
                 immediate = prior if (
@@ -399,6 +419,7 @@ def build_panel(conn, dimensions_root: str | Path = "config/dimensions",
             cur.execute("DELETE FROM panel_row")
             for row in rows:
                 flags = {"frequency": row.pop("frequency"), "sovereign_template": row.pop("sovereign_template")}
+                row.pop("continuity_key", None)
                 flags.update({feature: values for feature, values in row.pop("_flags").items() if values})
                 values = [row.get(column) for column in (
                     "version_id", "bank_id", "cet1_ratio", "tier1_ratio", "total_capital_ratio",

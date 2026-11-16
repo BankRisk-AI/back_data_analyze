@@ -26,3 +26,15 @@
   name: C.R.H. - Caisse de refinancement de l'habitat
   type: covered-bond/refinancing institution
   reason: Specialist covered-bond refinancing institution with an exceptional leverage observation.
+- lei: 529900GGYMNGRQTDOO93
+  name: BNG Bank N.V.
+  type: public_funding_agency
+  reason: Dutch local-government funding bank with a public-sector mandate.
+- lei: JLP5FSPH9WPSHY3NIM24
+  name: Nederlandse Waterschapsbank N.V.
+  type: public_funding_agency
+  reason: Dutch public-sector and water-authority funding bank.
+- lei: 549300HFEHJOXGE4ZE63
+  name: SFIL S.A.
+  type: public_funding_agency
+  reason: French public-sector lending and refinancing institution.

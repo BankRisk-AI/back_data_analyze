@@ -1,0 +1,15 @@
+banks:
+  - Alpha
+  - Piraeus
+  - Eurobank
+  - National Bank of Greece
+  - Bank of Cyprus
+  - Hellenic Bank
+  - Monte dei Paschi
+  - Banco Santander
+  - BBVA
+  - BNP Paribas
+  - Deutsche Bank
+  - ING
+crisis_bank: Piraeus
+stable_bank: BNP Paribas

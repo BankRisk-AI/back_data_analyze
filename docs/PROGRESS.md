@@ -80,6 +80,8 @@
   `/api/versions/{version_id}/datasets/{dataset}/preview` routes were removed;
   use `/api/public/periods` and `/api/public/versions/{version_id}/datasets/{dataset}/preview`.
 - Public analysis now also exposes the additive `sov` and `tr_sov` datasets.
+- Alert screens should use the read-only `/api/public/alerts/*` and
+  `/api/public/banks/{bank_id}/alerts` endpoints.
 - Stage 3d adds `/api/public/report-types`, cascading years and quarters,
   `/api/public/banks` and bank panels, panel cross-sections and feature
   definitions, plus raw `/api/public/indicators/{indicator_id}/series`.
@@ -116,7 +118,27 @@
   evidence in [panel statistics](design/panel_stats.md).
 - Stage 3 closed (2026-11-15): panel checks and public analysis contract are
   complete.
-- Next = Stage 4a: rule-engine design.
+- Stage 4a (2026-11-16): rule-engine design drafted in
+  [rule_engine.md](design/rule_engine.md), with EU/EBA and BNM profiles and an
+  empty event-catalogue format.
+- Stage 4b (2026-11-16): migration 011 added the atomic `alert` table,
+  profile evaluator and `evaluate_rules` worker kind; EU/EBA alerts were
+  evaluated on production. The schema now has 16 logical tables; see
+  [rule results](design/rule_results.md).
+- Stage 4b-calibrate (2026-11-16): replaced correlated-rule summation with
+  fixed family-maximum scoring, preserved the historical 4b profile SHA,
+  evaluated the calibrated EU/EBA profile on production, and documented the
+  before/after results in [rule results](design/rule_results.md).
+- Stage 4b-final (2026-11-16): froze EU/EBA profile v1.0, moved persistence
+  into feature families, reduced relative severity, added public-funding
+  specialists, rebuilt panel flags, and reevaluated production.
+- Stage 4c done (2026-11-16): added read-only public alert profile, summary,
+  period, bank timeline, and detail endpoints with old-format compatibility.
+- Stage 4c-fix (2026-11-16): fixed profile resolution to use the latest
+  evaluated alert SHA from the database, with name/full-SHA/prefix support;
+  the previous YAML/path resolution caused production bank timelines to 404.
+- Next = Stage 4c-ui (React alert screens), then Stage 4d evaluation once
+  `config/events.yaml` is curated.
 - Environments: `eba` is production via `DATABASE_URL`, `eba_test` is test via
   `TEST_DATABASE_URL`, and production storage is
   `/var/projects/python/eba_analyst/prod/eba_storage`.
