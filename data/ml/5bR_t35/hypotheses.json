@@ -1,0 +1,171 @@
+{
+  "H1a": {
+    "RF_vs_LR": {
+      "dPR": {
+        "ci95": [
+          -0.14645671015759493,
+          0.13588752608046975
+        ],
+        "estimate": -0.013515838738095282,
+        "p_holm": 1.0,
+        "p_one_sided": 0.5742128935532234
+      },
+      "dROC": {
+        "ci95": [
+          -0.004987343378404762,
+          0.1552811433733988
+        ],
+        "estimate": 0.072306319294271,
+        "p_one_sided": 0.03648175912043978
+      },
+      "fold_wilcoxon": {
+        "n": 5,
+        "p": 0.5,
+        "status": "exact"
+      }
+    },
+    "XGB_vs_LR": {
+      "dPR": {
+        "ci95": [
+          -0.13298757248178705,
+          0.1457208798229226
+        ],
+        "estimate": -0.00397775794832278,
+        "p_holm": 1.0,
+        "p_one_sided": 0.5287356321839081
+      },
+      "dROC": {
+        "ci95": [
+          0.012514131544149534,
+          0.1591479355974979
+        ],
+        "estimate": 0.08375953958283278,
+        "p_one_sided": 0.009495252373813094
+      },
+      "fold_wilcoxon": {
+        "n": 5,
+        "p": 0.21875,
+        "status": "exact"
+      }
+    }
+  },
+  "H1b": {
+    "ml_recall": 0.92,
+    "selected_model": "XGB",
+    "v1_1_recall": 0.9266666666666666
+  },
+  "H2": {
+    "criterion": false,
+    "events": [
+      {
+        "L": null,
+        "censored": true,
+        "event": "ev_2016_hsh_state_aid",
+        "t_A": null,
+        "t_B": null
+      },
+      {
+        "L": null,
+        "censored": true,
+        "event": "ev_2017_popular_foltf",
+        "t_A": null,
+        "t_B": null
+      },
+      {
+        "L": null,
+        "censored": true,
+        "event": "ev_2017_mps_precautionary_recap",
+        "t_A": null,
+        "t_B": null
+      },
+      {
+        "L": null,
+        "censored": true,
+        "event": "ev_2017_vicenza_foltf",
+        "t_A": null,
+        "t_B": null
+      },
+      {
+        "L": null,
+        "censored": true,
+        "event": "ev_2017_veneto_foltf",
+        "t_A": null,
+        "t_B": null
+      },
+      {
+        "L": 0,
+        "censored": false,
+        "event": "ev_2017_novo_banco_state_aid",
+        "t_A": 2,
+        "t_B": 2
+      },
+      {
+        "L": 0,
+        "censored": false,
+        "event": "ev_2018_ccb_liquidation",
+        "t_A": 4,
+        "t_B": 4
+      },
+      {
+        "L": 0,
+        "censored": false,
+        "event": "ev_2019_carige_temp_admin",
+        "t_A": 3,
+        "t_B": 3
+      },
+      {
+        "L": null,
+        "censored": true,
+        "event": "ev_2019_nordlb_recap",
+        "t_A": 2,
+        "t_B": null
+      }
+    ],
+    "thresholds": {
+      "matched_far": 0.016109941800221288,
+      "max_ur_0_9": 0.28965295851230655
+    },
+    "wilcoxon": {
+      "n": 0,
+      "p": null,
+      "status": "exploratory"
+    }
+  },
+  "H3": {
+    "dPR": {
+      "ci95": [
+        -0.04845265416201916,
+        0.0791281666722504
+      ],
+      "estimate": 0.021822689594196004,
+      "p_one_sided": 0.3008495752123938
+    },
+    "fold_wilcoxon": {
+      "n": 5,
+      "p": 0.3125,
+      "status": "exact"
+    }
+  },
+  "H4": {
+    "status": "pending - Stage 7 (BNM pilot)"
+  },
+  "H5": {
+    "capital_earnings_rank_1_2": false,
+    "primary": {
+      "Asset quality": 1.3736439869472978,
+      "Capital": 1.1308897615641806,
+      "Concentration": 0.23381206041968058,
+      "Earnings": 0.16514608612507864,
+      "Growth": 0.24717580011692916
+    },
+    "sensitivity": {
+      "Asset quality": 1.8546318474839074,
+      "Capital": 1.1308897615641806,
+      "Earnings": 0.16514608612507864,
+      "Liquidity": 0
+    },
+    "status": "computed"
+  },
+  "run": "data/ml/5bR_t35",
+  "selected_model": "XGB"
+}

@@ -64,6 +64,7 @@ def main(argv: list[str] | None = None) -> int:
     ml_train.add_argument("--runs", default="",
                           help="comma-separated runs: original,robustness,t5_noT1,quarterly")
     ml_train.add_argument("--limit-hours", type=float, default=2.0)
+    ml_train.add_argument("--space", choices=("table35", "extended"), default="table35")
     ml_eval = ml_sub.add_parser("evaluate")
     ml_eval.add_argument("--target", required=True)
     ml_eval.add_argument("--grid", choices=("semiannual", "quarterly"), default="semiannual")
@@ -72,6 +73,12 @@ def main(argv: list[str] | None = None) -> int:
     ml_eval.add_argument("--models", default="LR,RF,XGB")
     ml_eval.add_argument("--runs", default="")
     ml_eval.add_argument("--limit-hours", type=float, default=2.0)
+    ml_eval.add_argument("--space", choices=("table35", "extended"), default="table35")
+    ml_hypotheses = ml_sub.add_parser(
+        "hypotheses", help="write the Stage 5b-R2 hypothesis report from a saved run")
+    ml_hypotheses.add_argument("run", nargs="?", help="saved run directory")
+    ml_hypotheses.add_argument("--run", dest="run_option")
+    ml_hypotheses.add_argument("--quick", action="store_true")
     reset = sub.add_parser("reset-data", help="empty application data while preserving schema and migrations")
     reset.add_argument("--confirm", required=True, help="must equal the connected database name")
     reset.add_argument("--target", choices=("test", "prod"), required=True)
@@ -216,6 +223,21 @@ def main(argv: list[str] | None = None) -> int:
                                     f"primary={results[0]['evaluable_events']} all={results[1]['evaluable_events']}"))
         return 0
     if a.cmd == "ml":
+        if a.ml_cmd == "hypotheses":
+            from app.modules.eba_ml.application.ml_pipeline import hypotheses
+            Path("logs").mkdir(parents=True, exist_ok=True)
+            run = Path(a.run_option or a.run)
+            report = hypotheses(run, quick=a.quick)
+            required = ("H1a", "H1b", "H2", "H3", "H5")
+            for section in required:
+                if section not in report or "pending" in json.dumps(report[section]).lower():
+                    raise SystemExit(f"hypotheses section {section} incomplete")
+            output = run / ("hypotheses_quick.json" if a.quick else "hypotheses.json")
+            temporary = output.with_suffix(output.suffix + ".tmp")
+            temporary.write_text(json.dumps(report, indent=2, sort_keys=True))
+            temporary.replace(output)
+            print(output)
+            return 0
         target, _ = select_target("prod")
         from app.core.config import get_schema
         from app.core.database import connect
@@ -239,7 +261,7 @@ def main(argv: list[str] | None = None) -> int:
                 target, grid, robustness = run_specs[run_name]
                 results.append(train_models(
                     conn, target, grid, a.out, robustness, models=models,
-                    wall_clock_hours=a.limit_hours))
+                    wall_clock_hours=a.limit_hours, space=a.space))
             result = results[-1]
         finally:
             conn.close()
