@@ -46,6 +46,12 @@ def main(argv: list[str] | None = None) -> int:
     figures.add_argument("--out", required=True)
     figures.add_argument("--lang", choices=("en", "ro"), default="en")
     figures.add_argument("--only", help="comma-separated figure IDs, for example F1,F3")
+    evaluation = sub.add_parser("evaluate", help="evaluate frozen models against an event catalogue")
+    evaluation_sub = evaluation.add_subparsers(dest="evaluation_cmd", required=True)
+    evaluation_rules = evaluation_sub.add_parser("rules")
+    evaluation_rules.add_argument("--profile", required=True)
+    evaluation_rules.add_argument("--events", required=True)
+    evaluation_rules.add_argument("--target", choices=("test", "prod"), required=True)
     reset = sub.add_parser("reset-data", help="empty application data while preserving schema and migrations")
     reset.add_argument("--confirm", required=True, help="must equal the connected database name")
     reset.add_argument("--target", choices=("test", "prod"), required=True)
@@ -170,6 +176,24 @@ def main(argv: list[str] | None = None) -> int:
         except ValueError as exc:
             raise SystemExit(str(exc)) from exc
         print(target_summary(target, f"figures-generated count={count} out={a.out}"))
+        return 0
+    if a.cmd == "evaluate" and a.evaluation_cmd == "rules":
+        target, _ = select_target(a.target)
+        from app.core.config import get_schema
+        from app.core.database import connect
+        from app.event_evaluation import evaluate_events, write_report
+        profile_path = Path("config/rules") / f"{a.profile}.yaml"
+        conn = connect(get_schema())
+        try:
+            results = [
+                evaluate_events(conn, profile_path, a.events, "primary"),
+                evaluate_events(conn, profile_path, a.events, "all"),
+            ]
+        finally:
+            conn.close()
+        write_report(results, "docs/design/rule_evaluation.md")
+        print(target_summary(target, f"rules-evaluated-events profile={a.profile} "
+                                    f"primary={results[0]['evaluable_events']} all={results[1]['evaluable_events']}"))
         return 0
     if a.cmd == "reset-data":
         target, _ = select_target(a.target)

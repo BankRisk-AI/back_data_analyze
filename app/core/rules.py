@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import calendar
 from datetime import date
 from pathlib import Path
 from typing import Any
@@ -190,17 +191,17 @@ def evaluate_rows(profile: dict[str, Any], rows: list[dict[str, Any]]) -> list[d
                     triggered = _condition(delta, rule)
                     evaluated += 1
             elif rule["type"] == "persistence":
-                index = periods.index(row["period"])
-                count = rule["consecutive_periods"]
-                candidate_periods = periods[max(0, index - count + 1):index + 1]
-                values = [
-                    by_key.get((row["bank_id"], period), {}).get(feature)
-                    for period in candidate_periods
-                ]
-                not_evaluated = len(values) != count or any(v is None for v in values)
-                if feature == "npl_ratio" and any(
-                    period < BREAK_PERIOD <= row["period"] for period in candidate_periods
-                ):
+                prior_period = date(row["period"].year, row["period"].month, row["period"].day)
+                month = prior_period.month - 6
+                year = prior_period.year
+                if month <= 0:
+                    month += 12
+                    year -= 1
+                prior_period = date(year, month, calendar.monthrange(year, month)[1])
+                prior = by_key.get((row["bank_id"], prior_period))
+                values = [prior.get(feature) if prior else None, value]
+                not_evaluated = prior is None or any(v is None for v in values)
+                if feature == "npl_ratio" and prior and prior_period < BREAK_PERIOD <= row["period"]:
                     not_evaluated = True
                     input_flags = sorted(set(input_flags + ["series_break"]))
                 if not not_evaluated:

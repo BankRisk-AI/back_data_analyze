@@ -1,10 +1,176 @@
-version: 1
-description: Curated distress-event catalogue; no events populated yet.
-event_schema:
-  event_id: required unique string
-  bank_lei: required 20-character LEI
-  event_date: required ISO-8601 date
-  event_type: required controlled event label
-  source: required citation or URL
-  notes: optional curation note
-events: []
+# Distress events for the EBA transparency-exercise sample (2014-12 .. 2025-06)
+# Compiled 2026-11-21 against data/banks.csv (prod `eba`).
+#
+# Event definition (following the event-based approach of Betz et al., 2014,
+# "Predicting distress in European banks"): a bank in the sample is in distress
+# when one of the following public, dated, attributable events occurs:
+#   - foltf:            declared "failing or likely to fail" (ECB / SRB), with or without resolution
+#   - resolution:       resolution action or liquidation under national insolvency law
+#   - state_support:    public recapitalisation, precautionary recapitalisation, impaired-asset
+#                       measure or state-supported sale/liquidation decided by the State and
+#                       assessed by the European Commission
+#   - early_intervention: supervisory takeover (e.g. temporary administration)
+#
+# cause:  fundamental = deterioration of solvency, asset quality or profitability
+#         exogenous   = triggered mainly by sanctions / AML / geopolitical action
+# set:    primary     = used in the main evaluation (fundamental causes only)
+#         sensitivity = added only in the sensitivity analysis
+# status: included | excluded (excluded events are kept for transparency, with the reason)
+#
+# Eligibility: an event is evaluable only if the bank has at least one panel
+# observation in the window of 1-4 quarters before the event date. With
+# semi-annual data before 2018-09 the window contains at most two observations.
+
+events:
+  - event_id: ev_2016_hsh_state_aid
+    bank_id: 24
+    bank_lei: TUKDD90GPC79G1KOE162
+    bank_name: Hamburg Commercial Bank AG (HSH Nordbank)
+    event_date: "2016-05-02"
+    event_type: state_support
+    cause: fundamental
+    set: primary
+    status: included
+    source: "European Commission Decision (EU) 2016/2057 of 2 May 2016 on State aid to HSH Nordbank (SA.29338); https://op.europa.eu/en/publication-detail/-/publication/2b8bea33-b2a0-11e6-9e3c-01aa75ed71a1/language-en"
+    notes: "Owners' guarantee restored and impaired assets taken over by the Länder; condition: sale or wind-down by 2018. Window 201506-201603 -> observations 201506, 201512."
+
+  - event_id: ev_2017_popular_foltf
+    bank_id: 44
+    bank_lei: 80H66LPTVDLM0P28XF25
+    bank_name: Banco Popular Español SA
+    event_date: "2017-06-06"
+    event_type: foltf
+    cause: fundamental
+    set: primary
+    status: included
+    source: "ECB FOLTF assessment 6 June 2017; SRB resolution decision 7 June 2017 (sale to Banco Santander); https://srb.europa.eu/en/cases"
+    notes: "Last panel observation 201606 = 4 quarters before the event (edge of the window)."
+
+  - event_id: ev_2017_mps_precautionary_recap
+    bank_id: 68
+    bank_lei: J4CP7MHCXR8DAQMKIL78
+    bank_name: Banca Monte dei Paschi di Siena S.p.A.
+    event_date: "2017-07-04"
+    event_type: state_support
+    cause: fundamental
+    set: primary
+    status: included
+    source: "European Commission press release 4 July 2017: Commission authorises precautionary recapitalisation of Monte dei Paschi di Siena; https://germany.representation.ec.europa.eu/news/kommission-genehmigt-rekapitalisierung-der-italienischen-bank-monte-dei-paschi-di-siena-mps-2017-07-04_de"
+    notes: "Sensitivity date: request for precautionary recapitalisation after the failed private capital increase, late December 2016 (alt_event_date to verify before use)."
+
+  - event_id: ev_2017_vicenza_foltf
+    bank_id: 76
+    bank_lei: V3AFM0G2D3A6E0QWDG59
+    bank_name: Banca Popolare di Vicenza SCpA
+    event_date: "2017-06-23"
+    event_type: foltf
+    cause: fundamental
+    set: primary
+    status: included
+    source: "ECB FOLTF assessment 23 June 2017 (repeated breaches of supervisory capital requirements); SRB decided resolution not in the public interest; Italian liquidation; https://srb.europa.eu/en/cases"
+    notes: "Last panel observation 201606 (edge of the window)."
+
+  - event_id: ev_2017_veneto_foltf
+    bank_id: 71
+    bank_lei: 549300W9STRUCJ2DLU64
+    bank_name: Veneto Banca SCpA
+    event_date: "2017-06-23"
+    event_type: foltf
+    cause: fundamental
+    set: primary
+    status: included
+    source: "ECB FOLTF assessment 23 June 2017; SRB decided resolution not in the public interest; Italian liquidation; https://srb.europa.eu/en/cases"
+    notes: "Last panel observation 201606 (edge of the window)."
+
+  - event_id: ev_2017_novo_banco_state_aid
+    bank_id: 115
+    bank_lei: 5493009W2E2YDCXY6S81
+    bank_name: Novo Banco, SA
+    event_date: "2017-10-11"
+    event_type: state_support
+    cause: fundamental
+    set: primary
+    status: included
+    source: "European Commission approval of State aid for the sale of Novo Banco to Lone Star, 11 October 2017; https://ec.europa.eu/competition/state_aid/cases/271354/271354_1965800_138_2.pdf"
+    notes: "Includes the contingent capital mechanism of the Portuguese Resolution Fund. Successor entity LSF NANI INVESTMENTS (bank_id 502) is not yet linked in the crosswalk. Window 201612-201709 -> observations 201612, 201706."
+
+  - event_id: ev_2018_ablv_foltf
+    bank_id: 83
+    bank_lei: 549300IHIJ7SCANBWN17
+    bank_name: ABLV Bank
+    event_date: "2018-02-23"
+    event_type: foltf
+    cause: exogenous
+    set: sensitivity
+    status: included
+    source: "ECB FOLTF assessment 23 February 2018 (ABLV Bank, AS and ABLV Bank Luxembourg); SRB decided resolution not in the public interest; https://www.srb.europa.eu/cases"
+    notes: "Liquidity run triggered by the US FinCEN money-laundering action of February 2018, not by balance-sheet fundamentals. Last observation 201706."
+
+  - event_id: ev_2018_ccb_liquidation
+    bank_id: 12
+    bank_lei: 5493007F6CE5P22TJ731
+    bank_name: Co-operative Central Bank Ltd (Cyprus Cooperative Bank)
+    event_date: "2018-06-19"
+    event_type: state_support
+    cause: fundamental
+    set: primary
+    status: included
+    source: "European Commission approval of Cypriot measures for the liquidation of Cyprus Cooperative Bank, incl. sale of assets and deposits to Hellenic Bank, 19 June 2018; https://www.europeansources.info/?p=512662"
+    notes: "Last panel observation 201706 (within the window)."
+
+  - event_id: ev_2019_carige_temp_admin
+    bank_id: 72
+    bank_lei: F1T87K3OQ2OV1UORLH26
+    bank_name: Banca Carige SpA
+    event_date: "2019-01-02"
+    event_type: early_intervention
+    cause: fundamental
+    set: primary
+    status: included
+    source: "ECB press release 2 January 2019: temporary administrators appointed to replace the Board of Banca Carige; https://www.bankingsupervision.europa.eu/press/pr/date/2019/html/ssm.pr190102.en.html"
+    notes: "Last panel observation 201806."
+
+  - event_id: ev_2019_nordlb_recap
+    bank_id: 19
+    bank_lei: DSNHHQ2B9X5N6OUJ1236
+    bank_name: Norddeutsche Landesbank - Girozentrale
+    event_date: "2019-12-05"
+    event_type: state_support
+    cause: fundamental
+    set: primary
+    status: included
+    source: "European Commission, 5/6 December 2019: recapitalisation of NordLB by its public owners (EUR 3.6 bn) concluded to be market conform; https://germany.representation.ec.europa.eu/news/staatliche-beihilfen-kommission-halt-rekapitalisierung-der-nordlb-fur-marktkonform-2019-12-06_de"
+    notes: "Public recapitalisation by the State of Lower Saxony and the savings-bank sector; the Commission found no State aid (market economy operator), but it is a public rescue under the event definition. Verify the exact publication day (5 or 6 Dec). Sensitivity: earlier owners' decision in 2019 (to verify)."
+
+  - event_id: ev_2022_sberbank_europe_foltf
+    bank_id: 119
+    bank_lei: 529900IZ8TASAYR3A694
+    bank_name: Sberbank Europe AG
+    event_date: "2022-02-28"
+    event_type: foltf
+    cause: exogenous
+    set: sensitivity
+    status: included
+    source: "ECB FOLTF assessment of Sberbank Europe AG and its Croatian and Slovenian subsidiaries (ECB press release ssm.pr220228); https://www.bankingsupervision.europa.eu/ecb/pub/pdf/ssm.FOLTF_assessment_of_Sberbank_Europe_AG~144fd77e46.en.pdf"
+    notes: "Deposit run caused by sanctions after the invasion of Ukraine. Last observation 202106."
+
+# Events found in the sources but NOT evaluable or NOT matching the definition
+excluded:
+  - event: "2015 recapitalisations of Greek banks after the ECB comprehensive assessment (Piraeus, National Bank of Greece; Alpha and Eurobank largely private)"
+    banks: [134, 123, 128, 135]
+    reason: "Events coincide with the banks' first panel observation (201512): no pre-event history. Details to verify if cited."
+  - event: "Caixa Geral de Depósitos recapitalisation by the Portuguese State, 2017"
+    banks: [94]
+    reason: "European Commission concluded no State aid (market economy investor); ambiguous as a distress event. Candidate for sensitivity only."
+  - event: "Banco Mare Nostrum merged into Bankia (BFA), 2017-2018"
+    banks: [43, 42]
+    reason: "Merger between two State-owned banks under restructuring; ambiguous 'distressed merger'. Not used."
+  - event: "Banca Monte dei Paschi capital increase with State participation, 2022"
+    banks: [68]
+    reason: "Continuation of the 2017 restructuring, not a new event; would double count MPS."
+  - event: "Dexia (orderly resolution since 2011-2012) and DEPFA (wind-down entity)"
+    banks: [8, 114]
+    reason: "Wind-down entities throughout the sample, no discrete event in the window. Recommended: mark as specialist_institution (type wind_down)."
+  - event: "Pre-2015 events (Banco Espírito Santo 2014, Bank of Cyprus 2013, Slovenian bank recapitalisations 2013-2014)"
+    banks: []
+    reason: "Before the data window."

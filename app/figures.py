@@ -17,6 +17,7 @@ PROFILE_LABELS = {
     "1296bd8e": "v0",
     "794ea5ad": "v0.9",
     "5a1ec1f4": "v1.0",
+    "28a28fa0": "v1.1",
 }
 COLORS = {"green": "#4daf4a", "amber": "#ffbf00", "red": "#e41a1c", "not_evaluated": "#bdbdbd"}
 LABELS = {
@@ -31,6 +32,7 @@ def _matplotlib():
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
+    matplotlib.rcParams["svg.hashsalt"] = "eba-analyst"
     return plt
 
 
@@ -86,7 +88,7 @@ def _f1(cur, out, labels):
             grouped[version][period][0] += 1
     fig, ax = plt.subplots(figsize=(12, 5))
     csv_rows = [["profile", "period", "red_share_percent"]]
-    for version in ("v0", "v0.9", "v1.0"):
+    for version in ("v0", "v0.9", "v1.0", "v1.1"):
         periods = sorted(grouped[version])
         shares = [100 * grouped[version][p][0] / grouped[version][p][1] for p in periods]
         ax.plot([_date(p) for p in periods], shares, label=version)
@@ -100,7 +102,7 @@ def _f1(cur, out, labels):
 
 def _f2(cur, out, labels):
     plt = _matplotlib()
-    rows = _alerts(cur, next((s for s, v in _profiles(cur) if v == "v1.0"), None))
+    rows = _alerts(cur, next((s for s, v in _profiles(cur) if v == "v1.1"), None))
     grouped = defaultdict(lambda: defaultdict(int))
     for _sha, period, level, _name, payload in rows:
         if isinstance(payload, dict) and payload.get("level_reason") == "specialist_excluded":
@@ -115,7 +117,7 @@ def _f2(cur, out, labels):
     ax.stackplot(x, *shares, colors=[COLORS[level] for level in ("green", "amber", "red", "not_evaluated")],
                  labels=[labels[level] for level in ("green", "amber", "red", "not_evaluated")])
     ax.set_xticks(list(x), periods)
-    ax.set(title="Alert levels over time (v1.0)", xlabel=labels["period"], ylabel="Share (%)")
+    ax.set(title="Alert levels over time", xlabel=labels["period"], ylabel="Share (%)")
     ax.legend(); ax.tick_params(axis="x", rotation=60)
     _save(fig, out, "F2", [["period", "green", "amber", "red", "not_evaluated"]] +
           [[p] + [f"{shares[i][j]:.8f}" for i in range(4)] for j, p in enumerate(periods)],
@@ -124,7 +126,7 @@ def _f2(cur, out, labels):
 
 def _f3(cur, out, labels, names):
     plt = _matplotlib()
-    sha = next((s for s, v in _profiles(cur) if v == "v1.0"), None)
+    sha = next((s for s, v in _profiles(cur) if v == "v1.1"), None)
     rows = _alerts(cur, sha)
     selected = [r for r in rows if any(n.casefold() in (r[3] or "").casefold() for n in names)]
     periods = sorted({r[1] for r in selected})
@@ -148,7 +150,7 @@ def _f3(cur, out, labels, names):
                                        edgecolor="black", linewidth=.3, hatch=hatches[value]))
     ax.set(xlim=(0, len(periods)), ylim=(0, len(banks)), yticks=[i + .5 for i in range(len(banks))],
            yticklabels=banks, xticks=[i + .5 for i in range(len(periods))], xticklabels=periods,
-           title="Alert heatmap (v1.0)", xlabel=labels["period"])
+           title="Bank-period alert levels", xlabel=labels["period"])
     ax.invert_yaxis(); ax.tick_params(axis="x", rotation=60)
     _save(fig, out, "F3", [["bank", *periods]] + [[bank, *row] for bank, row in zip(banks, matrix)],
           "Bank-period alert levels; white is not in sample and grey is not evaluated.")
@@ -193,7 +195,7 @@ def _f5(cur, out, labels):
     colors = {"semi-annual": "#377eb8", "quarterly": "#984ea3"}
     ax.bar([_date(p) for p in periods], [r[1] for r in rows],
            color=[colors[r[2]] for r in rows], edgecolor="black", linewidth=.3)
-    ax.set(title="F5 Data coverage", xlabel=labels["period"], ylabel=labels["banks"])
+    ax.set(title="Data coverage", xlabel=labels["period"], ylabel=labels["banks"])
     ax.text(.01, 1.02, "Blue: semi-annual   Purple: quarterly", transform=ax.transAxes, fontsize=8)
     for x, row in enumerate(rows):
         ax.annotate(row[3] or "", (_date(row[0]), row[1]), fontsize=6, rotation=90, ha="center", va="bottom")
@@ -203,7 +205,7 @@ def _f5(cur, out, labels):
 
 def _f6(cur, out, labels, crisis, stable):
     plt = _matplotlib()
-    sha = next((s for s, v in _profiles(cur) if v == "v1.0"), None)
+    sha = next((s for s, v in _profiles(cur) if v == "v1.1"), None)
     rows = [r for r in _alerts(cur, sha) if r[3] and (crisis.casefold() in r[3].casefold() or stable.casefold() in r[3].casefold())]
     fig, axes = plt.subplots(2, 1, figsize=(12, 7), sharex=True)
     score_colors = ["#f0f0f0", "#a6d854", "#ffd92f", "#e41a1c"]
@@ -228,17 +230,38 @@ def _f6(cur, out, labels, crisis, stable):
         ax.tick_params(axis="x", rotation=60)
         csv_rows.extend([[bank, p] + [grouped[p].get(f, 0) for f in ("capital", "asset_quality", "profitability", "dynamics")]
                          + [final.get(p, -1)] for p in periods])
-    fig.suptitle("Family scores over time (v1.0)")
+    fig.suptitle("Family scores over time")
     _save(fig, out, "F6", csv_rows,
           "Family score strips and final alert level for the crisis and stable banks.")
+
+
+def _f7(cur, out):
+    plt = _matplotlib()
+    from app.event_evaluation import evaluate_baselines, evaluate_events
+    baselines = evaluate_baselines(cur.connection, "config/rules/eu_eba.yaml", "config/events.yaml")
+    points = [(name, data) for name, data in baselines["baselines"].items()]
+    points = [(name, data) for name, data in points
+              if name != "B7 random baseline"]
+    points += [("v1.1 red", baselines["baselines"]["v1.1 red"]),
+               ("v1.1 amber+", baselines["baselines"]["v1.1 amber_or_red"])]
+    fig, ax = plt.subplots(figsize=(8, 6))
+    rows = [["method", "false_alarm_rate_percent", "hit_rate_percent"]]
+    for name, data in points:
+        x = data.get("false_alarm_rate_percent", 100 * data.get("false_alarm_rate", 0))
+        y = data.get("hit_rate_percent", 100 * data.get("hit_rate", 0))
+        ax.scatter([x], [y], label=name)
+        rows.append([name, f"{x:.8f}", f"{y:.8f}"])
+    ax.set(title="Hit rate versus false-alarm rate", xlabel="False-alarm rate (%)", ylabel="Hit rate (%)")
+    ax.legend(fontsize=7)
+    _save(fig, out, "F7", rows, "Event hit rate versus false-alarm rate for frozen v1.1 and fixed baselines.")
 
 
 def generate(target: str, out_dir: str, lang: str = "en", only: list[str] | None = None) -> int:
     if lang not in LABELS:
         raise ValueError("lang must be en or ro")
     config = yaml.safe_load(Path("config/figures.yaml").read_text()) or {}
-    selected = set(only or ("F1", "F2", "F3", "F4", "F5", "F6"))
-    unknown = selected - {"F1", "F2", "F3", "F4", "F5", "F6"}
+    selected = set(only or ("F1", "F2", "F3", "F4", "F5", "F6", "F7"))
+    unknown = selected - {"F1", "F2", "F3", "F4", "F5", "F6", "F7"}
     if unknown:
         raise ValueError(f"unknown figures: {', '.join(sorted(unknown))}")
     conn = connect("public")
@@ -252,11 +275,12 @@ def generate(target: str, out_dir: str, lang: str = "en", only: list[str] | None
             if "F4" in selected: _f4(cur, out)
             if "F5" in selected: _f5(cur, out, labels)
             if "F6" in selected: _f6(cur, out, labels, config.get("crisis_bank", "Piraeus"), config.get("stable_bank", "BNP Paribas"))
+            if "F7" in selected: _f7(cur, out)
     finally:
         conn.close()
     out = Path(out_dir)
     manifest = {}
-    for path in sorted(out.glob("F[1-6].*")):
+    for path in sorted(out.glob("F[1-7].*")):
         manifest[path.name] = hashlib.sha256(path.read_bytes()).hexdigest()
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return len(selected)

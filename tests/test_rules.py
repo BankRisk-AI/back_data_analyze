@@ -69,6 +69,8 @@ def test_persistence_relative_specialist_and_composite():
          "weight": 2, "source": "test", "status": "verified"},
     )
     rows = [
+        row(1, date(2020, 9, 30), roe_annualised=-.1, npl_ratio=.2),
+        row(1, date(2020, 12, 31), roe_annualised=-.1, npl_ratio=.2),
         row(1, date(2021, 3, 31), roe_annualised=-.1, npl_ratio=.2),
         row(1, date(2021, 6, 30), roe_annualised=-.1, npl_ratio=.2),
         row(2, date(2021, 6, 30), roe_annualised=.2, npl_ratio=.01,
@@ -76,10 +78,38 @@ def test_persistence_relative_specialist_and_composite():
         row(3, date(2021, 6, 30), roe_annualised=.2, npl_ratio=.02),
     ]
     alerts = evaluate_rows(p, rows)
-    assert result(alerts[1:], "persist")["triggered"] is True
-    assert result(alerts[1:], "relative")["triggered"] is True
+    latest = alerts[3]
+    assert result([latest], "persist")["triggered"] is True
+    assert result([latest], "relative")["triggered"] is True
     specialist = next(a for a in alerts if a["bank_id"] == 2)
     assert specialist["level"] == "not_evaluated"
+
+
+def test_persistence_requires_exact_calendar_six_month_observation():
+    p = profile(rule("persist", "persistence", "roe_annualised", consecutive_periods=2))
+    alerts = evaluate_rows(p, [
+        row(1, date(2018, 6, 30), roe_annualised=-.1),
+        row(1, date(2018, 9, 30), roe_annualised=-.1),
+        row(1, date(2019, 3, 31), roe_annualised=-.1),
+        row(1, date(2019, 6, 30), roe_annualised=-.1),
+    ])
+    assert result([alerts[0]], "persist")["not_evaluated"] is True
+    assert result([alerts[1]], "persist")["not_evaluated"] is True
+    assert result([alerts[2]], "persist")["triggered"] is True
+    assert result([alerts[3]], "persist")["not_evaluated"] is True
+
+
+def test_npl_persistence_crossing_definition_break_is_not_evaluated():
+    p = profile(rule("persist", "persistence", "npl_ratio", condition="above",
+                      threshold=.05, consecutive_periods=2))
+    alerts = evaluate_rows(p, [
+        row(1, date(2019, 12, 31), npl_ratio=.1),
+        row(1, date(2020, 6, 30), npl_ratio=.1),
+        row(1, date(2020, 12, 31), npl_ratio=.1),
+    ])
+    assert result([alerts[1]], "persist")["not_evaluated"] is True
+    assert result([alerts[1]], "persist")["input_flags"] == ["series_break"]
+    assert result([alerts[2]], "persist")["triggered"] is True
 
 
 def test_profile_validation_rejects_duplicate_ids_and_missing_verified_threshold():
@@ -101,9 +131,9 @@ def test_eu_rocet1_thresholds_use_multiplication_factor():
 
 def test_frozen_eu_profile_requires_version_bump_for_changes():
     profile, profile_sha = load_profile("config/rules/eu_eba.yaml")
-    assert profile["version"] == "1.0"
+    assert profile["version"] == "1.1"
     assert profile["frozen"] is True
-    assert profile_sha == "5a1ec1f44d9bfdc55518e3792b593a97e60c97c7405d8c918d7be2525bcc4d5c"
+    assert profile_sha == "28a28fa0f89da8435abdb0d6042a69cb2bff421c456926374dd202e0089f7e40"
 
 
 def test_persisted_alerts_are_idempotent(db, tmp_path):
@@ -166,9 +196,10 @@ def test_two_families_red_and_all_not_evaluated_reason():
     )
     rows = [
         row(1, date(2024, 6, 30), cet1_ratio=.15, npl_ratio=.10),
+        row(1, date(2024, 12, 31), cet1_ratio=.12, npl_ratio=.15),
         row(1, date(2025, 6, 30), cet1_ratio=.10, npl_ratio=.2),
     ]
-    alert = evaluate_rows(p, rows)[1]
+    alert = evaluate_rows(p, rows)[2]
     assert alert["level"] == "red"
     assert alert["rule_results"]["level_reason"] == "two_families:asset_quality,dynamics"
     empty = evaluate_rows(p, [row(2, date(2025, 6, 30), cet1_ratio=None, npl_ratio=None)])[0]

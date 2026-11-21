@@ -24,17 +24,21 @@ Profile v0.9 (`794ea5ad...17ad5c`) introduced family maximum scoring to remove
 correlated-rule summation. Profile v1.0
 (`5a1ec1f4...5bcc4d5c`) moves persistence into the feature family, reduces
 relative rules to informational severity 1, and expands the specialist
-screen. Version 1.0 is frozen and was fixed before any event data existed;
-future behavioral changes require a version bump.
+screen. Profile v1.1 (`28a28fa0...e0089f7e40`) changes persistence to an
+exact calendar `t-6 months` comparison. Versions 1.0 and 1.1 are frozen and
+were fixed before any event data existed; future behavioral changes require a
+version bump.
 
 ## Rule model and semantics
 
 Each rule has `id`, `type`, `feature`, `condition`, `severity`, `weight`,
 `source`, and `status`. Supported types are level, trend, persistence,
 relative, and composite score. Level rules support thresholds and configured
-green/amber/red bands. Trend rules use calendar alignment: four quarters, or
-two semi-annual observations before 201809. Persistence requires N consecutive
-native periods. Relative rules rank each period cross-section. The composite uses family
+green/amber/red bands. Trend rules use calendar alignment: four quarters, or two semi-annual
+observations before 201809. Persistence requires the current observation and
+the exact calendar `t-6 months` observation; a missing or NULL observation is
+not evaluated. Comparisons crossing the 202006 NPL definition break are also
+not evaluated. Relative rules rank each period cross-section. The composite uses family
 maxima: severity 0/1/2/3 is assigned per rule, each family contributes its
 maximum evaluated severity, and the final level uses the fixed
 regulatory-breach, two-families, and family-sum decisions.
@@ -89,18 +93,18 @@ python -m app rules evaluate --profile eu_eba --target test|prod
 The generic worker exposes the `evaluate_rules` job kind. It reads
 `EBA_RULE_PROFILE` (default `eu_eba`) and uses the same atomic service.
 
-## Evaluation plan
+## Stage 4d event evaluation
 
 `config/events.yaml` defines the owner-curated event format with LEI, date,
-type, source, and notes; it is intentionally empty. For each event, a hit is
-an alert for the same bank in the 1--4 native quarters before the event.
-Report hit rate, false-alarm rate, and lead time. Apply the same temporal
-folds, bank eligibility, alert threshold, and metrics to H2 ML probabilities
-without future leakage.
+type, source, cause, set, and notes. `python -m app evaluate rules` applies
+the exact 12-to-3-month pre-event window, resolves approved crosswalk groups,
+and reports hit rate, Wilson confidence intervals, lead time, false alarms,
+precision, and per-event observations. The reusable window and metric code is
+in `app/event_evaluation.py`; ML evaluation will use the same windows without
+future leakage. Results are in `rule_evaluation.md`.
 
 ## Next decisions
 
-1. Curate `config/events.yaml` and approve the 1--4-quarter evaluation window.
-2. Confirm BNM thresholds and sources.
-3. Implement alert endpoints and the React UI, including compatibility for
+1. Confirm BNM thresholds and sources.
+2. Implement alert endpoints and the React UI, including compatibility for
    historical list-shaped and calibrated object-shaped `rule_results`.

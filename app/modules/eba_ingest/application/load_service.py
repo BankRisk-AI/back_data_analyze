@@ -267,6 +267,25 @@ def _load(cur, import_id: int, emit):
 
     emit("resolving banks and indicators", 10)
     for lei, name, country, finrep, previous in _metadata(paths.get("TR_Metadata", "")):
+        cur.execute(
+            """SELECT bank_id FROM bank
+               WHERE lei = ANY(%s) ORDER BY bank_id LIMIT 1
+               FOR UPDATE""",
+            (previous,),
+        )
+        predecessor = cur.fetchone()
+        if predecessor:
+            cur.execute(
+                """UPDATE bank
+                   SET previous_leis = (
+                       SELECT ARRAY(SELECT DISTINCT value FROM unnest(
+                           COALESCE(previous_leis, ARRAY[]::text[]) || %s || ARRAY[%s]
+                       ) AS value ORDER BY value)
+                   )
+                   WHERE bank_id=%s""",
+                (previous, lei, predecessor[0]),
+            )
+            continue
         cur.execute("""INSERT INTO bank(lei,name,country_code,finrep_reported,previous_leis)
                        VALUES (%s,%s,%s,%s,%s)
                        ON CONFLICT (lei) DO UPDATE SET name=EXCLUDED.name,country_code=EXCLUDED.country_code,

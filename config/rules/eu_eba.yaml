@@ -1,5 +1,5 @@
 profile: eu_eba
-version: "1.0"
+version: "1.1"
 frozen: true
 description: Draft EBA-style prudential and panel-risk rules; owner review required.
 defaults:

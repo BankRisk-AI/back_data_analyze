@@ -38,3 +38,15 @@
   name: SFIL S.A.
   type: public_funding_agency
   reason: French public-sector lending and refinancing institution.
+- lei: 969500STN7T9MRUMJ267
+  name: Bpifrance
+  type: public_funding_agency
+  reason: French public funding agency and state-backed investment institution.
+- lei: D3K6HXMBBB6SK9OXH394
+  name: Dexia
+  type: wind_down
+  reason: Wind-down institution with no discrete event in the sample.
+- lei: HRRVUBV0XN84YQZT6245
+  name: DEPFA BANK Plc
+  type: wind_down
+  reason: Wind-down institution with no discrete event in the sample.

@@ -1,40 +1,270 @@
 crosswalks:
-  - group_id: bank_of_cyprus
-    status: proposed
-    members:
-      - lei: PQ0RAP85KK9Z75ONZW93
-        name: Bank of Cyprus Public Company Limited
-        active_from: "2014-12"
-        active_to: "2016-06"
-      - lei: 635400L14KNHZXPUZM19
-        name: Bank of Cyprus Holdings Public Limited Company
-        active_from: "2016-12"
-        active_to: "2025-06"
-    reason: Corporate holding change at the 2016 hive-down boundary.
-    evidence: "201606 to 201612; Cyprus; loans 34244.514 to 31983.509 (-6.6%); successor previous_leis is PQ0RAP85KK9Z75ONZW93."
-  - group_id: bpifrance
-    status: proposed
-    members:
-      - lei: 969500FYSB4IT3QWYB65
-        name: Bpifrance S.A. (Banque Publique d’Investissement)
-        active_from: "2014-12"
-        active_to: "2020-06"
-      - lei: 969500STN7T9MRUMJ267
-        name: Bpifrance
-        active_from: "2020-09"
-        active_to: "2025-06"
-    reason: Same public investment bank with a reporting-name and LEI change.
-    evidence: "202006 to 202009; France; loans 57374.02594 to 57364.94294 (-0.0%)."
-  - group_id: magyar_bankholding
-    status: proposed
-    members:
-      - lei: 529900J3WLMSUC78RN75
-        name: Magyar Bankholding
-        active_from: "2014-12"
-        active_to: "2021-06"
-      - lei: 3H0Q3U74FVFED2SHZT16
-        name: MBH bankcsoport
-        active_from: "2021-09"
-        active_to: "2025-06"
-    reason: Same Hungarian banking group after consolidation and reporting-name change.
-    evidence: "202106 to 202109; Hungary; loans 14345.36746 to 14617.67512 (+1.9%)."
+- group_id: bank_of_cyprus
+  status: approved
+  decided_by: owner
+  decided_on: '2026-11-21'
+  members:
+  - lei: PQ0RAP85KK9Z75ONZW93
+    name: Bank of Cyprus Public Company Limited
+    active_from: 2014-12
+    active_to: 2016-06
+  - lei: 635400L14KNHZXPUZM19
+    name: Bank of Cyprus Holdings Public Limited Company
+    active_from: 2016-12
+    active_to: 2025-06
+  reason: declared predecessor LEI in TR_Metadata + adjacency + size continuity
+  evidence: 201606 to 201612; CY; loans 34244.514 to 31983.509 (-6.6%).
+- group_id: bpifrance
+  status: approved
+  decided_by: owner
+  decided_on: '2026-11-21'
+  members:
+  - lei: 969500FYSB4IT3QWYB65
+    name: Bpifrance S.A. (Banque Publique d’Investissement)
+    active_from: 2014-12
+    active_to: 2020-06
+  - lei: 969500STN7T9MRUMJ267
+    name: Bpifrance
+    active_from: 2020-09
+    active_to: 2025-06
+  reason: declared predecessor LEI in TR_Metadata + adjacency + size continuity
+  evidence: 202006 to 202009; FR; loans 57374.026 to 57364.943 (-0.0%).
+- group_id: magyar_bankholding
+  status: approved
+  decided_by: owner
+  decided_on: '2026-11-21'
+  members:
+  - lei: 529900J3WLMSUC78RN75
+    name: Magyar Bankholding
+    active_from: 2014-12
+    active_to: 2021-06
+  - lei: 3H0Q3U74FVFED2SHZT16
+    name: MBH bankcsoport
+    active_from: 2021-09
+    active_to: 2025-06
+  reason: consolidation of MKB, Budapest Bank and Takarék into MBH; continuity at
+    the boundary +1.9%
+  evidence: 202106 to 202109; HU; loans 14345.367 to 14617.675 (+1.9%).
+- group_id: alpha_services_to_alpha_bank
+  status: approved
+  members:
+  - lei: 5299009N55YRQC69CN08
+    name: ALPHA SERVICES AND HOLDINGS S.A.
+    active_from: 2015-12
+    active_to: 2024-06
+  - lei: 213800DBQIB6VBNU5C64
+    name: Alpha Bank S.A.
+    active_from: 2024-09
+    active_to: 2025-06
+  reason: declared predecessor LEI + adjacency; boundary anomaly retained
+  evidence: GR; 202406 to 202409; loans 40717.613 to 83617.064 (+105.4%); total assets
+    73683.610 to 73501.008; CET1 14.781% to 15.182%; no overlap.
+  decided_by: owner
+  decided_on: '2026-11-21'
+  boundary_anomaly:
+    period: '202409'
+    feature: loans
+    value: 105.4
+- group_id: aareal_to_atlantic_lux
+  status: approved
+  members:
+  - lei: EZKODONU5TYHW4PP1R34
+    name: Aareal Bank AG
+  - lei: 254900RNFMDM0P11YR84
+    name: ATLANTIC LUX HOLDCO S.A R.L.
+  reason: declared predecessor LEI in TR_Metadata; adjacency and size continuity
+  evidence: 202206 to 202209; DE; loans 36684.093 to 37049.037 (+1.0%).
+  decided_by: owner
+  decided_on: '2026-11-21'
+- group_id: abanca_holding_to_corporacion
+  status: approved
+  members:
+  - lei: 9598003BP0LHPHDWV834
+    name: ABANCA Holding Financiero
+    S.A.: null
+  - lei: 54930056IRBXK0Q1FP96
+    name: Abanca Corporacion Bancaria
+    S.A.: null
+  reason: declared predecessor LEI in TR_Metadata; adjacency and size continuity
+  evidence: 201906 to 201909; ES; loans 37972.363 to 41156.344 (+8.4%).
+  decided_by: owner
+  decided_on: '2026-11-21'
+- group_id: allied_irish_to_aib
+  status: approved
+  members:
+  - lei: 3U8WV1YX2VMUHH7Z1Q21
+    name: Allied Irish Banks
+    Plc: null
+  - lei: 635400AKJBGNS5WNQL34
+    name: AIB Group plc
+  reason: declared predecessor LEI in TR_Metadata; adjacency and size continuity
+  evidence: 201706 to 201712; IE; loans 82331.246 to 80785.377 (-1.9%).
+  decided_by: owner
+  decided_on: '2026-11-21'
+- group_id: citibank_holdings_to_europe
+  status: approved
+  members:
+  - lei: 549300K7L8YW8M215U46
+    name: Citibank Holdings Ireland Limited
+  - lei: N1FBEDJ5J41VKZLO2475
+    name: Citibank Europe plc
+  reason: holding removed 2023; perimeter change -20.2%
+  evidence: 202306 to 202309; IE; loans 40111.571 to 32016.171 (-20.2%). Prefix-shifted
+    provisional identifier; no reorganisation.
+  decided_by: owner
+  decided_on: '2026-11-21'
+- group_id: credit_agricole_group
+  status: approved
+  members:
+  - lei: 969500TJ5KRTCJQWXH05
+    name: Crédit Agricole Group
+  - lei: FR969500TJ5KRTCJQWXH
+    name: Groupe Crédit Agricole
+  reason: FR-prefixed provisional identifier, not a reorganisation
+  evidence: 201506 to 201512; FR; loans 886172.415 to 905692.695 (+2.2%). Prefix-shifted
+    provisional identifier; no reorganisation.
+  decided_by: owner
+  decided_on: '2026-11-21'
+- group_id: criteria_to_caixabank
+  status: approved
+  members:
+  - lei: 959800DQQUAMV0K08004
+    name: Criteria Caixa S.A.U.
+  - lei: 7CUNS533WID6K7DGFI87
+    name: CaixaBank
+    S.A.: null
+  reason: declared predecessor LEI in TR_Metadata; adjacency and size continuity
+  evidence: 201706 to 201712; ES; loans 263629.287 to 263378.132 (-0.1%).
+  decided_by: owner
+  decided_on: '2026-11-21'
+- group_id: groupe_bpce
+  status: approved
+  members:
+  - lei: 9695005MSX1OYEMGDF46
+    name: Groupe BPCE
+  - lei: FR9695005MSX1OYEMGDF
+    name: Groupe BPCE
+  reason: FR-prefixed provisional identifier, not a reorganisation
+  evidence: 201506 to 201512; FR; loans 800966.765 to 775428.555 (-3.2%). Prefix-shifted
+    provisional identifier; no reorganisation.
+  decided_by: owner
+  decided_on: '2026-11-21'
+- group_id: hypo_real_estate_to_pfandbriefbank
+  status: approved
+  members:
+  - lei: 52990082YOVOZIC8QX60
+    name: Hypo Real Estate Holding AG
+  - lei: DZZ47B9A52ZJ6LT6VV95
+    name: Deutsche Pfandbriefbank AG
+  reason: declared predecessor LEI in TR_Metadata; adjacency and size continuity
+  evidence: 201506 to 201512; DE; loans 44112.811 to 45803.915 (+3.8%).
+  decided_by: owner
+  decided_on: '2026-11-21'
+- group_id: iccrea
+  status: approved
+  members:
+  - lei: 815600D79C96B9661149
+    name: ICCREA Holding
+  - lei: NNVPP80YIZGEY2314M97
+    name: ICCREA BANCA S.P.A.
+  reason: declared predecessor LEI in TR_Metadata; adjacency and size continuity
+  evidence: 201606 to 201612; IT; loans 39614.197 to 38433.924 (-3.0%).
+  decided_by: owner
+  decided_on: '2026-11-21'
+- group_id: precision_to_quintet
+  status: approved
+  members:
+  - lei: 549300AUUQG072ATL746
+    name: Precision Capital S.A.
+  - lei: KHCL65TP05J1HUW2D560
+    name: Quintet Private Bank (Europe) S.A
+  reason: declared predecessor LEI in TR_Metadata; adjacency and size continuity
+  evidence: 202106 to 202109; LU; loans 5400.992 to 5574.418 (+3.2%).
+  decided_by: owner
+  decided_on: '2026-11-21'
+- group_id: bank_of_ireland
+  status: approved
+  members:
+  - lei: Q2GQA2KF6XJ24W42G291
+    name: The Governor and Company of the Bank of Ireland
+  - lei: 635400C8EK6DRI12LJ39
+    name: Bank of Ireland Group plc
+  reason: declared predecessor LEI in TR_Metadata; adjacency and size continuity
+  evidence: 201706 to 201712; IE; loans 96706.988 to 95787.369 (-1.0%).
+  decided_by: owner
+  decided_on: '2026-11-21'
+- group_id: nordea_group_to_abp
+  status: proposed
+  members:
+  - lei: 6SCPQ280AIY8EP3XFW53
+    name: Nordea Bank - group
+  - lei: 529900ODI3047E2LIV03
+    name: Nordea Bank Abp
+  reason: successor without declared predecessor; evidence only
+  evidence: SE 201806 -> FI 201809; assets 548980.162 -> 554553.275; CET1 19.960%
+    -> 20.260%; country and legal-entity change; no declared predecessor.
+- group_id: abn_amro_group_to_bank
+  status: proposed
+  members:
+  - lei: 724500DWE10NNL1AXZ52
+    name: ABN AMRO Group N.V.
+  - lei: BFXS5XCH7N0Y05NIXW11
+    name: ABN AMRO Bank N.V.
+  reason: successor without declared predecessor; evidence only
+  evidence: NL 201806 -> 201809; assets 490756.153 -> 496321.811; CET1 18.340% ->
+    18.570%; no declared predecessor.
+- group_id: novo_banco_to_lsf_nani
+  status: proposed
+  members:
+  - lei: 5493009W2E2YDCXY6S81
+    name: Novo Banco, SA
+  - lei: 222100K6QL2V4MLHWQ08
+    name: LSF NANI INVESTMENTS S.A R.L.
+  reason: successor without declared predecessor; evidence only
+  evidence: PT 201806 -> 201809; assets 49429.563 -> 50188.031; CET1 13.490% -> 13.490%;
+    successor after sale; no declared predecessor.
+- group_id: promontoria_to_bawag
+  status: proposed
+  members:
+  - lei: 5299004SNO5GECIBWJ18
+    name: Promontoria Sacher Holding N.V.
+  - lei: 529900S9YO2JHTIIDG38
+    name: BAWAG Group AG
+  reason: successor without declared predecessor; evidence only
+  evidence: AT 201706 -> 201712; assets 39621.813 -> 46632.323; CET1 14.145% -> 13.530%;
+    no declared predecessor.
+- group_id: raiffeisen_land_to_rbi
+  status: proposed
+  members:
+  - lei: 529900JP9C734S1LE008
+    name: Raiffeisen-Landesbanken-Holding GmbH
+  - lei: 9ZHRYM6F437SQJ6OUG95
+    name: Raiffeisen Bank International AG
+  reason: successor without declared predecessor; evidence only
+  evidence: AT 201606 -> 201612; predecessor assets 70106.245, successor asset fact
+    unavailable/zero and CET1 NULL; no declared predecessor.
+- group_id: sns_volksholding_volksbank
+  status: proposed
+  members:
+  - lei: 72450032NPOX5UJQTI97
+    name: SNS REAAL N.V.
+  - lei: 724500VLXQUMMD5BJB61
+    name: Volksholding B.V.
+  - lei: 724500A1FNICHSDF2I11
+    name: de Volksbank N.V.
+  reason: successor without declared predecessor; evidence only
+  evidence: 'NL: SNS REAAL spans 201412-202506; Volksholding 201512-201806; de Volksbank
+    has 0 panel periods; gaps and perimeter changes prevent an applied link.'
+- group_id: volkswagen_entities
+  status: proposed
+  members:
+  - lei: 529900USFSZYPS075O24
+    name: VW Financial Services AG
+  - lei: 529900GJD3OQLRZCKW37
+    name: Volkswagen Bank Gesellschaft mit beschränkter Haftung
+  - lei: 529900SSGT49ZZSWYE62
+    name: Volkswagen Financial Services AG
+  reason: successor without declared predecessor; evidence only
+  evidence: 'DE: VW Financial Services 201606 -> Volkswagen Bank 201712 (assets 114048.612
+    -> 72469.289; CET1 11.622% -> 15.640%); later Volkswagen Financial Services 202409
+    has assets 210611.502 and CET1 16.638%; gaps and perimeter changes.'

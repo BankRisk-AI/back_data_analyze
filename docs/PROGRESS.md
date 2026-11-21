@@ -2,6 +2,27 @@
 
 ## Done
 
+- Stage 4e (2026-11-21): approved three continuity crosswalk groups
+  (Bank of Cyprus, Bpifrance, and Magyar Bankholding), added predecessor-LEI
+  continuity handling to loads, froze EU/EBA profile v1.1
+  (`28a28fa0...e0089f7e40`) with calendar persistence, rebuilt production
+  panel rows, evaluated v1.1, regenerated F1-F6 deterministically, and
+  exported `data/banks.csv`.
+- Stage 4e-data (2026-11-21): approved the remaining owner-directed
+  crosswalks, linked two prefix-shifted provisional identifiers, normalized
+  country codes, added wind-down specialists, and rebuilt production outputs.
+- Stage 4d (2026-11-21): evaluated the nine-event primary set and eleven-event
+  sensitivity set against frozen v1.1; primary red hit rate was 100.0%
+  (Wilson 95% CI 70.1--100.0%) and amber-or-red hit rate was 100.0%
+  (CI 70.1--100.0%), with 12-month median lead time. See
+  [rule evaluation](design/rule_evaluation.md).
+- Stage 4d-baseline (2026-11-21): added fixed dashboard/random baselines,
+  relative usefulness, uncensored lead times, excluded-bank sensitivity,
+  NordLB diagnostics, and deterministic F7 hit-rate/false-alarm figure.
+- Stage 4d-fix (2026-11-21): corrected Sarlin relative usefulness, event-window
+  prevalence, noise-to-signal ratios, and profile-version-specific denominators.
+  Stage 4 is closed. Next = Stage 5a ML design (design only).
+
 - Stage 0: make the project installable and testable (2026-11-12)
 - Stage 1a: set-based staging-to-fact promotion (2026-11-12); measured
   benchmark improved from about 34.1s to about 4.8s for 100,000 rows on the local

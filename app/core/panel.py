@@ -197,7 +197,7 @@ def build_panel(conn, dimensions_root: str | Path = "config/dimensions",
             bank_groups = {bank_id: crosswalk_leis.get(lei) for bank_id, lei in bank_leis.items()}
             for row in rows:
                 group_id = bank_groups.get(row["bank_id"])
-                row["continuity_key"] = group_id or row["bank_id"]
+                row["continuity_key"] = group_id or str(row["bank_id"])
                 if group_id:
                     for feature in FEATURES:
                         _add_flag(row["_flags"], feature, "group_crosswalk")
