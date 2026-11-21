@@ -98,12 +98,12 @@ Each row uses only its own `profile_sha256` alert rows; the denominators and eve
 
 | profile | red hit rate | red false-alarm rate | NSR | U_r(0.7) | annual red share (2014,...,2025) |
 |---|---:|---:|---:|---:|---|
-| v0 | 100.0% | 16.1% | 0.161 | -18.990 | 45.0,37.9,30.9,23.5,20.1,16.4,22.9,14.7,10.9,4.2,4.2,3.1% |
-| v0.9 | 100.0% | 14.2% | 0.142 | -16.694 | 45.0,37.4,30.9,22.7,19.8,15.1,17.5,11.9,8.3,1.8,3.1,3.1% |
-| v1.0 | 100.0% | 28.2% | 0.282 | -34.112 | 64.0,55.3,50.4,45.0,39.7,34.9,32.0,25.6,21.0,10.1,8.4,5.4% |
+| v0 | 100.0% | 28.2% | 0.282 | -34.112 | 64.0,55.3,50.4,45.0,39.7,34.9,32.0,25.6,21.0,10.1,8.4,5.4% |
+| v0.9 | 100.0% | 16.1% | 0.161 | -18.990 | 45.0,37.9,30.9,23.5,20.1,16.4,22.9,14.7,10.9,4.2,4.2,3.1% |
+| v1.0 | 100.0% | 14.2% | 0.142 | -16.694 | 45.0,37.4,30.9,22.7,19.8,15.1,17.5,11.9,8.3,1.8,3.1,3.1% |
 | v1.1 | 100.0% | 13.8% | 0.138 | -16.235 | 45.0,37.4,30.9,22.7,18.1,14.9,16.5,11.9,8.0,1.8,2.9,2.7% |
 
-The version comparison is for transparency; only v1.1 is the pre-registered profile. The apparently unchanged historical figures were previously calculated from mixed/current rows; filtering by each version's own rows exposes the v1.0 false-alarm increase and the distinct annual red-share paths.
+The version comparison is for transparency; only v1.1 is the pre-registered profile. The historical labels are mapped by SHA (`v0=1296bd8e`, `v0.9=794ea5ad`, `v1.0=5a1ec1f4`, `v1.1=28a28fa0`). Historical alerts were re-evaluated from the committed v1.0 profile on the current panel; the earlier v0/v0.9 rows are retained because their source YAML revisions are not present in the reachable repository history. The apparent unchanged figures in the prior report came from swapped labels and mixed-panel rows.
 
 ## Limitations
 

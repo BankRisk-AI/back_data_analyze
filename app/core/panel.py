@@ -432,4 +432,13 @@ def build_panel(conn, dimensions_root: str | Path = "config/dimensions",
                      loan_growth_qoq,loan_growth_yoy,cet1_delta_qoq,min_headroom,indicators,flags,build_provenance)
                     VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,NULL,%s,%s,%s)""",
                             (*values, Json({}), Json(flags), Json(provenance)))
+            cur.execute("SELECT model_id FROM ml_model WHERE status='champion'")
+            champions = [model_id for (model_id,) in cur.fetchall()]
+            if champions:
+                cur.execute("INSERT INTO import_batch(status) VALUES ('uploaded') RETURNING import_id")
+                import_id = cur.fetchone()[0]
+                for model_id in champions:
+                    cur.execute("""INSERT INTO job(import_id,kind,status,message)
+                                   VALUES (%s,'score_panel','pending',%s)""",
+                                (import_id, f"score_panel model={model_id}"))
             return len(rows)

@@ -1791,6 +1791,468 @@ paths:
           content:
             application/problem+json:
               schema: *id001
+  /api/ml/options:
+    get:
+      tags:
+      - ml
+      summary: ML options
+      operationId: get_ml_options
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /api/ml/datasets:
+    get:
+      tags:
+      - ml
+      summary: List ML datasets
+      operationId: list_ml_datasets
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+          title: Page
+      - name: page_size
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 200
+          minimum: 1
+          default: 50
+          title: Page Size
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
+    post:
+      tags:
+      - ml
+      summary: Create ML dataset
+      operationId: create_ml_dataset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DatasetRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
+  /api/ml/datasets/{dataset_id}:
+    get:
+      tags:
+      - ml
+      summary: Get ML dataset
+      operationId: get_ml_dataset
+      parameters:
+      - name: dataset_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Dataset Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema: *id001
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
+  /api/ml/experiments:
+    get:
+      tags:
+      - ml
+      summary: List ML experiments
+      operationId: list_ml_experiments
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+          title: Page
+      - name: page_size
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 200
+          minimum: 1
+          default: 50
+          title: Page Size
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
+    post:
+      tags:
+      - ml
+      summary: Create ML experiment
+      operationId: create_ml_experiment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExperimentRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
+  /api/ml/experiments/{experiment_id}:
+    get:
+      tags:
+      - ml
+      summary: Get ML experiment
+      operationId: get_ml_experiment
+      parameters:
+      - name: experiment_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Experiment Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema: *id001
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
+  /api/ml/experiments/{experiment_id}/cancel:
+    post:
+      tags:
+      - ml
+      summary: Cancel ML experiment
+      operationId: cancel_ml_experiment
+      parameters:
+      - name: experiment_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Experiment Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema: *id001
+        '400':
+          description: Bad request
+          content:
+            application/problem+json:
+              schema: *id001
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
+  /api/ml/models:
+    get:
+      tags:
+      - ml
+      summary: List ML models
+      operationId: list_ml_models
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+          title: Page
+      - name: page_size
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 200
+          minimum: 1
+          default: 50
+          title: Page Size
+      - name: status
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Status
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
+  /api/ml/models/compare:
+    post:
+      tags:
+      - ml
+      summary: Compare ML models
+      operationId: compare_ml_models
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Body_compare_ml_models'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
+  /api/ml/models/{model_id}:
+    get:
+      tags:
+      - ml
+      summary: Get ML model
+      operationId: get_ml_model
+      parameters:
+      - name: model_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Model Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema: *id001
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
+    delete:
+      tags:
+      - ml
+      summary: Delete ML model
+      operationId: delete_ml_model
+      parameters:
+      - name: model_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Model Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema: *id001
+        '409':
+          description: Conflict
+          content:
+            application/problem+json:
+              schema: *id001
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
+  /api/ml/models/{model_id}/champion:
+    post:
+      tags:
+      - ml
+      summary: Promote ML champion
+      operationId: promote_ml_model
+      parameters:
+      - name: model_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Model Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema: *id001
+        '400':
+          description: Bad request
+          content:
+            application/problem+json:
+              schema: *id001
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
+  /api/ml/models/{model_id}/archive:
+    post:
+      tags:
+      - ml
+      summary: Archive ML model
+      operationId: archive_ml_model
+      parameters:
+      - name: model_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Model Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '404':
+          description: Not found
+          content:
+            application/problem+json:
+              schema: *id001
+        '409':
+          description: Conflict
+          content:
+            application/problem+json:
+              schema: *id001
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
+  /api/ml/predictions:
+    get:
+      tags:
+      - ml
+      summary: List ML predictions
+      operationId: list_ml_predictions
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+          title: Page
+      - name: page_size
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 200
+          minimum: 1
+          default: 50
+          title: Page Size
+      - name: champion_only
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: true
+          title: Champion Only
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Invalid request or parameter
+          content:
+            application/problem+json:
+              schema: *id001
 components:
   schemas:
     Aggregate:
@@ -2148,6 +2610,17 @@ components:
       - periods
       - specialist_institution
       title: BankSummary
+    Body_compare_ml_models:
+      properties:
+        model_ids:
+          items:
+            type: integer
+          type: array
+          title: Model Ids
+      type: object
+      required:
+      - model_ids
+      title: Body_compare_ml_models
     Body_create_import:
       properties:
         files:
@@ -2259,6 +2732,28 @@ components:
       - feature
       - values
       title: CrossSection
+    DatasetRequest:
+      properties:
+        target:
+          type: string
+          title: Target
+        grid:
+          type: string
+          title: Grid
+        feature_set:
+          type: string
+          title: Feature Set
+          default: robustness_v1
+        content_hash:
+          type: string
+          title: Content Hash
+          default: '0000000000000000000000000000000000000000000000000000000000000000'
+      additionalProperties: false
+      type: object
+      required:
+      - target
+      - grid
+      title: DatasetRequest
     DatasetSummary:
       properties:
         file_id:
@@ -2299,6 +2794,16 @@ components:
       - columns
       - periods
       title: DatasetSummary
+    DeleteRequest:
+      properties:
+        model_name:
+          type: string
+          title: Model Name
+      additionalProperties: false
+      type: object
+      required:
+      - model_name
+      title: DeleteRequest
     DroppedStaging:
       properties:
         dropped:
@@ -2309,6 +2814,53 @@ components:
       required:
       - dropped
       title: DroppedStaging
+    ExperimentRequest:
+      properties:
+        target:
+          type: string
+          title: Target
+        grid:
+          type: string
+          title: Grid
+        feature_set:
+          type: string
+          title: Feature Set
+          default: robustness_v1
+        content_hash:
+          type: string
+          title: Content Hash
+          default: '0000000000000000000000000000000000000000000000000000000000000000'
+        algorithms:
+          items:
+            type: string
+          type: array
+          title: Algorithms
+        seed:
+          type: integer
+          title: Seed
+          default: 20261121
+        folds:
+          items:
+            type: integer
+          type: array
+          title: Folds
+        budget:
+          type: integer
+          maximum: 60.0
+          minimum: 1.0
+          title: Budget
+          default: 60
+        thresholds:
+          items:
+            type: string
+          type: array
+          title: Thresholds
+      additionalProperties: false
+      type: object
+      required:
+      - target
+      - grid
+      title: ExperimentRequest
     FeatureDefinition:
       properties:
         name:
@@ -3980,3 +4532,5 @@ tags:
     validation of staged data.
 - name: public-analysis
   description: Analysis and chart-ready data from public facts and mirror views.
+- name: ml
+  description: Machine-learning datasets, experiments, models and predictions.

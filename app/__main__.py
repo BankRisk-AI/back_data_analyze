@@ -52,6 +52,26 @@ def main(argv: list[str] | None = None) -> int:
     evaluation_rules.add_argument("--profile", required=True)
     evaluation_rules.add_argument("--events", required=True)
     evaluation_rules.add_argument("--target", choices=("test", "prod"), required=True)
+    ml = sub.add_parser("ml", help="train and evaluate Stage 5 models")
+    ml_sub = ml.add_subparsers(dest="ml_cmd", required=True)
+    ml_train = ml_sub.add_parser("train")
+    ml_train.add_argument("--target", required=True)
+    ml_train.add_argument("--grid", choices=("semiannual", "quarterly"), default="semiannual")
+    ml_train.add_argument("--out", default="data/ml")
+    ml_train.add_argument("--robustness", action="store_true")
+    ml_train.add_argument("--models", default="LR,RF,XGB",
+                          help="comma-separated ML models to search")
+    ml_train.add_argument("--runs", default="",
+                          help="comma-separated runs: original,robustness,t5_noT1,quarterly")
+    ml_train.add_argument("--limit-hours", type=float, default=2.0)
+    ml_eval = ml_sub.add_parser("evaluate")
+    ml_eval.add_argument("--target", required=True)
+    ml_eval.add_argument("--grid", choices=("semiannual", "quarterly"), default="semiannual")
+    ml_eval.add_argument("--out", default="data/ml")
+    ml_eval.add_argument("--robustness", action="store_true")
+    ml_eval.add_argument("--models", default="LR,RF,XGB")
+    ml_eval.add_argument("--runs", default="")
+    ml_eval.add_argument("--limit-hours", type=float, default=2.0)
     reset = sub.add_parser("reset-data", help="empty application data while preserving schema and migrations")
     reset.add_argument("--confirm", required=True, help="must equal the connected database name")
     reset.add_argument("--target", choices=("test", "prod"), required=True)
@@ -194,6 +214,45 @@ def main(argv: list[str] | None = None) -> int:
         write_report(results, "docs/design/rule_evaluation.md")
         print(target_summary(target, f"rules-evaluated-events profile={a.profile} "
                                     f"primary={results[0]['evaluable_events']} all={results[1]['evaluable_events']}"))
+        return 0
+    if a.cmd == "ml":
+        target, _ = select_target("prod")
+        from app.core.config import get_schema
+        from app.core.database import connect
+        from app.ml import train as train_models
+        conn = connect(get_schema())
+        try:
+            models = [value.strip() for value in a.models.split(",") if value.strip()]
+            runs = [value.strip() for value in a.runs.split(",") if value.strip()]
+            if not runs:
+                runs = ["robustness" if a.robustness else "original"]
+            run_specs = {
+                "original": ("T5", "semiannual", False),
+                "robustness": ("T5", "semiannual", True),
+                "t5_noT1": ("T5_noT1", "semiannual", True),
+                "quarterly": ("T5", "quarterly", True),
+            }
+            results = []
+            for run_name in runs:
+                if run_name not in run_specs:
+                    raise SystemExit(f"unknown ML run: {run_name}")
+                target, grid, robustness = run_specs[run_name]
+                results.append(train_models(
+                    conn, target, grid, a.out, robustness, models=models,
+                    wall_clock_hours=a.limit_hours))
+            result = results[-1]
+        finally:
+            conn.close()
+        if a.ml_cmd == "evaluate":
+            Path("docs/design/ml_results.md").write_text(
+                "# Stage 5b ML results\n\n"
+                "The deterministic training artefact is in `data/ml` (git-ignored).\n\n"
+                f"- target: `{result['target']}`\n- grid: `{result['grid']}`\n"
+                f"- panel provenance hash: `{result['panel_hash']}`\n"
+                f"- search configuration budget: {result['search_configurations']}\n\n"
+                "Fold-level metrics are stored in the JSON artefact; no production "
+                "tables or API endpoints were changed.\n")
+        print(target_summary(target, f"ml-{a.ml_cmd} target={a.target} grid={a.grid}"))
         return 0
     if a.cmd == "reset-data":
         target, _ = select_target(a.target)

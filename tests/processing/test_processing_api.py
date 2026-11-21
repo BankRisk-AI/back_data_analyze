@@ -116,7 +116,7 @@ def test_request_id_is_returned_and_echoed(client):
 # ----------------------------------------------------------------------------------- system endpoints
 def test_health_reports_database_queue_and_a_missing_worker(client, db):
     h = client.get("/api/health").json()
-    assert h["status"] == "ok" and h["database"] is True and h["modules"] == ["eba_ingest", "eba_processing", "eba_public_analysis"] and h["queue"]["pending"] == 0 and h["worker_hint"] is None
+    assert h["status"] == "ok" and h["database"] is True and h["modules"] == ["eba_ingest", "eba_processing", "eba_public_analysis", "eba_ml"] and h["queue"]["pending"] == 0 and h["worker_hint"] is None
     imp, _ = stage(db, banks(3))
     db.cur.execute("INSERT INTO job(import_id, kind, status) VALUES (%s, 'validate_data', 'pending')", (imp,))
     assert client.get("/api/health").json()["worker_hint"] is None                     # waiting for a few seconds is normal
@@ -128,7 +128,9 @@ def test_health_reports_database_queue_and_a_missing_worker(client, db):
 def test_meta_lists_enums_and_every_problem_type(client):
     m = client.get("/api/meta").json()
     assert m["job_statuses"] == ["pending", "processing", "completed", "failed"] and "validated" in m["import_statuses"] and "unrecognised" in m["file_types"]
-    assert set(m["job_kinds"]) == {"stage", "validate_data", "load", "evaluate_rules"}
+    assert set(m["job_kinds"]) == {"stage", "validate_data", "load", "evaluate_rules",
+                                    "build_ml_dataset", "train_model", "tune_model",
+                                    "evaluate_model", "score_panel"}
     types = {p["type"]: p["status"] for p in m["problem_types"]}
     assert types["duplicate-file"] == 409 and types["file-too-large"] == 413 and types["unreadable-file"] == 422 and types["dataset-not-found"] == 404
     assert types["no-staging"] == 409 and types["query-too-slow"] == 504 and types["invalid-parameter"] == 422 and types["internal-error"] == 500 and types["invalid-request"] == 422

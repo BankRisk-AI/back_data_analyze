@@ -2,5 +2,6 @@
 from app.modules.eba_ingest.module import SPEC as EBA_INGEST
 from app.modules.eba_processing.module import SPEC as EBA_PROCESSING
 from app.modules.eba_public_analysis.module import SPEC as EBA_PUBLIC_ANALYSIS
+from app.modules.eba_ml.module import SPEC as EBA_ML
 
-MODULES = [EBA_INGEST, EBA_PROCESSING, EBA_PUBLIC_ANALYSIS]
+MODULES = [EBA_INGEST, EBA_PROCESSING, EBA_PUBLIC_ANALYSIS, EBA_ML]

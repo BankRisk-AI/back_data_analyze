@@ -1,0 +1,16 @@
+feature,mean_abs_shap
+npl_ratio,0.08772031
+npl_ratio_rank,0.06064267
+total_capital_ratio,0.05843489
+tier1_ratio,0.05782790
+loan_growth_yoy,0.04576224
+loan_growth_yoy_rank,0.04025095
+leverage_ratio_change12m,0.04021711
+leverage_ratio,0.03850214
+cet1_ratio,0.03680772
+cet1_ratio_rank,0.03652596
+total_capital_ratio_change12m,0.03618154
+roe_annualised,0.03370010
+tier1_ratio_change12m,0.03325266
+cet1_ratio_change12m,0.03118450
+total_capital_ratio_rank,0.02997791

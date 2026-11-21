@@ -21,7 +21,36 @@
   NordLB diagnostics, and deterministic F7 hit-rate/false-alarm figure.
 - Stage 4d-fix (2026-11-21): corrected Sarlin relative usefulness, event-window
   prevalence, noise-to-signal ratios, and profile-version-specific denominators.
-  Stage 4 is closed. Next = Stage 5a ML design (design only).
+  Stage 4 is closed.
+- Stage 5a (2026-11-21): completed the ML design-only specification, measured
+  T1--T5 candidate targets on the semi-annual panel, defined temporal folds,
+  leakage controls, model comparison, and six owner decisions. Next = owner
+  decisions on `ml_design.md`, then Stage 5b.
+- Stage 5b (2026-11-21): implemented deterministic panel dataset manifests,
+  T5/T5_noT1 semi-annual and quarterly training artefacts, LR/RF/XGBoost and
+  SMOTE comparisons, pooled/final metrics, bootstrap comparisons, SHAP output,
+  robustness diagnostics, thresholded out-of-time event reporting, and
+  deterministic F8--F10. Stage 5b is complete; next is Stage 5c ML endpoints
+  and React views.
+- Stage 5c (2026-11-21): corrected final-test label alignment (17 T5
+  positives), continuous v1.1 comparator ROC-AUC, robustness SHAP ranking,
+  equal-volume recall/Holm/lead-time helpers, and deterministic F11--F12.
+  Hypothesis verdicts are recorded in
+  [hypotheses results](design/hypotheses_results.md).
+- Stage 5e-1 (2026-11-21): moved the ML pipeline into the registered `eba_ml`
+  module, added idempotent migration 012 with four ML registry tables,
+  content-addressed artifact verification, protected Stage 5c experiment/model
+  import, lifecycle protection rules, and regression coverage. Schema is now
+  20 logical tables. Next = Stage 5e-2 (worker handlers and `/api/ml` routes).
+- Stage 5e-2 (2026-11-21): added ML worker handlers, advisory-lock/cancellation
+  boundaries, `/api/ml` dataset/experiment/model/prediction/options routes,
+  protected champion promotion, panel scoring, and OpenAPI regeneration.
+  Initial protected robustness XGBoost is champion and has been scored.
+  Next = Stage 5e-3 (limits, restart handling, production smoke tests).
+- Stage 5d (2026-11-21): completed the design-only `eba_ml` module proposal,
+  including persistence, worker jobs, API, React screens, protection rules,
+  reproducibility tests, and the 5e/5f implementation plan. Next = owner
+  decisions, then 5e backend.
 
 - Stage 0: make the project installable and testable (2026-11-12)
 - Stage 1a: set-based staging-to-fact promotion (2026-11-12); measured
@@ -101,6 +130,8 @@
   `/api/versions/{version_id}/datasets/{dataset}/preview` routes were removed;
   use `/api/public/periods` and `/api/public/versions/{version_id}/datasets/{dataset}/preview`.
 - Public analysis now also exposes the additive `sov` and `tr_sov` datasets.
+- ML screens should use `/api/ml` for datasets, experiments, model registry,
+  champion predictions, comparison, and options-driven controls.
 - Alert screens should use the read-only `/api/public/alerts/*` and
   `/api/public/banks/{bank_id}/alerts` endpoints.
 - Stage 3d adds `/api/public/report-types`, cascading years and quarters,

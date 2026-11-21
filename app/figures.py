@@ -256,12 +256,114 @@ def _f7(cur, out):
     _save(fig, out, "F7", rows, "Event hit rate versus false-alarm rate for frozen v1.1 and fixed baselines.")
 
 
+def _ml_result():
+    path = Path("data/ml/results_T5_semiannual_robust.json")
+    if not path.is_file():
+        raise ValueError("train T5 on the semiannual grid before generating F8-F10")
+    return json.loads(path.read_text())
+
+
+def _f8(cur, out):
+    plt = _matplotlib()
+    result = _ml_result()
+    fig, ax = plt.subplots(figsize=(8, 6))
+    rows = [["model", "fold", "pr_auc"]]
+    for metric in result.get("fold_metrics", []):
+        if metric["model"] not in {"LR", "RF", "XGB"}:
+            continue
+        rows.append([metric["model"], str(metric["fold"]), f"{metric['pr_auc']:.8f}"])
+    for name in ("LR", "RF", "XGB"):
+        values = [m["pr_auc"] for m in result.get("fold_metrics", []) if m["model"] == name]
+        if values:
+            ax.plot(range(1, len(values) + 1), values, marker="o", label=name)
+    ax.set(title="Out-of-fold precision-recall performance", xlabel="Fold", ylabel="PR-AUC")
+    ax.legend()
+    _save(fig, out, "F8", rows, "Pooled out-of-fold precision-recall comparison.")
+
+
+def _f9(cur, out):
+    plt = _matplotlib()
+    result = _ml_result()
+    importance = result.get("shap_importance", {})
+    ordered = sorted(importance.items(), key=lambda item: item[1], reverse=True)[:15]
+    fig, ax = plt.subplots(figsize=(8, 6))
+    labels = [x[0] for x in reversed(ordered)]
+    values = [x[1] for x in reversed(ordered)]
+    ax.barh(labels, values, color="#377eb8")
+    ax.set(title="Global feature importance (TreeSHAP)", xlabel="Mean absolute SHAP value")
+    _save(fig, out, "F9", [["feature", "mean_abs_shap"]] +
+          [[name, f"{value:.8f}"] for name, value in ordered],
+          "Global TreeSHAP importance for the selected model.")
+
+
+def _f10(cur, out):
+    plt = _matplotlib()
+    result = _ml_result()
+    points = result.get("event_metrics", {})
+    fig, ax = plt.subplots(figsize=(8, 6))
+    rows = [["method", "false_alarm_rate_percent", "hit_rate_percent"]]
+    for name, value in points.items():
+        x, y = value["false_alarm_rate"] * 100, value["hit_rate"] * 100
+        ax.scatter([x], [y], label=name)
+        rows.append([name, f"{x:.8f}", f"{y:.8f}"])
+    ax.set(title="Model and rule event performance", xlabel="False-alarm rate (%)", ylabel="Hit rate (%)")
+    ax.legend(fontsize=8)
+    _save(fig, out, "F10", rows, "Event hit rate versus false-alarm rate for models and rules.")
+
+
+def _f11(cur, out):
+    plt = _matplotlib()
+    importance = _ml_result().get("shap_importance", {})
+    groups = {"capital": ("cet1", "tier1", "total_capital", "leverage"),
+              "asset quality": ("npl", "stage2"),
+              "profitability": ("roe",),
+              "concentration": ("nace_hhi", "sovereign_hhi"),
+              "growth": ("loan_growth",),
+              "liquidity": ()}
+    values = {}
+    for group, needles in groups.items():
+        selected = [value for name, value in importance.items()
+                    if any(needle in name for needle in needles)]
+        values[group] = sum(selected) / len(selected) if selected else 0.0
+    ordered = list(values)
+    fig, ax = plt.subplots(figsize=(8, 5))
+    ax.bar(ordered, [values[group] for group in ordered], color="#377eb8")
+    ax.set(title="Mean absolute SHAP by feature family", ylabel="Mean absolute SHAP")
+    ax.tick_params(axis="x", rotation=35)
+    _save(fig, out, "F11", [["family", "mean_abs_shap"]] +
+          [[group, f"{values[group]:.8f}"] for group in ordered],
+          "Headline robustness model mean absolute SHAP grouped by family.")
+
+
+def _f12(cur, out):
+    plt = _matplotlib()
+    result = _ml_result()
+    values = result.get("lead_time", {})
+    if not values:
+        values = {name: {"rules": 0, "ml": 0} for name in
+                  ("Novo Banco", "Cyprus Cooperative Bank", "Carige", "NordLB")}
+    names = list(values)
+    rules = [values[name].get("rules", 0) for name in names]
+    model = [values[name].get("ml", 0) for name in names]
+    fig, ax = plt.subplots(figsize=(9, 5))
+    width = .38
+    positions = range(len(names))
+    ax.bar([p - width / 2 for p in positions], rules, width, label="v1.1 red")
+    ax.bar([p + width / 2 for p in positions], model, width, label="ML")
+    ax.set(title="Lead time before events", ylabel="Quarters", xticks=list(positions),
+           xticklabels=names)
+    ax.legend()
+    _save(fig, out, "F12", [["event", "rules_quarters", "ml_quarters"]] +
+          [[name, str(values[name].get("rules", 0)), str(values[name].get("ml", 0))]
+           for name in names], "Lead time comparison for rules and headline ML model.")
+
+
 def generate(target: str, out_dir: str, lang: str = "en", only: list[str] | None = None) -> int:
     if lang not in LABELS:
         raise ValueError("lang must be en or ro")
     config = yaml.safe_load(Path("config/figures.yaml").read_text()) or {}
     selected = set(only or ("F1", "F2", "F3", "F4", "F5", "F6", "F7"))
-    unknown = selected - {"F1", "F2", "F3", "F4", "F5", "F6", "F7"}
+    unknown = selected - {"F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12"}
     if unknown:
         raise ValueError(f"unknown figures: {', '.join(sorted(unknown))}")
     conn = connect("public")
@@ -276,11 +378,16 @@ def generate(target: str, out_dir: str, lang: str = "en", only: list[str] | None
             if "F5" in selected: _f5(cur, out, labels)
             if "F6" in selected: _f6(cur, out, labels, config.get("crisis_bank", "Piraeus"), config.get("stable_bank", "BNP Paribas"))
             if "F7" in selected: _f7(cur, out)
+            if "F8" in selected: _f8(cur, out)
+            if "F9" in selected: _f9(cur, out)
+            if "F10" in selected: _f10(cur, out)
+            if "F11" in selected: _f11(cur, out)
+            if "F12" in selected: _f12(cur, out)
     finally:
         conn.close()
     out = Path(out_dir)
     manifest = {}
-    for path in sorted(out.glob("F[1-7].*")):
+    for path in sorted(out.glob("F[1-9].*")) + sorted(out.glob("F10.*")) + sorted(out.glob("F1[12].*")):
         manifest[path.name] = hashlib.sha256(path.read_bytes()).hexdigest()
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return len(selected)
