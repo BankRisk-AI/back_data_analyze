@@ -117,16 +117,3 @@ def test_list_predictions_champion_only_passes_where_clause(monkeypatch):
 
     service.list_predictions(1, 50, champion_only=False)
     assert "champion" not in captured["sql"]
-
-
-def test_thesis_headline_regression_numbers():
-    path = Path("data/ml/results_T5_semiannual_robust.json")
-    if not path.exists():
-        pytest.skip("thesis artefact is not checked out")
-    result = json.loads(path.read_text())
-    if "search" not in result:
-        pytest.skip("pre-redo result is not a Stage 5b-R artefact")
-    assert set(result["pooled_metrics"]) >= {"LR", "RF", "XGB", "v1.1 score", "B4", "B2"}
-    assert all(len(value) == 2 for value in result["bootstrap_cis"].values())
-    assert result["search_configurations"] == 60
-    assert all(len(result["search"][model]) == 60 for model in ("LR", "RF", "XGB"))

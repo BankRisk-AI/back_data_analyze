@@ -15,6 +15,8 @@ from datetime import date
 
 import numpy as np
 
+from app.modules.eba_rules.public import compliant, r0_alert
+
 LABEL_OPTIONS = ("E1", "E2", "E3", "E2_or_E3")
 
 
@@ -24,27 +26,6 @@ def _add_months(d: date, n: int) -> date:
     y, m = divmod(total, 12)
     day = min(d.day, calendar.monthrange(y, m + 1)[1])
     return date(y, m + 1, day)
-
-
-def _ratios_present(row: dict) -> bool:
-    return (row.get("cet1_ratio") is not None and
-            row.get("tier1_ratio") is not None and
-            row.get("total_capital_ratio") is not None)
-
-
-def compliant(row: dict, r0_levels: dict) -> bool:
-    """R0-compliant: all three capital ratios present and >= alert levels (§3.5)."""
-    return (_ratios_present(row) and
-            row["cet1_ratio"] >= r0_levels["cet1"] and
-            row["tier1_ratio"] >= r0_levels["tier1"] and
-            row["total_capital_ratio"] >= r0_levels["total_capital"])
-
-
-def _any_breach(row: dict, r0_levels: dict) -> bool:
-    return (_ratios_present(row) and
-            (row["cet1_ratio"] < r0_levels["cet1"] or
-             row["tier1_ratio"] < r0_levels["tier1"] or
-             row["total_capital_ratio"] < r0_levels["total_capital"]))
 
 
 def _forward_four_q_change(row: dict, field: str, by_bank_period: dict) -> float | None:
@@ -172,10 +153,10 @@ def _e1(row: dict, by_bank: dict, r0_levels: dict, horizon_months: int):
     future = [x for x in by_bank[row["bank_id"]]
               if row["period"] < x["period"] <= horizon_end]
     if not future:
-        already = any(_any_breach(x, r0_levels) for x in by_bank[row["bank_id"]]
+        already = any(r0_alert(x, r0_levels) for x in by_bank[row["bank_id"]]
                       if x["period"] <= row["period"])
         return (1, None) if already else (None, "no_future")
-    return (1 if any(_any_breach(x, r0_levels) for x in future) else 0), None
+    return (1 if any(r0_alert(x, r0_levels) for x in future) else 0), None
 
 
 def _e2(row: dict, by_bank_period: dict, threshold: float):

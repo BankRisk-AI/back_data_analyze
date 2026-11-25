@@ -1,4 +1,3 @@
-QUERY_TIMEOUT_SECONDS = 10
 
 FEATURES = {
     "cet1_ratio": ("CET1 ratio", "end-period CET1 ratio", "ratio", "201412", "higher_is_riskier"),

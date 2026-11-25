@@ -1,7 +1,7 @@
 # Stage 4: configurable rule engine
 
 Stage 4a design decisions and the fixed family calibration are implemented by
-the panel-independent evaluator in `app/core/rules.py`. The evaluator loads version-controlled YAML,
+the panel-independent evaluator of the independent module `app/modules/eba_rules` (since Stage R-3; see its README; profiles in `app/modules/eba_rules/config/profiles/`, frozen profiles verified by sha256). The evaluator loads version-controlled YAML,
 validates it, evaluates the panel, and writes one atomic alert result per
 bank-period. The same service runs EBA and BNM profiles.
 
@@ -51,7 +51,7 @@ rules and the composite by default. No panel or fact rows are written.
 
 ## Profiles
 
-`config/rules/eu_eba.yaml` contains 18 rules: 11 level, 2 trend, 2
+`app/modules/eba_rules/config/profiles/eu_eba_v1.1.yaml` contains 18 rules: 11 level, 2 trend, 2
 persistence, 2 relative, and 1 composite. Verified regulatory minima are CET1
 4.5%, Tier 1 6%, total capital 8%, leverage 3%, plus the urgent CET1 7%
 buffer rule. Verified EBA Risk Dashboard Q3 2025 bands are included for Tier
@@ -63,7 +63,7 @@ for profile compatibility and marked unused; family logic replaces summation.
 RoCET1 thresholds use multiplication, as decided: accounting ROE thresholds
 of 6% and 10% become **7.20% and 12.00%** using the production
 equity/CET1 factor **1.2001447434**, IQR **1.1151567110--1.3135999112**, and
-N=2,382 observations from 2020A--2025S. `config/rules/bnm.yaml` mirrors the
+N=2,382 observations from 2020A--2025S. `app/modules/eba_rules/config/profiles/bnm.yaml` mirrors the
 same rule structure with empty thresholds/bands/weights and `to_verify`
 status.
 
@@ -77,7 +77,7 @@ denominator component.
 
 ## Production result
 
-`python -m app rules evaluate --profile eu_eba --target prod` wrote 4,367
+`python -m scripts.data.build_reference rules --profile eu_eba --target prod` wrote 4,367
 alerts. `docs/design/rule_results.md` contains the complete per-period
 evaluated-bank shares, rule trigger/not-evaluated counts, before/after
 not-evaluated comparison, dominant rules, and sanity check.
@@ -87,7 +87,7 @@ not-evaluated comparison, dominant rules, and sanity check.
 The CLI command is:
 
 ```text
-python -m app rules evaluate --profile eu_eba --target test|prod
+python -m scripts.data.build_reference rules --profile eu_eba --target test|prod
 ```
 
 The generic worker exposes the `evaluate_rules` job kind. It reads
@@ -96,11 +96,11 @@ The generic worker exposes the `evaluate_rules` job kind. It reads
 ## Stage 4d event evaluation
 
 `config/events.yaml` defines the owner-curated event format with LEI, date,
-type, source, cause, set, and notes. `python -m app evaluate rules` applies
+type, source, cause, set, and notes. `python -m scripts.ml.evaluate_rules` applies
 the exact 12-to-3-month pre-event window, resolves approved crosswalk groups,
 and reports hit rate, Wilson confidence intervals, lead time, false alarms,
 precision, and per-event observations. The reusable window and metric code is
-in `app/event_evaluation.py`; ML evaluation will use the same windows without
+in `scripts/ml/event_evaluation.py`; ML evaluation will use the same windows without
 future leakage. Results are in `rule_evaluation.md`.
 
 ## Next decisions

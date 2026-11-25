@@ -5,7 +5,7 @@ from app.modules.eba_ingest import enqueue_import, get_import, ingest, process_i
 from app.modules.eba_ingest.infrastructure.storage import storage as storage_module
 from app.core.worker import Worker
 from app.worker import build_registry
-from conftest import write_csv
+from csv_support import write_csv
 
 GOOD = ["AAAAAAAAAAAAAAAAAAAA,DE,202003,I1,x,1,", "BBBBBBBBBBBBBBBBBBBB,FR,202003,I1,x,2,", "AAAAAAAAAAAAAAAAAAAA,DE,202006,I1,x,3,"]
 ODD = ["AAAAAAAAAAAAAAAAAAAA,DE,2020,I1,x,4,", "AAAAAAAAAAAAAAAAAAAA,DE,202013,I1,x,5,", "AAAAAAAAAAAAAAAAAAAA,DE,,I1,x,6,", "AAAAAAAAAAAAAAAAAAAA,DE,abcdef,I1,x,7,", "AAAAAAAAAAAAAAAAAAAA,DE,202004,I1,x,8,"]

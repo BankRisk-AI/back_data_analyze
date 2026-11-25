@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 from app.core.worker import Worker
 from app.main import create_app
 from app.worker import build_registry
-from helpers import banks, stage
+from processing_helpers import banks, stage
 
 AGG = ["XXXXXXXXXXXXXXXXXXXX,OT,202003,I1,Item one,0,5,"]
 
@@ -116,7 +116,7 @@ def test_request_id_is_returned_and_echoed(client):
 # ----------------------------------------------------------------------------------- system endpoints
 def test_health_reports_database_queue_and_a_missing_worker(client, db):
     h = client.get("/api/health").json()
-    assert h["status"] == "ok" and h["database"] is True and h["modules"] == ["eba_ingest", "eba_processing", "eba_public_analysis", "eba_ml"] and h["queue"]["pending"] == 0 and h["worker_hint"] is None
+    assert h["status"] == "ok" and h["database"] is True and h["modules"] == ["eba_ingest", "eba_processing", "eba_public_analysis", "eba_rules", "eba_ml"] and h["queue"]["pending"] == 0 and h["worker_hint"] is None
     imp, _ = stage(db, banks(3))
     db.cur.execute("INSERT INTO job(import_id, kind, status) VALUES (%s, 'validate_data', 'pending')", (imp,))
     assert client.get("/api/health").json()["worker_hint"] is None                     # waiting for a few seconds is normal
@@ -171,7 +171,7 @@ def test_upload_process_and_validate_through_the_api(client, db):
 
 
 def test_the_module_command_line_validates_without_the_worker(db, capsys, monkeypatch):
-    from app.modules.eba_processing.__main__ import main
+    from scripts.data.processing_cli import main
 
     imp, _ = stage(db, banks(40) + ["SHORTLEI,DE,202003,I1,Item one,0,1,"])
     monkeypatch.setenv("EBA_SCHEMA", db.schema)

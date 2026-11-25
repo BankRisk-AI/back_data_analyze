@@ -18,3 +18,4 @@ class ModuleSpec:
     register_handlers: Callable[[JobHandlerRegistry], None] | None = None   # job kinds the module processes in the worker
     migrations_dir: Path | None = None                              # numbered .sql files owned by the module
     tags: list[dict] = field(default_factory=list)                  # OpenAPI tag descriptions
+    after_panel_rebuild: Callable[[object, object], None] | None = None   # hook(conn, PanelRebuilt) run after core/panel.py wrote panel_row

@@ -1,0 +1,599 @@
+[
+ {
+  "bank_id": 1,
+  "family_scores": {
+   "asset_quality": {
+    "not_evaluated": false,
+    "rule_id": "npl_high",
+    "score": 0
+   },
+   "capital": {
+    "not_evaluated": false,
+    "rule_id": "leverage_supervisory_low",
+    "score": 1
+   },
+   "dynamics": {
+    "not_evaluated": true,
+    "rule_id": null,
+    "score": 0
+   },
+   "profitability": {
+    "not_evaluated": false,
+    "rule_id": "rocet1_supervisory_low",
+    "score": 1
+   }
+  },
+  "level": "amber",
+  "reason": "family_score:capital,profitability",
+  "score": 2.0,
+  "triggered": [
+   "composite_alert",
+   "leverage_supervisory_low",
+   "rocet1_supervisory_low"
+  ],
+  "version_id": 100
+ },
+ {
+  "bank_id": 2,
+  "family_scores": {
+   "asset_quality": {
+    "not_evaluated": false,
+    "rule_id": "npl_dashboard_band",
+    "score": 1
+   },
+   "capital": {
+    "not_evaluated": false,
+    "rule_id": "tier1_dashboard_band",
+    "score": 2
+   },
+   "dynamics": {
+    "not_evaluated": true,
+    "rule_id": null,
+    "score": 0
+   },
+   "profitability": {
+    "not_evaluated": false,
+    "rule_id": "rocet1_supervisory_low",
+    "score": 2
+   }
+  },
+  "level": "red",
+  "reason": "two_families:capital,profitability",
+  "score": 5.0,
+  "triggered": [
+   "cet1_supervisory_low",
+   "cet1_worst_decile",
+   "composite_alert",
+   "leverage_supervisory_low",
+   "npl_dashboard_band",
+   "npl_worst_decile",
+   "rocet1_supervisory_low",
+   "tier1_dashboard_band"
+  ],
+  "version_id": 100
+ },
+ {
+  "bank_id": 3,
+  "family_scores": {
+   "asset_quality": {
+    "not_evaluated": false,
+    "rule_id": "npl_dashboard_band",
+    "score": 1
+   },
+   "capital": {
+    "not_evaluated": false,
+    "rule_id": "tier1_dashboard_band",
+    "score": 1
+   },
+   "dynamics": {
+    "not_evaluated": true,
+    "rule_id": null,
+    "score": 0
+   },
+   "profitability": {
+    "not_evaluated": false,
+    "rule_id": "rocet1_supervisory_low",
+    "score": 2
+   }
+  },
+  "level": "amber",
+  "reason": "family_score:capital,asset_quality,profitability",
+  "score": 4.0,
+  "triggered": [
+   "cet1_supervisory_low",
+   "composite_alert",
+   "leverage_supervisory_low",
+   "npl_dashboard_band",
+   "npl_worst_decile",
+   "rocet1_supervisory_low",
+   "tier1_dashboard_band"
+  ],
+  "version_id": 100
+ },
+ {
+  "bank_id": 4,
+  "family_scores": {
+   "asset_quality": {
+    "not_evaluated": false,
+    "rule_id": "npl_high",
+    "score": 0
+   },
+   "capital": {
+    "not_evaluated": false,
+    "rule_id": "leverage_supervisory_low",
+    "score": 1
+   },
+   "dynamics": {
+    "not_evaluated": true,
+    "rule_id": null,
+    "score": 0
+   },
+   "profitability": {
+    "not_evaluated": false,
+    "rule_id": "rocet1_supervisory_low",
+    "score": 1
+   }
+  },
+  "level": "amber",
+  "reason": "family_score:capital,profitability",
+  "score": 2.0,
+  "triggered": [
+   "composite_alert",
+   "leverage_supervisory_low",
+   "rocet1_supervisory_low"
+  ],
+  "version_id": 100
+ },
+ {
+  "bank_id": 1,
+  "family_scores": {
+   "asset_quality": {
+    "not_evaluated": false,
+    "rule_id": "npl_high",
+    "score": 0
+   },
+   "capital": {
+    "not_evaluated": false,
+    "rule_id": "leverage_supervisory_low",
+    "score": 1
+   },
+   "dynamics": {
+    "not_evaluated": true,
+    "rule_id": null,
+    "score": 0
+   },
+   "profitability": {
+    "not_evaluated": false,
+    "rule_id": "rocet1_supervisory_low",
+    "score": 1
+   }
+  },
+  "level": "amber",
+  "reason": "family_score:capital,profitability",
+  "score": 2.0,
+  "triggered": [
+   "composite_alert",
+   "leverage_supervisory_low",
+   "rocet1_supervisory_low"
+  ],
+  "version_id": 101
+ },
+ {
+  "bank_id": 2,
+  "family_scores": {
+   "asset_quality": {
+    "not_evaluated": false,
+    "rule_id": "npl_high",
+    "score": 1
+   },
+   "capital": {
+    "not_evaluated": false,
+    "rule_id": "tier1_dashboard_band",
+    "score": 2
+   },
+   "dynamics": {
+    "not_evaluated": true,
+    "rule_id": null,
+    "score": 0
+   },
+   "profitability": {
+    "not_evaluated": false,
+    "rule_id": "rocet1_supervisory_low",
+    "score": 2
+   }
+  },
+  "level": "red",
+  "reason": "two_families:capital,profitability",
+  "score": 5.0,
+  "triggered": [
+   "cet1_supervisory_low",
+   "cet1_worst_decile",
+   "composite_alert",
+   "leverage_supervisory_low",
+   "npl_dashboard_band",
+   "npl_high",
+   "npl_worst_decile",
+   "rocet1_supervisory_low",
+   "tier1_dashboard_band"
+  ],
+  "version_id": 101
+ },
+ {
+  "bank_id": 3,
+  "family_scores": {
+   "asset_quality": {
+    "not_evaluated": false,
+    "rule_id": "npl_dashboard_band",
+    "score": 2
+   },
+   "capital": {
+    "not_evaluated": false,
+    "rule_id": "tier1_dashboard_band",
+    "score": 1
+   },
+   "dynamics": {
+    "not_evaluated": true,
+    "rule_id": null,
+    "score": 0
+   },
+   "profitability": {
+    "not_evaluated": false,
+    "rule_id": "rocet1_supervisory_low",
+    "score": 2
+   }
+  },
+  "level": "red",
+  "reason": "two_families:asset_quality,profitability",
+  "score": 5.0,
+  "triggered": [
+   "cet1_supervisory_low",
+   "composite_alert",
+   "leverage_supervisory_low",
+   "npl_dashboard_band",
+   "npl_high",
+   "npl_worst_decile",
+   "rocet1_supervisory_low",
+   "tier1_dashboard_band"
+  ],
+  "version_id": 101
+ },
+ {
+  "bank_id": 4,
+  "family_scores": {
+   "asset_quality": {
+    "not_evaluated": true,
+    "rule_id": null,
+    "score": 0
+   },
+   "capital": {
+    "not_evaluated": true,
+    "rule_id": null,
+    "score": 0
+   },
+   "dynamics": {
+    "not_evaluated": true,
+    "rule_id": null,
+    "score": 0
+   },
+   "profitability": {
+    "not_evaluated": true,
+    "rule_id": null,
+    "score": 0
+   }
+  },
+  "level": "not_evaluated",
+  "reason": "required_input_missing:cet1_ratio,tier1_ratio,total_capital_ratio",
+  "score": null,
+  "triggered": [],
+  "version_id": 101
+ },
+ {
+  "bank_id": 1,
+  "family_scores": {
+   "asset_quality": {
+    "not_evaluated": false,
+    "rule_id": "npl_dashboard_band",
+    "score": 1
+   },
+   "capital": {
+    "not_evaluated": false,
+    "rule_id": "tier1_dashboard_band",
+    "score": 1
+   },
+   "dynamics": {
+    "not_evaluated": false,
+    "rule_id": "cet1_yoy_drop",
+    "score": 0
+   },
+   "profitability": {
+    "not_evaluated": false,
+    "rule_id": "rocet1_supervisory_low",
+    "score": 1
+   }
+  },
+  "level": "amber",
+  "reason": "family_score:capital,asset_quality,profitability",
+  "score": 3.0,
+  "triggered": [
+   "cet1_supervisory_low",
+   "composite_alert",
+   "leverage_supervisory_low",
+   "npl_dashboard_band",
+   "rocet1_supervisory_low",
+   "tier1_dashboard_band"
+  ],
+  "version_id": 102
+ },
+ {
+  "bank_id": 2,
+  "family_scores": {
+   "asset_quality": {
+    "not_evaluated": false,
+    "rule_id": "high_npl_persistence",
+    "score": 2
+   },
+   "capital": {
+    "not_evaluated": false,
+    "rule_id": "tier1_dashboard_band",
+    "score": 2
+   },
+   "dynamics": {
+    "not_evaluated": false,
+    "rule_id": "cet1_yoy_drop",
+    "score": 2
+   },
+   "profitability": {
+    "not_evaluated": false,
+    "rule_id": "rocet1_supervisory_low",
+    "score": 2
+   }
+  },
+  "level": "red",
+  "reason": "two_families:asset_quality,capital,dynamics,profitability",
+  "score": 8.0,
+  "triggered": [
+   "cet1_supervisory_low",
+   "cet1_worst_decile",
+   "cet1_yoy_drop",
+   "composite_alert",
+   "high_npl_persistence",
+   "leverage_supervisory_low",
+   "npl_dashboard_band",
+   "npl_high",
+   "npl_worst_decile",
+   "rocet1_supervisory_low",
+   "tier1_dashboard_band"
+  ],
+  "version_id": 102
+ },
+ {
+  "bank_id": 3,
+  "family_scores": {
+   "asset_quality": {
+    "not_evaluated": false,
+    "rule_id": "npl_dashboard_band",
+    "score": 2
+   },
+   "capital": {
+    "not_evaluated": false,
+    "rule_id": "tier1_dashboard_band",
+    "score": 1
+   },
+   "dynamics": {
+    "not_evaluated": false,
+    "rule_id": "cet1_yoy_drop",
+    "score": 0
+   },
+   "profitability": {
+    "not_evaluated": false,
+    "rule_id": "rocet1_supervisory_low",
+    "score": 2
+   }
+  },
+  "level": "red",
+  "reason": "two_families:asset_quality,profitability",
+  "score": 5.0,
+  "triggered": [
+   "cet1_supervisory_low",
+   "composite_alert",
+   "high_npl_persistence",
+   "leverage_supervisory_low",
+   "npl_dashboard_band",
+   "npl_high",
+   "npl_worst_decile",
+   "rocet1_supervisory_low",
+   "tier1_dashboard_band"
+  ],
+  "version_id": 102
+ },
+ {
+  "bank_id": 4,
+  "family_scores": {
+   "asset_quality": {
+    "not_evaluated": false,
+    "rule_id": "npl_high",
+    "score": 0
+   },
+   "capital": {
+    "not_evaluated": false,
+    "rule_id": "leverage_supervisory_low",
+    "score": 1
+   },
+   "dynamics": {
+    "not_evaluated": false,
+    "rule_id": "cet1_yoy_drop",
+    "score": 0
+   },
+   "profitability": {
+    "not_evaluated": false,
+    "rule_id": "rocet1_supervisory_low",
+    "score": 1
+   }
+  },
+  "level": "amber",
+  "reason": "family_score:capital,profitability",
+  "score": 2.0,
+  "triggered": [
+   "composite_alert",
+   "leverage_supervisory_low",
+   "rocet1_supervisory_low"
+  ],
+  "version_id": 102
+ },
+ {
+  "bank_id": 1,
+  "family_scores": {
+   "asset_quality": {
+    "not_evaluated": false,
+    "rule_id": "npl_dashboard_band",
+    "score": 1
+   },
+   "capital": {
+    "not_evaluated": false,
+    "rule_id": "tier1_dashboard_band",
+    "score": 1
+   },
+   "dynamics": {
+    "not_evaluated": false,
+    "rule_id": "cet1_yoy_drop",
+    "score": 0
+   },
+   "profitability": {
+    "not_evaluated": false,
+    "rule_id": "rocet1_supervisory_low",
+    "score": 1
+   }
+  },
+  "level": "amber",
+  "reason": "family_score:capital,asset_quality,profitability",
+  "score": 3.0,
+  "triggered": [
+   "cet1_supervisory_low",
+   "composite_alert",
+   "leverage_supervisory_low",
+   "npl_dashboard_band",
+   "rocet1_supervisory_low",
+   "tier1_dashboard_band"
+  ],
+  "version_id": 103
+ },
+ {
+  "bank_id": 2,
+  "family_scores": {
+   "asset_quality": {
+    "not_evaluated": false,
+    "rule_id": "npl_dashboard_band",
+    "score": 2
+   },
+   "capital": {
+    "not_evaluated": false,
+    "rule_id": "cet1_buffer_warning",
+    "score": 3
+   },
+   "dynamics": {
+    "not_evaluated": false,
+    "rule_id": "cet1_yoy_drop",
+    "score": 2
+   },
+   "profitability": {
+    "not_evaluated": false,
+    "rule_id": "rocet1_supervisory_low",
+    "score": 2
+   }
+  },
+  "level": "red",
+  "reason": "regulatory_breach:cet1_buffer_warning",
+  "score": 9.0,
+  "triggered": [
+   "cet1_buffer_warning",
+   "cet1_supervisory_low",
+   "cet1_worst_decile",
+   "cet1_yoy_drop",
+   "composite_alert",
+   "high_npl_persistence",
+   "leverage_supervisory_low",
+   "npl_dashboard_band",
+   "npl_high",
+   "npl_worst_decile",
+   "npl_yoy_rise",
+   "rocet1_supervisory_low",
+   "tier1_dashboard_band"
+  ],
+  "version_id": 103
+ },
+ {
+  "bank_id": 3,
+  "family_scores": {
+   "asset_quality": {
+    "not_evaluated": false,
+    "rule_id": "npl_dashboard_band",
+    "score": 2
+   },
+   "capital": {
+    "not_evaluated": false,
+    "rule_id": "tier1_dashboard_band",
+    "score": 1
+   },
+   "dynamics": {
+    "not_evaluated": false,
+    "rule_id": "npl_yoy_rise",
+    "score": 2
+   },
+   "profitability": {
+    "not_evaluated": false,
+    "rule_id": "rocet1_supervisory_low",
+    "score": 2
+   }
+  },
+  "level": "red",
+  "reason": "two_families:asset_quality,dynamics,profitability",
+  "score": 7.0,
+  "triggered": [
+   "cet1_supervisory_low",
+   "composite_alert",
+   "high_npl_persistence",
+   "leverage_supervisory_low",
+   "npl_dashboard_band",
+   "npl_high",
+   "npl_worst_decile",
+   "npl_yoy_rise",
+   "rocet1_supervisory_low",
+   "tier1_dashboard_band"
+  ],
+  "version_id": 103
+ },
+ {
+  "bank_id": 4,
+  "family_scores": {
+   "asset_quality": {
+    "not_evaluated": false,
+    "rule_id": "npl_high",
+    "score": 0
+   },
+   "capital": {
+    "not_evaluated": false,
+    "rule_id": "leverage_supervisory_low",
+    "score": 1
+   },
+   "dynamics": {
+    "not_evaluated": true,
+    "rule_id": null,
+    "score": 0
+   },
+   "profitability": {
+    "not_evaluated": false,
+    "rule_id": "rocet1_supervisory_low",
+    "score": 1
+   }
+  },
+  "level": "amber",
+  "reason": "family_score:capital,profitability",
+  "score": 2.0,
+  "triggered": [
+   "composite_alert",
+   "leverage_supervisory_low",
+   "rocet1_supervisory_low"
+  ],
+  "version_id": 103
+ }
+]

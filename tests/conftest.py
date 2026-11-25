@@ -21,8 +21,6 @@ load_dotenv(PROJECT_ROOT / ".env")
 TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL")
 SCHEMA = "public"
 
-HEADER = "LEI_Code,NSA,Period,Item,Label,Amount,footnote\n"
-
 _PROD_DB_NAME = "eba"
 
 
@@ -156,17 +154,3 @@ def db(database_url, tmp_path):
 
     cur.close()
     conn.close()
-
-
-# ---------------------------------------------------------
-# Test data helpers
-# ---------------------------------------------------------
-
-def write_csv(path, rows, encoding="cp1252", header=HEADER):
-    with open(path, "w", encoding=encoding, newline="") as file:
-        file.write(header)
-
-        for row in rows:
-            file.write(row + "\n")
-
-    return str(path)

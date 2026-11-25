@@ -12,24 +12,21 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-import yaml
 
+from app.modules.eba_ml.application.config import load_ml_config
 from app.modules.eba_ml.application.dataset import build_dataset, save_dataset
 from app.modules.eba_ml.application.io import get_logger, write_json
 from app.modules.eba_ml.application.models import SEED
 from app.modules.eba_ml.application.training.assembly import assemble_result, build_split_report
 from app.modules.eba_ml.application.training.final_test import evaluate_final_test
 from app.modules.eba_ml.application.training.metrics import compute_pooled_metrics
-from app.modules.eba_ml.application.training.oof import refit_folds
+from app.modules.eba_ml.application.training.oof import FoldDiagnostic, refit_folds
 from app.modules.eba_ml.application.training.search import run_fold_search
 from app.modules.eba_ml.application.training.trainers import oob_curve
 from app.modules.eba_ml.domain.labels import LABEL_OPTIONS, build_labels
 from app.modules.eba_ml.domain.operating_point import freeze_operating_point
-from app.modules.eba_ml.domain.rules import choose_r1_margin, r1_alert
-
-
-def _load_ml_config() -> dict:
-    return yaml.safe_load(Path("config/ml.yaml").read_text())
+from app.modules.eba_rules.public import (
+    choose_r1_margin, r1_margin_grid_pp, regulatory_levels)
 
 
 def train(
@@ -45,14 +42,16 @@ def train(
     dataset: dict[str, Any] | None = None,
     tail_quantile: float | None = None,
     sensitivity: str | None = None,
+    fold_diagnostic: FoldDiagnostic | None = None,
 ) -> dict[str, Any]:
     """Run the full ML training pipeline and save results JSON (§3.5).
 
     label: target label name (E1, E2, E3, E2_or_E3); default from config/ml.yaml.
     reuse_search: skip search if <out_dir>/search.json exists and panel_hash matches.
     dataset: inject a pre-built dataset dict (skips build_dataset; for testing).
+    fold_diagnostic: optional per-fold thesis hook, stored as result["smote_metrics"].
     """
-    cfg = _load_ml_config()
+    cfg = load_ml_config()
     if label is None:
         label = cfg.get("label", "E2_or_E3")
     if label not in LABEL_OPTIONS:
@@ -75,12 +74,12 @@ def train(
         dataset = build_dataset(conn, grid, robustness)
         save_dataset(dataset, out_dir)
 
-    r0_levels = cfg.get("r0_levels", {"cet1": 0.07, "tier1": 0.085, "total_capital": 0.105})
+    r0_levels = regulatory_levels()
     if tail_quantile is None:
         tail_quantile = cfg.get("tail_quantile", 0.95)
     horizon_months = cfg.get("horizon_months", 12)
     npl_break = date.fromisoformat(cfg.get("npl_series_break", "2020-06-30"))
-    margins_pp = cfg.get("r1_margin_grid_pp", [float(x) / 2 for x in range(21)])
+    margins_pp = r1_margin_grid_pp()
 
     y_full, included, label_meta = build_labels(
         dataset["rows"], label, tail_quantile, horizon_months, r0_levels, npl_break)
@@ -117,7 +116,7 @@ def train(
     logger.info("phase=refit")
     predictions, fold_metrics, smote_metrics = refit_folds(
         pred_dataset, y, selected_algorithms, selected_params, space, SEED,
-        started, wall_clock_hours, logger)
+        started, wall_clock_hours, logger, fold_diagnostic)
 
     key_to_index = {f"{r['bank_id']}:{r['period'].isoformat()}": i
                     for i, r in enumerate(pred_rows)}
@@ -131,7 +130,6 @@ def train(
     final_test, test_predictions, ft_train_idx, test_idx = evaluate_final_test(
         pred_dataset, y, selected_algorithms, selected_params, space)
     split_report = build_split_report(pred_rows, y, ft_train_idx, test_idx)
-    _log_r1_margin_grid(pred_rows, y, test_idx, r0_levels, margins_pp, logger)
 
     logger.info("phase=metrics")
     pooled_metrics = compute_pooled_metrics(pred_dataset, y, predictions, key_to_index)
@@ -216,23 +214,3 @@ def _check_leakage(dataset: dict, y: np.ndarray, logger) -> None:
             if auc > 0.95:
                 raise ValueError(f"possible label leakage: {col} (PR-AUC={auc:.3f})")
 
-
-def _log_r1_margin_grid(rows, y, test_idx, r0_levels, margins_pp, logger) -> None:
-    """Log R1 alert F2/precision/recall/alert-share on test rows for each margin."""
-    from sklearn.metrics import fbeta_score, precision_score, recall_score
-    test_rows = [rows[i] for i in test_idx]
-    y_test = y[test_idx]
-    if y_test.sum() == 0:
-        return
-    logger.info("phase=r1_margin_grid rows=%d positives=%d", len(y_test), int(y_test.sum()))
-    for mp in margins_pp:
-        mf = mp / 100.0
-        alerts = np.array([int(r1_alert(r, r0_levels, mf)) for r in test_rows])
-        if alerts.sum() == 0:
-            logger.info("  r1 margin_pp=%.1f alerts=0", mp)
-            continue
-        f2   = float(fbeta_score(y_test, alerts, beta=2, zero_division=0))
-        prec = float(precision_score(y_test, alerts, zero_division=0))
-        rec  = float(recall_score(y_test, alerts, zero_division=0))
-        logger.info("  r1 margin_pp=%.1f f2=%.3f prec=%.3f rec=%.3f alert_share=%.3f",
-                    mp, f2, prec, rec, float(alerts.mean()))

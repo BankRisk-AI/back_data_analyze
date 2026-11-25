@@ -40,3 +40,12 @@ def test_no_test_module_reads_database_url_directly():
         "These test files read DATABASE_URL directly — use TEST_DATABASE_URL "
         "or the db fixture instead:\n  " + "\n  ".join(offenders)
     )
+
+
+def test_the_test_session_is_locked_to_the_test_database():
+    """pytest_configure points DATABASE_URL at eba_test: tests cannot reach the production database."""
+    import os
+    from urllib.parse import urlparse
+    from app.core.config import get_database_url
+    assert get_database_url() == os.environ["TEST_DATABASE_URL"]
+    assert urlparse(get_database_url()).path.lstrip("/") == "eba_test"

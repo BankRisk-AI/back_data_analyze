@@ -2,9 +2,8 @@
 """PostgreSQL connection management."""
 
 import psycopg2
-from psycopg2 import sql
-
 from app.core.config import get_database_url
+from psycopg2 import sql
 
 
 def connect(schema: str = "public"):

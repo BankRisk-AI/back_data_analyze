@@ -1,3 +1,5 @@
+> **Superseded for thesis numbers by T3_primary (determinism fix); LR coefficients differ (cet1_ratio +0.349 here vs +0.331 in T3).**
+
 # T-2 Evaluation Results: EBA ML Stage §3.6
 
 Run: `data/ml/T2_primary/` · Selected model: **LR** · Seed: 20261121 · Date: 2026-11-25

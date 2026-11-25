@@ -11,7 +11,7 @@ from app.modules.eba_ingest.infrastructure.storage.storage import store
 from app.modules.eba_ingest.application.load_service import _metadata
 from app.modules.eba_ingest.infrastructure.readers.readers import xlsx_bank_list_sheet
 from app.modules.eba_processing.application.validation import run_validation
-from conftest import write_csv, HEADER
+from csv_support import write_csv, HEADER
 
 ROWS = ["AAAAAAAAAAAAAAAAAAAA,DE,202003,2020140,CET1 ratio,0.15,", "BBBBBBBBBBBBBBBBBBBB,FR,202003,2020140,CET1 ratio,0.12,",
         "AAAAAAAAAAAAAAAAAAAA,DE,202006,2020140,CET1 ratio \u2013 transitional,0.16,", "BBBBBBBBBBBBBBBBBBBB,FR,202006,2020140,CET1 ratio,0.13,",

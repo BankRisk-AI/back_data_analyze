@@ -3,7 +3,7 @@ from datetime import date
 import yaml
 import pytest
 
-from app.event_evaluation import evaluate_events, relative_usefulness, usefulness_metrics
+from scripts.ml.event_evaluation import evaluate_events, relative_usefulness, usefulness_metrics
 
 
 def test_sarlin_relative_usefulness_hand_calculation():
@@ -24,7 +24,7 @@ class _Cursor:
         if "SELECT bank_id,trim(lei)" in query:
             self.rows = [(1, "TESTBANK000000000001")]
         elif "FROM panel_row" in query:
-            self.rows = [(1, date(2021, 6, 30), {})]
+            self.rows = [(1, date(2021, 6, 30), 1, {}, *[None] * 14)]   # load_panel row
         elif "FROM alert" in query:
             self.rows = [(1, date(2021, 6, 30), "red",
                           {"level_reason": "synthetic", "family_scores": {}})]
@@ -56,7 +56,7 @@ def test_synthetic_event_hit_lead_time_and_eligibility(tmp_path):
         "set": "primary",
         "status": "included",
     }]}))
-    result = evaluate_events(_Connection(), "config/rules/eu_eba.yaml", events)
+    result = evaluate_events(_Connection(), "eu_eba", events)
     assert result["evaluable_events"] == 1
     assert result["metrics"]["red"]["hit_rate_percent"] == 100
     assert result["metrics"]["red"]["lead_time_months"]["median"] == 7

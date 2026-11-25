@@ -72,6 +72,29 @@
   budget=2, LOEO=1). Re-ran both full hypotheses. Next = Stage 5b-R3
   (sensitivities: original run, T5_noT1, quarterly; OOB curve with
   Brier/log-loss).
+- Stage AUD-2 (2026-11-25): after-panel-rebuild hooks (`core/hooks.py`, `ModuleSpec.after_panel_rebuild`; rules
+  re-evaluate, ML queues score jobs; `core/panel.py` free of module code); one panel reader `core/panel_reader.py:load_panel`
+  for ML, rules and public analysis (+ single `panel_hash`); alert upsert keeps alert_ids; `ProfileIntegrityError` is a
+  409 problem+json; long functions split (`_load`, `build_panel`, `build_dictionary`, `_score`, `collision_check`, `v02`).
+  Docs: `docs/audit/data_flow.md`, `AUD-1b_call_flow.md`. Finding kept: owner exclusions of earlier files are not applied at load.
+- Stage AUD-1-fix/AUD-1b (2026-11-25): `build_panel` shadowing fixed (+ e2e test); API/UI default = active
+  profile, labels per sha (`historical_profiles` in eba_rules module.yaml); required-input-missing rows are
+  `not_evaluated`, trend rules store the tested change; v1.1 alerts rewritten in prod (audit_log 79, 5 rows
+  green -> not_evaluated, alert_ids renumbered). Audits: `docs/audit/AUD-1*.md`.
+- Stage R-3 (2026-11-25): rule engine is the independent module `app/modules/eba_rules` (domain ->
+  application -> infrastructure -> presentation, `public.py` as the only interface, all config in
+  `config/`: module.yaml, profiles/eu_eba_v1.1.yaml (sha 28a28fa0... unchanged), bnm.yaml,
+  regulatory_levels.yaml). `app/core/rules.py`, `eba_ml/domain/rules.py`, `config/rules/` and
+  `r0_levels`/`r1_margin_grid_pp` of `config/ml.yaml` removed; alert routes moved out of
+  `eba_public_analysis` with unchanged paths/responses. Golden: 4367 prod alerts recomputed identical,
+  hypotheses identical, openapi unchanged.
+- Stage R-1 (2026-11-25): structural refactor, behaviour unchanged. Application code stays in
+  `app/`; every terminal command moved to `scripts/` (`data/`, `ml/`, `figures/`, `hypotheses/`,
+  see `scripts/README.md`). `python -m app` now only has `serve` and `worker`. Hypotheses H1a-H5,
+  statistics, SMOTE comparison and the R1 margin grid moved out of `app/`; hypotheses settings in
+  `config/ml.yaml: hypotheses`. Test enforces app never imports scripts. Golden check (a)
+  hypotheses on T3_primary identical; (b) retrain into `data/ml/R1_golden` compared with
+  `scripts.ml.compare_runs`. openapi.yaml unchanged.
 - Stage ML-R-A (2026-11-24): pure structural refactor of `pipeline.py` —
   bit-identical outputs guaranteed. Created `config/ml.yaml` (111 L),
   domain files `thresholds.py`/`lead_time.py`/`families.py`, `application/io.py`,

@@ -47,58 +47,59 @@ def v01(cur, ds):
     return _issue("V01", n, f"{n} rows miss lei_code, period or item" if n else "", ex)
 
 
-def v02(cur, ds):
+def _duplicate_groups(cur, ds: Dataset) -> list[dict]:
+    """Identities staged more than once: copies and number of distinct canonical amounts."""
     ident = [c for c in ds.columns if c not in (LABEL_COLUMN, MEASURE_COLUMN, *ANNOTATION_COLUMNS)]
     cols = sql.SQL(", ").join(sql.Identifier(c) for c in ident)
     canonical_amount = f"CASE WHEN amount ~ '{NUMBER_REGEX}' THEN amount::numeric::text ELSE amount END"
-    duplicate_query = (
-        sql.SQL("SELECT count(*) FILTER (WHERE amounts = 1), "
-                "COALESCE(sum(c) FILTER (WHERE amounts = 1), 0), "
-                "count(*) FILTER (WHERE amounts > 1), "
-                "COALESCE(sum(c) FILTER (WHERE amounts > 1), 0) "
-                "FROM (SELECT count(*) AS c, count(DISTINCT ")
-        + sql.SQL(canonical_amount)
-        + sql.SQL(") AS amounts FROM {} GROUP BY ").format(ds.table)
-        + cols
-        + sql.SQL(" HAVING count(*) > 1) d")
-    )
     cur.execute(sql.SQL("SELECT ") + cols + sql.SQL(", count(*) AS copies, count(DISTINCT ")
                 + sql.SQL(canonical_amount) + sql.SQL(") AS amounts FROM {} GROUP BY ").format(ds.table)
                 + cols + sql.SQL(" HAVING count(*) > 1 ORDER BY copies DESC"))
     names = [d[0] for d in cur.description]
-    groups = [dict(zip(names, r)) for r in cur.fetchall()]
+    return [dict(zip(names, r)) for r in cur.fetchall()]
+
+
+def _v02_examples(exact: list, resolved: list, unresolved: list) -> list[dict]:
+    """Unresolved conflicts first, then exact duplicates, then decided groups."""
+    if unresolved:
+        return [g for g, _ in unresolved[:MAX_EXAMPLES]]
+    if exact:
+        return exact[:MAX_EXAMPLES]
+    return [g for g, _ in resolved[:MAX_EXAMPLES]]
+
+
+def _v02_unresolved_issue(exact: list, resolved: list, unresolved: list, examples: list):
+    conflict_rows = sum(g["copies"] for g, _ in unresolved)
+    detail = f"{len(unresolved)} identities have conflicting amounts, in {conflict_rows} rows"
+    if resolved:
+        detail += (f"; {len(resolved)} identities ({sum(g['copies'] for g, _ in resolved)} rows) resolved by decision "
+                   + ", ".join(d.id for _, d in resolved))
+    if exact:
+        detail += f"; {len(exact)} exact-duplicate identities ({sum(g['copies'] for g in exact)} rows) are retained as info"
+    return _issue("V02", int(conflict_rows), detail, examples, severity="error")
+
+
+def v02(cur, ds):
+    """V02: duplicate identities; conflicting amounts are errors unless a data decision resolves them."""
+    groups = _duplicate_groups(cur, ds)
     exact = [g for g in groups if g["amounts"] == 1]
     conflicts = [g for g in groups if g["amounts"] > 1]
     decisions = [d for d in load_data_decisions() if d.edition == _edition(cur, ds.import_id) and d.file_type == ds.file_type]
-    resolved = []
-    unresolved = []
+    resolved, unresolved = [], []
     for group in conflicts:
         decision = next((d for d in decisions if decision_matches_row(d, group)), None)
         (resolved if decision else unresolved).append((group, decision))
-    exact_rows = sum(g["copies"] for g in exact)
-    resolved_rows = sum(g["copies"] for g, _ in resolved)
-    conflict_rows = sum(g["copies"] for g, _ in unresolved)
+    examples = _v02_examples(exact, resolved, unresolved)
     if unresolved:
-        examples = [g for g, _ in unresolved[:MAX_EXAMPLES]]
-    elif exact:
-        examples = exact[:MAX_EXAMPLES]
-    else:
-        examples = [g for g, _ in resolved[:MAX_EXAMPLES]]
-    if unresolved:
-        detail = f"{len(unresolved)} identities have conflicting amounts, in {conflict_rows} rows"
-        if resolved:
-            detail += f"; {len(resolved)} identities ({resolved_rows} rows) resolved by decision " + ", ".join(d.id for _, d in resolved)
-        if exact:
-            detail += f"; {len(exact)} exact-duplicate identities ({exact_rows} rows) are retained as info"
-        return _issue("V02", int(conflict_rows), detail, examples, severity="error")
+        return _v02_unresolved_issue(exact, resolved, unresolved, examples)
     if conflicts:
+        rows = sum(g["copies"] for g, _ in resolved)
         ids = ", ".join(d.id for _, d in resolved)
-        return _issue("V02", int(resolved_rows),
-                      f"{len(conflicts)} conflicting identities ({resolved_rows} rows) resolved by decision {ids}; excluded at load",
+        return _issue("V02", int(rows), f"{len(conflicts)} conflicting identities ({rows} rows) resolved by decision {ids}; excluded at load",
                       examples, severity="info")
     if exact:
-        return _issue("V02", int(exact_rows),
-                      f"{len(exact)} identities have exact duplicate amounts, in {exact_rows} rows; one copy is retained as info",
+        rows = sum(g["copies"] for g in exact)
+        return _issue("V02", int(rows), f"{len(exact)} identities have exact duplicate amounts, in {rows} rows; one copy is retained as info",
                       examples, severity="info")
     return _issue("V02", 0)
 

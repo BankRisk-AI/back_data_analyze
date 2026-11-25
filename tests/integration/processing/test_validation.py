@@ -7,7 +7,7 @@ from app.modules.eba_processing.application import validation as V
 from app.modules.eba_processing.domain.exceptions import NothingToValidate
 from app.modules.eba_processing.application.validation import report_to_dict
 from app.worker import build_registry
-from helpers import banks, stage
+from processing_helpers import banks, stage
 
 BAD = [
     "LEI00000000000000999,DE,202003,I1,Item one,0,10000,",   # outlier, and a 41st bank in 202003

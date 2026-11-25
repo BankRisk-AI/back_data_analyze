@@ -1,6 +1,6 @@
 import csv
 
-from app.core.smoke import build_sample
+from scripts.data.smoke_sample import build_sample
 
 
 def test_build_sample_preserves_header_encoding_and_filters_rows(tmp_path):

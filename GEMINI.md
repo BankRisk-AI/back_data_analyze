@@ -17,3 +17,5 @@ Token efficiency:
 - Keep responses concise.
 
 At the end of each task, update shared memory as specified in `AGENTS.md`.
+
+Git: never run any git command that changes the repository state (add, rm, mv, commit, tag, push, reset, stash, checkout, restore). Delete or move files with plain rm/mv; the owner stages and commits.

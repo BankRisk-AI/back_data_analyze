@@ -1,5 +1,5 @@
 """Composition root of the HTTP application: one FastAPI app with the router of every module. Each module can also run alone
-(python -m app.modules.<module> serve, or its presentation/api/api.py:create_app)."""
+(`python -m scripts.data.ingest_cli serve`, or its presentation/api/api.py:create_app)."""
 from __future__ import annotations
 
 from fastapi import FastAPI
@@ -7,6 +7,7 @@ from fastapi import FastAPI
 from app.core.api import create_base_app, mount_ui
 from app.core.api.system import build_system_router, call_with_options
 from app.core.config import get_cors_origins, get_max_upload_bytes, get_schema, get_storage_dir, get_ui_dir, get_user_id
+from app.core.hooks import register_module_hooks
 from app.core.module import ModuleSpec
 from app.core.worker import JobHandlerRegistry
 from app.core.logging import get_logger
@@ -42,8 +43,7 @@ def create_app(modules: list[ModuleSpec] | None = None, schema: str | None = Non
     app.router.add_event_handler("startup", log_database)
     app.openapi_tags = [{"name": "system", "description": "Health, enumerations and the state of any job."}] + [t for m in modules for t in m.tags]
     registry = JobHandlerRegistry()
-    from app.core.rules import register_handler as register_rules_handler
-    register_rules_handler(registry, schema)
+    register_module_hooks(modules)
     for module in modules:
         if module.register_handlers:
             module.register_handlers(registry)

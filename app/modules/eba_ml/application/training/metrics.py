@@ -9,7 +9,7 @@ from typing import Any
 
 import numpy as np
 
-from app.modules.eba_ml.domain.metrics import _classification_metrics
+from app.modules.eba_ml.domain.metrics import classification_metrics
 
 
 def compute_pooled_metrics(
@@ -32,7 +32,7 @@ def compute_pooled_metrics(
     return pooled
 
 
-def compute_classification_metrics(
+def computeclassification_metrics(
     dataset: dict[str, Any], y: np.ndarray,
     predictions: dict[str, dict], algorithm_names: tuple, key_to_index: dict,
 ) -> dict[str, dict]:
@@ -43,5 +43,5 @@ def compute_classification_metrics(
         keys = list(values)
         actual = np.asarray([y[key_to_index[key]] for key in keys])
         probability = np.asarray([values[key] for key in keys])
-        event_metrics[name] = _classification_metrics(actual, probability)
+        event_metrics[name] = classification_metrics(actual, probability)
     return event_metrics

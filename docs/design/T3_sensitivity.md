@@ -36,7 +36,7 @@ Positives report distinct positive **banks** (not observation-rows) for train+va
 | OOF PR-AUC LR / RF / XGB | 0.220 / 0.162 / 0.142 | 0.029 / 0.055 / **0.049** | — | 0.110 / 0.076 / 0.073 | see §SMOTE |
 | OOF ROC-AUC LR / RF / XGB | 0.681 / 0.661 / 0.653 | 0.570 / **0.732** / 0.629 | — | 0.646 / 0.613 / 0.620 | see §SMOTE |
 | Final-test PR-AUC (selected) | **LR: 0.206** | **XGB: 0.103** | — | **LR: 0.211** | see §SMOTE |
-| Final-test ROC-AUC (selected) | **LR: 0.595** | **XGB: —¹** | — | **LR: —¹** | see §SMOTE |
+| Final-test ROC-AUC (selected) | **LR: 0.595** | **XGB: 0.684** | — | **LR: 0.671** | see §SMOTE |
 | R1 margin / test alert share | 20.0 pp / **98.2%** | 2.5 pp / 0.4% | — | 4.5 pp / 2.0% | = primary |
 | H1a verdict | Not supported: RF dPR=−0.058 CI=[−0.147,+0.029]; XGB dPR=−0.078 | Not supported: RF dPR=+0.027 CI=[−0.007,+0.112]; XGB dPR=+0.020 | — | Not supported: RF dPR=−0.035 CI=[−0.155,+0.040] | — |
 | H3 verdict | Not supported: dPR=−0.001 CI=[−0.106,+0.133] | Not supported: dPR=−0.011 CI=[−0.193,+0.094] | — | Not supported: dPR=+0.047 CI=[−0.018,+0.170] | — |
@@ -45,9 +45,19 @@ Positives report distinct positive **banks** (not observation-rows) for train+va
 | H1b 10%: ML / R1 / CI | 0.282 / 0.026 / [+0.056,+0.487] | 0.231 / 0.038 / [−0.050,+0.424] | — | 0.409 / 0.045 / [+0.050,+0.765] | — |
 | Capital sign (cet1\_ratio) | LR coef = **+0.331** (E2 mechanics) | XGB corr(val,SHAP) = **−0.499** (risk-reducing) ★ | — | LR coef = **+0.354** (E2 mechanics) | +0.331 |
 
-¹ Final-test ROC-AUC for E3 XGB and q975 LR not extracted here; retrievable from `results_*.json → final_test.{model}.roc_auc`.
-
 ★ E3 is marked **exploratory** throughout: 14 OOF positives from 12 banks (just above the 10-bank minimum) and fold 3 (test\_year=2019) is empty (all 2019 rows excluded by NPL break).
+
+---
+
+## Complementary fold-wise Wilcoxon tests
+
+Per-fold PR-AUC differences (n = number of folds with a non-zero difference), from `hypotheses.json → fold_wilcoxon`. The test is **one-sided**: `scripts/hypotheses/stats.py` calls `wilcoxon(values, alternative="greater", method="exact")` (alternative: first model better). With n=5 the minimum attainable p is 1/32 = 0.031 one-sided (2/32 = 0.0625 two-sided), so the test is low-powered.
+
+| Test | T3_primary (n=5, exact) | T3_E3 | T3_q975 (n=5, exact) |
+|---|---|---|---|
+| H1a RF − LR | p = 0.500 | not computed (n < 5) | p = 0.594 |
+| H1a XGB − LR | p = 0.594 | not computed (n < 5) | p = 0.688 |
+| H3 levels+trends − levels | p = 0.594 | not computed (n < 5) | p = 0.594 |
 
 ---
 
@@ -124,7 +134,7 @@ CW = class-weight balancing (the primary approach). SMOTE pooled OOF PR-AUC/ROC-
 
 **Primary**: Asset\_quality dominates; Capital is rank 2 but Earnings is rank 3 — H5 not supported.
 
-**E3 (exploratory) ★**: Earnings is rank 1, Capital is rank 2 (`capital_earnings_rank_1_2 = 1`). For the pure NPL construct, the thesis-expected SHAP hierarchy is recovered. However, with only 14 OOF positives, this result is **exploratory and should not be presented as a confirmed finding**.
+**E3 (exploratory) ★**: under the primary family grouping Earnings is rank 1 and Capital rank 2 (`capital_earnings_rank_1_2 = 1`). Under the **sensitivity grouping** (Asset_quality + Concentration + Growth merged) Asset_quality ranks first (0.0757 > Earnings 0.0685 > Capital 0.0490), so H5 fails there too. For the pure NPL construct, the thesis-expected SHAP hierarchy is recovered. However, with only 14 OOF positives, this result is **exploratory and should not be presented as a confirmed finding**.
 
 **q975**: Earnings rises to rank 1, but Asset\_quality is rank 2 (Capital rank 3) — H5 not supported.
 
@@ -134,13 +144,15 @@ CW = class-weight balancing (the primary approach). SMOTE pooled OOF PR-AUC/ROC-
 
 ### H1b — ML better than R1 at fixed alert share
 
-**Primary**: CI at 10% share = [+0.056, +0.487] — fully positive.
+**Pre-specified H1b (equal alert volume, final test): not supported in any run.** The comparison below is the post-hoc fixed-share analysis.
+
+**Primary** (post-hoc, 10% share): CI = [+0.056, +0.487] — fully positive.
 
 **E3**: CI = [−0.050, +0.424] — straddles zero. R1 fires on only 0.4% of test rows (R1 margin optimised to 2.5pp on E3 training data). The comparison is structurally weak: a capital headroom rule is not designed to detect NPL stress.
 
 **q975**: CI at 10% share = [+0.050, +0.765] — fully positive; advantage larger than primary (ML=0.409 vs R1=0.045).
 
-**Conclusion**: H1b is supported (positive CI at 10% share) for primary and q975. The E3 result is inconclusive but structurally expected — R1 is a capital rule applied to a NPL construct.
+**Conclusion**: the pre-specified H1b is not supported in any run; only the post-hoc fixed-share comparison is positive (primary and q975). The E3 result is inconclusive but structurally expected — R1 is a capital rule applied to a NPL construct.
 
 ---
 

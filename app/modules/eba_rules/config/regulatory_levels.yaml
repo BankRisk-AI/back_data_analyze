@@ -1,0 +1,13 @@
+# Regulatory capital levels used by the R0 and R1 benchmark rules (thesis §3.5, Table 3.8).
+# R0: a bank is non-compliant when any ratio is below its level. R1: any ratio below level + margin.
+# Levels are fractions of risk-weighted assets (0.07 = 7%). The profile used is `active_profile` of module.yaml.
+
+r0_levels:
+  eu_eba:                  # CET1 4.5% + 2.5% conservation buffer; T1 6% + 2.5%; total 8% + 2.5% (CRR Art. 92, CRD Art. 129)
+    cet1: 0.07             # CET1 ratio alert level
+    tier1: 0.085           # Tier 1 ratio alert level
+    total_capital: 0.105   # total capital ratio alert level
+  bnm: null                # to be supplied by the owner; regulatory_levels("bnm") fails until then
+
+r1:
+  margin_grid_pp: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0, 10.5, 11.0, 11.5, 12.0, 12.5, 13.0, 13.5, 14.0, 14.5, 15.0, 15.5, 16.0, 16.5, 17.0, 17.5, 18.0, 18.5, 19.0, 19.5, 20.0]   # candidate R1 margins in percentage points; the F2-best margin on training rows is used

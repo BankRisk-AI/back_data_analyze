@@ -5,7 +5,8 @@ import pytest
 import yaml
 from psycopg2.extras import Json
 
-from app.core.rules import evaluate_profile, evaluate_rows, load_profile, validate_profile
+from app.modules.eba_rules.domain.profile_schema import validate_profile
+from app.modules.eba_rules.public import evaluate_panel, evaluate_rows, load_profile
 
 
 def profile(*rules):
@@ -29,8 +30,10 @@ def rule(rule_id, kind, feature, **extra):
 
 def row(bank_id, period, **values):
     return {
-        "bank_id": bank_id, "version_id": period.month + period.year * 10,
-        "period": period, "flags": {}, **values,
+        "bank_id": bank_id, "dataset_version": period.month + period.year * 10,
+        "period": period, "flags": {},
+        "cet1_ratio": 0.2, "tier1_ratio": 0.2, "total_capital_ratio": 0.2,   # required inputs present by default
+        **values,
     }
 
 
@@ -123,14 +126,14 @@ def test_profile_validation_rejects_duplicate_ids_and_missing_verified_threshold
 
 
 def test_eu_rocet1_thresholds_use_multiplication_factor():
-    config = yaml.safe_load(Path("config/rules/eu_eba.yaml").read_text())
+    config = load_profile("eu_eba")[0]
     rule = next(r for r in config["rules"] if r["id"] == "rocet1_supervisory_low")
     assert rule["bands"]["amber"]["min"] == pytest.approx(0.06 * 1.2001447434)
     assert rule["bands"]["green"]["above"] == pytest.approx(0.10 * 1.2001447434)
 
 
 def test_frozen_eu_profile_requires_version_bump_for_changes():
-    profile, profile_sha = load_profile("config/rules/eu_eba.yaml")
+    profile, profile_sha = load_profile("eu_eba")
     assert profile["version"] == "1.1"
     assert profile["frozen"] is True
     assert profile_sha == "28a28fa0f89da8435abdb0d6042a69cb2bff421c456926374dd202e0089f7e40"
@@ -155,12 +158,16 @@ def test_persisted_alerts_are_idempotent(db, tmp_path):
            VALUES (%s,%s,%s,%s)""",
         (version_id, bank_id, 0.03, Json({})),
     )
-    path = tmp_path / "profile.yaml"
-    path.write_text(yaml.safe_dump(profile(rule("level", "level", "cet1_ratio"))))
-    evaluate_profile(db.conn, path)
-    evaluate_profile(db.conn, path)
-    db.cur.execute("SELECT count(*), count(distinct profile_sha256) FROM alert")
-    assert db.cur.fetchone() == (1, 1)
+    evaluate_panel(db.conn, "eu_eba")
+    db.cur.execute("SELECT alert_id FROM alert")
+    first_id = db.cur.fetchone()[0]
+    evaluate_panel(db.conn, "eu_eba")
+    db.cur.execute("SELECT count(*), count(distinct profile_sha256), min(alert_id) FROM alert")
+    assert db.cur.fetchone() == (1, 1, first_id)               # upsert: the alert keeps its id
+    db.cur.execute("DELETE FROM panel_row")
+    evaluate_panel(db.conn, "eu_eba")
+    db.cur.execute("SELECT count(*) FROM alert")
+    assert db.cur.fetchone()[0] == 0                           # rows that no longer exist are deleted
 
 
 def test_family_max_does_not_sum_correlated_rules():
@@ -204,4 +211,23 @@ def test_two_families_red_and_all_not_evaluated_reason():
     assert alert["rule_results"]["level_reason"] == "two_families:asset_quality,dynamics"
     empty = evaluate_rows(p, [row(2, date(2025, 6, 30), cet1_ratio=None, npl_ratio=None)])[0]
     assert empty["level"] == "not_evaluated"
-    assert empty["rule_results"]["level_reason"] == "all_families_not_evaluated"
+    assert empty["rule_results"]["level_reason"] == "required_input_missing:cet1_ratio"
+
+
+def test_a_row_without_its_required_capital_ratios_is_never_green():
+    p = profile(rule("npl", "level", "npl_ratio", threshold=0.05))
+    healthy = evaluate_rows(p, [row(1, date(2025, 6, 30), npl_ratio=0.01)])[0]
+    missing = evaluate_rows(p, [row(2, date(2025, 6, 30), npl_ratio=0.01, tier1_ratio=None)])[0]
+    assert healthy["level"] == "green"
+    assert missing["level"] == "not_evaluated" and missing["score"] is None
+    assert missing["rule_results"]["level_reason"] == "required_input_missing:tier1_ratio"
+
+
+def test_trend_rules_store_the_tested_change_and_keep_the_level_separately():
+    p = profile(rule("drop", "trend", "cet1_ratio", condition="decrease_over", threshold=0.02, periods=4))
+    rows = [row(1, date(2023, 12, 31), cet1_ratio=0.15), row(1, date(2024, 12, 31), cet1_ratio=0.12)]
+    first, second = evaluate_rows(p, rows)
+    drop = result([second], "drop")
+    assert drop["triggered"] is True
+    assert drop["input_value"] == pytest.approx(-0.03) and drop["feature_value"] == 0.12
+    assert result([first], "drop")["not_evaluated"] is True and result([first], "drop")["input_value"] is None

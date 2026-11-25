@@ -168,8 +168,11 @@ def archive_model(model_id: int) -> dict:
 
 
 def hard_delete_model(model_id: int, model_name: str) -> None:
-    with connect(get_schema()) as conn:
+    conn = connect(get_schema())
+    try:
         lifecycle.hard_delete(conn, model_id, model_name, ArtifactStore())
+    finally:
+        conn.close()
 
 
 def list_predictions(page: int, page_size: int, champion_only: bool,

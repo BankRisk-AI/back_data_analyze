@@ -1,0 +1,32 @@
+# eba_rules module configuration: which alert profile is active and which profiles exist.
+# A profile marked frozen is verified by its sha256 every time it is loaded; editing it fails loudly.
+
+# Profile evaluated by the worker job `evaluate_rules` (override per run with env EBA_RULE_PROFILE).
+active_profile: eu_eba
+
+profiles:
+  - name: eu_eba                           # profile name stored in alert.profile_name
+    version: "1.1"                         # must equal `version` inside the file
+    file: profiles/eu_eba_v1.1.yaml        # path relative to this config directory
+    frozen: true                           # frozen: content may never change; new rules = new version file
+    sha256: 28a28fa0f89da8435abdb0d6042a69cb2bff421c456926374dd202e0089f7e40   # sha256 of the file bytes
+  - name: bnm                              # skeleton: thresholds still to be supplied by the owner
+    version: "1"
+    file: profiles/bnm.yaml
+    frozen: false                          # adjustable: sha256 is not enforced
+
+# Profiles evaluated in the past whose alerts are still in the alert table but whose files are gone.
+# They are labelled by sha256 so the API shows the right name/version for every stored alert set.
+historical_profiles:
+  - sha256: 1296bd8e5a16fcd1d644a77b436ba64b17cfa4f98eb659a67be5213814c8bfad   # first weighted-sum run (stage 4b)
+    name: eu_eba
+    version: "0"
+    frozen: true
+  - sha256: 794ea5ad1673359bd6af0f40dc9be153a4289a6c0e7d7386cb226ba95417ad5c   # family-maximum scoring
+    name: eu_eba
+    version: "0.9"
+    frozen: true
+  - sha256: 5a1ec1f44d9bfdc55518e3792b593a97e60c97c7405d8c918d7be2525bcc4d5c   # persistence moved into feature families
+    name: eu_eba
+    version: "1.0"
+    frozen: true
