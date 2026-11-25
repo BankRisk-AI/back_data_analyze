@@ -72,6 +72,59 @@
   budget=2, LOEO=1). Re-ran both full hypotheses. Next = Stage 5b-R3
   (sensitivities: original run, T5_noT1, quarterly; OOB curve with
   Brier/log-loss).
+- Stage ML-R-A (2026-11-24): pure structural refactor of `pipeline.py` —
+  bit-identical outputs guaranteed. Created `config/ml.yaml` (111 L),
+  domain files `thresholds.py`/`lead_time.py`/`families.py`, `application/io.py`,
+  `application/training/` (10 files), `application/evaluation/` (9 files),
+  deprecated `pipeline.py` shim, CLI `__main__.py`, 23 unit tests in
+  `tests/unit/test_ml_domain.py`, and `tests/golden_compare.py`. All new files
+  ≤200 L, all new functions ≤50 L. 111 unit tests pass. Next = ML-R-B (bug fixes).
+- Stage T-0 (2026-11-24): counted instability events under thesis §3 definitions
+  (read-only, `scripts/count_events.py`). E1 (12-month breach of CET1<7%,
+  Tier1<8.5%, Total<10.5%) yielded too few qualifying events for ML use; E2
+  (4q CET1 decline, threshold TBD) and E3 (4q NPL increase, threshold TBD)
+  provide sufficient event counts. Decision: use E2/E3 as primary targets in T-2.
+- Stage T-1 (2026-11-24): removed all ML code made obsolete by thesis §3
+  alignment. Deleted: T1--T5 target construction, LOEO, Sarlin-based thresholds
+  in evaluation, v1.1/B4/B2 comparators, event table and event metrics in training,
+  SHAP inside training, `fit_final_model`, deprecated `pipeline.py` re-export,
+  `h1b.py`, `h2.py`. Stubbed: `backfill_protected_models`, `cmd_train`, `_train`
+  worker handler (all raise `NotImplementedError("T-2: ...")`). `score_panel`
+  job and all API routes still work. 83 unit tests pass (down from 111; 28
+  thresholds/lead-time tests removed). HSH confirmed: bank_id 24
+  (Hamburg Commercial Bank AG) = bank_id 185 (HSH Beteiligungs Management GmbH)
+  via previous_leis crosswalk. Next = T-2 (E2/E3 label functions, R0/R1
+  benchmarks, F2 operating point, H1b/H2 rewrites).
+- Stage T-2 (2026-11-24): implemented thesis §3 target labels, benchmarks,
+  operating point and hypotheses on top of T-1 code. New modules:
+  `domain/labels.py` (E1/E2/E3/E2_or_E3, NPL-break exclusion, tail thresholds),
+  `domain/rules.py` (R0/R1 alert, choose_r1_margin), `domain/operating_point.py`
+  (F2-maximising frozen threshold). Updated: `training/train.py` (uses
+  `build_labels`, saves `r1_margin`/`operating_point_threshold`),
+  `training/assembly.py` (new fields), `training/final_test.py` (returns
+  `test_predictions`), `evaluation/context.py` (panel_hash verify, conn field),
+  `evaluation/h1b.py` (equal-volume recall, cluster bootstrap, v1.1 descriptive),
+  `evaluation/h2.py` (lead-time, Wilcoxon), `evaluation/h5.py` (OOF SHAP per
+  fold, LinearExplainer for LR), `evaluation/hypotheses.py` (H1b/H2 restored),
+  `__main__.py` (--label flag), `worker_handlers.py` (_train re-enabled).
+  `config/ml.yaml` updated with r0_levels, label, tail_quantile, margins grid.
+  `docs/design/thesis_alignment.md` written. 95 unit tests pass (12 new label
+  tests including T-0 reproduction). Integration test skips when eba_test is
+  empty. Background train launched into `data/ml/T2_primary/`. Next = T-3.
+
+- Stage T-3 (2026-11-25): reproducible primary ML run (T3_primary) + sensitivity
+  analyses. T3_primary: E2_or_E3, q=0.95, table35, robustness → LR selected
+  (OOF PR=0.220, test PR=0.206). T3_E3: E3-only → XGB (required empty-fold dtype
+  fix). T3_q975: q=0.975 → LR. T3_E2low skipped (6 banks < threshold). SMOTE
+  embedded. Reproducibility verified byte-identical. docs/design/T3_sensitivity.md
+  written from JSON.
+
+- Stage T-4 (2026-11-25): thesis-T3-primary models in registry and app. LR
+  champion for (E2_or_E3, semiannual); RF + XGB validated+protected. Old stage5c
+  T5 models superseded (note in model_card). Operating_point_f2 threshold replaces
+  matched_far/max_ur_0_9. score_panel: 2502 R0-compliant rows scored (1074 alerts),
+  14 R0-breach rows flagged. API: label (E1/E2/E3/E2_or_E3) + tail_quantile
+  validated; unknown → 422. 111 unit tests pass. openapi.yaml regenerated.
 
 - Stage 0: make the project installable and testable (2026-11-12)
 - Stage 1a: set-based staging-to-fact promotion (2026-11-12); measured
