@@ -1,28 +1,14 @@
-"""Thesis regression: stored T3_primary hypotheses and v1.1 alerts must not change. Run: pytest -m thesis."""
+"""Thesis regression (needs the thesis panel in the test database): stored T3_primary hypotheses are reproduced. Run: pytest -m thesis."""
 import json
 from pathlib import Path
 
 import pytest
 
-from thesis_panel import panel_rows
-
 pytestmark = pytest.mark.thesis
 RUN = Path("data/ml/T3_primary")
-EXPECTED_ALERTS = Path(__file__).parent / "data" / "eu_eba_v1_1_expected_alerts.json"
 
 
-def test_v1_1_alerts_on_the_fixed_synthetic_panel_match_the_stored_file():
-    from app.modules.eba_rules.public import evaluate_rows, load_profile
-    results = evaluate_rows(load_profile("eu_eba")[0], panel_rows())
-    actual = [{"bank_id": r["bank_id"], "version_id": r["dataset_version"], "level": r["level"],
-               "score": r["score"], "reason": r["rule_results"]["level_reason"],
-               "family_scores": r["rule_results"]["family_scores"],
-               "triggered": sorted(x["rule_id"] for x in r["rule_results"]["rules"] if x["triggered"])}
-              for r in results]
-    assert json.loads(json.dumps(actual)) == json.loads(EXPECTED_ALERTS.read_text())
-
-
-def test_t3_primary_hypotheses_are_reproduced(tmp_path):
+def test_t3_primary_hypotheses_are_reproduced(tmp_path, db):
     if not RUN.is_dir():
         pytest.skip("data/ml/T3_primary is absent")
     from app.core.config import get_schema

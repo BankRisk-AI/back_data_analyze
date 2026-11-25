@@ -12,7 +12,7 @@ from app.modules.eba_processing.application import datasets as D
 from app.modules.eba_processing.application import validation as V
 from app.modules.eba_processing.domain import Filters
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
 REAL = os.path.join(os.environ.get("EBA_REAL_DIR") or str(PROJECT_ROOT / "eba_prepared"), "2020A")
 FILES = ["tr_oth.csv", "tr_cre.csv", "tr_mrk.csv"]
 pytestmark = [

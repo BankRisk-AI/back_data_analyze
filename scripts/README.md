@@ -54,6 +54,13 @@ python -m scripts.hypotheses.main --run data/ml/T3_primary [--out DIR] [--quick]
 Writes `hypotheses.json` and `hypotheses.md` (`hypotheses_quick.*` with `--quick`) into `--out`
 (default: the run directory).
 
+## scripts/analyse - look at the data
+
+| Command | Purpose | Example |
+|---|---|---|
+| `scripts.analyse.main --hist …` | Histograms (`draw_graph.py`): `--hist indicator --indicator cet1_ratio` = one indicator over all banks; `--hist bank --bank 68` = every indicator of one bank; `--bins`, `--graph-out file.png`. | `python -m scripts.analyse.main --hist indicator --indicator cet1_ratio --graph-out /tmp/cet1.png` |
+| `scripts.analyse.main` | Panel rows from `load_panel` (read-only), counts + first rows, optional CSV. Function `get_panel(bank_id, period, date_from, date_to)` in `panel_data.py`. | `python -m scripts.analyse.main --bank 68 --from 2016-01-01 --to 2017-12-31 --out /tmp/mps.csv` |
+
 ## scripts/figures
 
 | Command | Purpose | Example |

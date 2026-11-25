@@ -1,6 +1,5 @@
 from openpyxl import Workbook
 
-from app.core.database import connect
 from app.modules.eba_ingest import ingest
 from app.modules.eba_ingest.application.load_service import LoadError, run_load
 from app.modules.eba_public_analysis.application.datasets import preview

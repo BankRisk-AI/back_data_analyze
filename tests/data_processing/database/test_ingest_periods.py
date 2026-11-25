@@ -1,5 +1,4 @@
 """Regression: periods that are not YYYYMM must never make the period report fail (a cast placed after a regex in an AND is not protected)."""
-import pytest
 
 from app.modules.eba_ingest import enqueue_import, get_import, ingest, process_import
 from app.modules.eba_ingest.infrastructure.storage import storage as storage_module
