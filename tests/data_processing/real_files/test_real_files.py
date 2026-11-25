@@ -5,7 +5,7 @@ from app.modules.eba_ingest.application.load_service import run_load
 from app.modules.eba_processing.application.validation import run_validation
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
 
 REAL = Path(os.getenv("EBA_REAL_DIR") or str(PROJECT_ROOT / "eba_prepared")) / "2020A"
 
