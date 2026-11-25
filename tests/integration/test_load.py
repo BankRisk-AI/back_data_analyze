@@ -83,3 +83,27 @@ def test_load_failure_keeps_staging_and_environment_can_keep_successful_staging(
     run_load(report.import_id, db.schema)
     db.cur.execute("SELECT to_regclass(%s)", (f"staging.f{report.files[0].file_id}",))
     assert db.cur.fetchone()[0] is not None
+
+
+def _load_edition(db, amount: str, name: str) -> int:
+    lei_code = "LEI00000000000000001"
+    data = db.dir / f"tr_cre_{name}.csv"
+    data.write_text("LEI_Code,NSA,Period,Item,Label,Portfolio,Amount,footnote\n"
+                    f"{lei_code},DE,202003,I1,Item one,0,{amount},\n", encoding="cp1252")
+    sdd = db.dir / f"SDD_{name}.xlsx"
+    _book(sdd, [["Item", "Label", "Category", "Dataset", "Item_TR_2020"], ["STD1", f"Item one {name}", "CAPITAL", "tr_cre", "I1"]])
+    metadata = db.dir / f"TR_Metadata_{name}.xlsx"
+    _book(metadata, [["title"], ["LEI_Code", "Name", "Country", "Finrep", "LEI_Code_2019"],
+                     [lei_code, f"Bank {name}", "DE", "Yes", ""]], "Bank list")
+    report = ingest([str(data), str(sdd), str(metadata)], db.storage, user_id=1, edition_label="2020", schema=db.schema)
+    db.cur.execute("UPDATE import_batch SET status='validated' WHERE import_id=%s", (report.import_id,))
+    run_load(report.import_id, db.schema)
+    return report.import_id
+
+
+def test_a_new_import_for_the_same_period_deactivates_the_old_version(db):
+    first = _load_edition(db, "12.5", "one")
+    second = _load_edition(db, "13.5", "two")
+    db.cur.execute("SELECT import_id, version_no, is_active FROM dataset_version "
+                   "WHERE year=2020 AND quarter=1 ORDER BY version_no")
+    assert db.cur.fetchall() == [(first, 1, False), (second, 2, True)]

@@ -2,7 +2,7 @@ import pytest
 from fastapi.testclient import TestClient
 from app.modules.eba_ingest.presentation.api.api import create_app
 from app.modules.eba_ingest.application.job_worker import ImportWorker
-from conftest import write_csv
+from csv_support import write_csv
 ROWS = ["AAAAAAAAAAAAAAAAAAAA,DE,202003,2020140,CET1 ratio,0.15,", "BBBBBBBBBBBBBBBBBBBB,FR,202003,2020140,CET1 ratio,0.12,",
         "AAAAAAAAAAAAAAAAAAAA,DE,202006,2020140,CET1 ratio,0.16,", "XXXXXXXXXXXXXXXXXXXX,OT,202003,2020140,CET1 ratio,0.50,"]
 

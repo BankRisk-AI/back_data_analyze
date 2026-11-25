@@ -198,7 +198,7 @@ old item and 201812 for the new template, through 202506.
 
 ## Dimension configuration and verification
 
-`python -m app dimensions build eba_prepared` generates the 12 committed
+`python -m scripts.data.build_reference dimensions eba_prepared` generates the 12 committed
 files in `config/dimensions/`: `2015`, `2017`, `2018`, `2019`, `2020S`,
 `2020A`, and `2021`--`2025` are decoded; `2016.yaml` is explicitly partial
 because its workbook is absent, while its total and non-performing meanings

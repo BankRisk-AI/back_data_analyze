@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 from app.core.worker import Worker
 from app.main import create_app
 from app.worker import build_registry
-from helpers import banks, stage
+from processing_helpers import banks, stage
 
 AGG = ["XXXXXXXXXXXXXXXXXXXX,OT,202003,I1,Item one,0,5,"]
 
@@ -171,7 +171,7 @@ def test_upload_process_and_validate_through_the_api(client, db):
 
 
 def test_the_module_command_line_validates_without_the_worker(db, capsys, monkeypatch):
-    from app.modules.eba_processing.__main__ import main
+    from scripts.data.processing_cli import main
 
     imp, _ = stage(db, banks(40) + ["SHORTLEI,DE,202003,I1,Item one,0,1,"])
     monkeypatch.setenv("EBA_SCHEMA", db.schema)

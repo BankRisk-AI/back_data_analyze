@@ -13,3 +13,5 @@ eba_prepared
 .prod
 prod
 data/panel_row_*.csv
+logs/
+data/ml/

@@ -5,7 +5,7 @@ import pytest
 from app.core.exceptions import InvalidParameter
 from app.modules.eba_processing.application import analytics as A
 from app.modules.eba_processing.domain import Filters
-from helpers import banks, lei, stage
+from processing_helpers import banks, lei, stage
 
 AGG = ["XXXXXXXXXXXXXXXXXXXX,OT,202003,I1,Item one,0,5,", "XXXXXXXXXXXXXXXXXXXX,OT,202006,I1,Item one,0,5,"]
 

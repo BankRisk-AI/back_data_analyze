@@ -5,7 +5,11 @@ from pathlib import Path
 import yaml
 
 from app.core.exceptions import BadRequestError, InvalidParameter, NotFoundError
-from app.modules.eba_public_analysis.infrastructure.db import read_session, specialist_leis, validate_page
+from app.modules.eba_public_analysis.infrastructure.db import (
+    read_session,
+    specialist_leis,
+    validate_page,
+)
 
 
 def _profile_file(name: str) -> dict:
@@ -104,7 +108,8 @@ def alert_summary(profile: str | None, schema: str) -> dict:
         for period, counts in grouped.items():
             total = sum(counts.values())
             periods.append({"period": period, "counts": counts,
-                            "shares": {key: round(value * 100 / total, 4) if total else 0 for key, value in counts.items()}})
+                            "shares": {key: round(value * 100 / total, 4) if total else 0 for key,
+                            value in counts.items()}})
         return {"profile_name": name, "profile_sha256": sha, "periods": periods}
 
 
@@ -124,9 +129,11 @@ def alerts(period: str, profile: str | None, level: str | None, exclude_speciali
             clauses.append("a.level=%s"); params.append(level)
         cur.execute(f"""SELECT a.alert_id,a.bank_id,trim(b.lei),b.name,to_char(v.period_end,'YYYYMM'),
                                a.level,a.score,a.rule_results
-                        FROM alert a JOIN dataset_version v USING(version_id) JOIN bank b USING(bank_id)
+                        FROM alert a JOIN dataset_version v USING(version_id) JOIN bank b USING(
+                        bank_id)
                         WHERE {' AND '.join(clauses)}
-                        ORDER BY CASE a.level WHEN 'red' THEN 0 WHEN 'amber' THEN 1 WHEN 'green' THEN 2 ELSE 3 END,
+                        ORDER BY CASE a.level WHEN 'red' THEN 0 WHEN 'amber' 
+                        THEN 1 WHEN 'green' THEN 2 ELSE 3 END,
                                  a.score DESC NULLS LAST,b.name,a.bank_id""", params)
         filtered = [row for row in cur.fetchall() if not (exclude_specialist and row[2] in specialist)]
         total = len(filtered)
@@ -156,7 +163,8 @@ def alert_detail(alert_id: int, profile: str | None, schema: str) -> dict:
     with read_session(schema) as (_, cur):
         cur.execute("""SELECT a.alert_id,a.bank_id,a.version_id,to_char(v.period_end,'YYYYMM'),
                               a.level,a.score,a.rule_results,a.profile_name,a.profile_sha256
-                       FROM alert a JOIN dataset_version v USING(version_id) WHERE a.alert_id=%s""", (alert_id,))
+                       FROM alert a JOIN dataset_version v USING(version_id) WHERE a.alert_id=%s""",
+                    (alert_id,))
         row = cur.fetchone()
         if not row:
             raise NotFoundError(f"alert {alert_id} does not exist")
@@ -175,5 +183,6 @@ def alert_detail(alert_id: int, profile: str | None, schema: str) -> dict:
         return {"alert_id": row[0], "bank_id": row[1], "version_id": row[2], "period": row[3],
                 "level": row[4], "score": row[5], "reason": payload_dict.get("level_reason"),
                 "family_scores": payload_dict.get("family_scores"), "rules": rules,
-                "profile_name": row[7], "profile_version": str(config.get("version")) if config.get("version") is not None else None,
+                "profile_name": row[7], "profile_version": str(config.get("version"))
+            if config.get("version") is not None else None,
                 "profile_sha256": row[8]}

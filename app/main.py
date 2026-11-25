@@ -1,5 +1,5 @@
 """Composition root of the HTTP application: one FastAPI app with the router of every module. Each module can also run alone
-(python -m app.modules.<module> serve, or its presentation/api/api.py:create_app)."""
+(`python -m scripts.data.ingest_cli serve`, or its presentation/api/api.py:create_app)."""
 from __future__ import annotations
 
 from fastapi import FastAPI

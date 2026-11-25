@@ -12,25 +12,7 @@ drop or reorder in some sklearn versions. Indicator columns are dropped.
 from __future__ import annotations
 
 import numpy as np
-import pytest
 from sklearn.impute import SimpleImputer
-
-
-def test_shap_vstack_fails_without_truncation():
-    """Reproduce the crash: np.vstack raises when SHAP arrays have different widths."""
-    shap_fold1 = np.ones((5, 51))
-    shap_fold2 = np.ones((3, 54))
-    with pytest.raises(ValueError, match="dimensions"):
-        np.vstack([shap_fold1, shap_fold2])
-
-
-def test_shap_truncation_to_base_features_fixes_vstack():
-    """Truncating to n_base columns resolves the mismatch."""
-    n_base = 50
-    shap_fold1 = np.ones((5, 51))
-    shap_fold2 = np.ones((3, 54))
-    result = np.vstack([arr[:, :n_base] for arr in [shap_fold1, shap_fold2]])
-    assert result.shape == (8, n_base)
 
 
 def test_get_feature_names_out_maps_shap_with_all_nan_column():

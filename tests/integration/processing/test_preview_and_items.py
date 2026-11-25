@@ -5,7 +5,7 @@ from app.modules.eba_processing.application import datasets as D
 from app.modules.eba_processing.domain import Filters
 from app.modules.eba_processing.domain.exceptions import DatasetNotFound, ImportNotFound
 from app.modules.eba_ingest import drop_staging
-from helpers import banks, lei, stage
+from processing_helpers import banks, lei, stage
 
 AGG = ["XXXXXXXXXXXXXXXXXXXX,OT,202003,I1,Item one,0,5,"]
 

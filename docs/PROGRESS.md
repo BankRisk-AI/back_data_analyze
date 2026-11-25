@@ -72,6 +72,13 @@
   budget=2, LOEO=1). Re-ran both full hypotheses. Next = Stage 5b-R3
   (sensitivities: original run, T5_noT1, quarterly; OOB curve with
   Brier/log-loss).
+- Stage R-1 (2026-11-25): structural refactor, behaviour unchanged. Application code stays in
+  `app/`; every terminal command moved to `scripts/` (`data/`, `ml/`, `figures/`, `hypotheses/`,
+  see `scripts/README.md`). `python -m app` now only has `serve` and `worker`. Hypotheses H1a-H5,
+  statistics, SMOTE comparison and the R1 margin grid moved out of `app/`; hypotheses settings in
+  `config/ml.yaml: hypotheses`. Test enforces app never imports scripts. Golden check (a)
+  hypotheses on T3_primary identical; (b) retrain into `data/ml/R1_golden` compared with
+  `scripts.ml.compare_runs`. openapi.yaml unchanged.
 - Stage ML-R-A (2026-11-24): pure structural refactor of `pipeline.py` —
   bit-identical outputs guaranteed. Created `config/ml.yaml` (111 L),
   domain files `thresholds.py`/`lead_time.py`/`families.py`, `application/io.py`,

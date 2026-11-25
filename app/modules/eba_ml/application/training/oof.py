@@ -6,14 +6,15 @@ and records per-fold PR-AUC, ROC-AUC, Brier score, and optionally SMOTE comparis
 from __future__ import annotations
 
 import time
-from typing import Any
+from typing import Any, Callable
 
 import numpy as np
 from sklearn.metrics import average_precision_score, brier_score_loss, roc_auc_score
 
 from app.modules.eba_ml.application.dataset import folds
 from app.modules.eba_ml.application.models import model_factory
-from app.modules.eba_ml.application.training.smote import smote_fold_comparison
+
+FoldDiagnostic = Callable[..., dict[str, Any] | None]
 
 
 def refit_folds(
@@ -26,14 +27,18 @@ def refit_folds(
     wall_clock_started: float,
     wall_clock_hours: float,
     logger,
+    fold_diagnostic: FoldDiagnostic | None = None,
 ) -> tuple[dict, list, list]:
-    """Refit each model on each fold; return (predictions, fold_metrics, smote_metrics).
+    """Refit each model on each fold; return (predictions, fold_metrics, diagnostics).
 
-    predictions: {model_name: {"bank_id:period": float}}. smote_metrics: SMOTE comparison.
+    predictions: {model_name: {"bank_id:period": float}}.
+    fold_diagnostic: optional thesis hook called per fitted fold model as
+    (X_train, y_train, X_test, y_test, model, fold_number, model_name, seed) -> dict | None;
+    non-None results are collected in `diagnostics` (the SMOTE comparison, scripts/ml).
     """
     predictions: dict[str, dict[str, float]] = {}
     fold_metrics: list[dict[str, Any]] = []
-    smote_metrics: list[dict[str, Any]] = []
+    diagnostics: list[dict[str, Any]] = []
 
     for fold_number, (train_idx, test_idx) in enumerate(folds(dataset["rows"]), 1):
         if not len(test_idx) or not len(train_idx):
@@ -60,11 +65,9 @@ def refit_folds(
                 f"{dataset['rows'][i]['bank_id']}:{dataset['rows'][i]['period'].isoformat()}": float(p)
                 for i, p in zip(test_idx, probability)
             })
-            if sr := smote_fold_comparison(
-                dataset["X"][train_idx], y[train_idx],
-                dataset["X"][test_idx], y[test_idx],
-                model, fold_number, name, seed,
-            ):
-                smote_metrics.append(sr)
+            if fold_diagnostic and (extra := fold_diagnostic(
+                    dataset["X"][train_idx], y[train_idx], dataset["X"][test_idx],
+                    y[test_idx], model, fold_number, name, seed)):
+                diagnostics.append(extra)
 
-    return predictions, fold_metrics, smote_metrics
+    return predictions, fold_metrics, diagnostics

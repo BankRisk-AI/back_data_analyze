@@ -77,7 +77,7 @@ denominator component.
 
 ## Production result
 
-`python -m app rules evaluate --profile eu_eba --target prod` wrote 4,367
+`python -m scripts.data.build_reference rules --profile eu_eba --target prod` wrote 4,367
 alerts. `docs/design/rule_results.md` contains the complete per-period
 evaluated-bank shares, rule trigger/not-evaluated counts, before/after
 not-evaluated comparison, dominant rules, and sanity check.
@@ -87,7 +87,7 @@ not-evaluated comparison, dominant rules, and sanity check.
 The CLI command is:
 
 ```text
-python -m app rules evaluate --profile eu_eba --target test|prod
+python -m scripts.data.build_reference rules --profile eu_eba --target test|prod
 ```
 
 The generic worker exposes the `evaluate_rules` job kind. It reads
@@ -96,11 +96,11 @@ The generic worker exposes the `evaluate_rules` job kind. It reads
 ## Stage 4d event evaluation
 
 `config/events.yaml` defines the owner-curated event format with LEI, date,
-type, source, cause, set, and notes. `python -m app evaluate rules` applies
+type, source, cause, set, and notes. `python -m scripts.ml.evaluate_rules` applies
 the exact 12-to-3-month pre-event window, resolves approved crosswalk groups,
 and reports hit rate, Wilson confidence intervals, lead time, false alarms,
 precision, and per-event observations. The reusable window and metric code is
-in `app/event_evaluation.py`; ML evaluation will use the same windows without
+in `scripts/ml/event_evaluation.py`; ML evaluation will use the same windows without
 future leakage. Results are in `rule_evaluation.md`.
 
 ## Next decisions

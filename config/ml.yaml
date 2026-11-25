@@ -24,24 +24,6 @@ final_test:
 # OOB n_estimators candidates tested for RF (table35 space only)
 oob_n_estimators: [50, 100, 150]
 
-# Event window: months before event (start, end) — e.g. 12 months before to 3 months before
-event_window_months: [-12, -3]
-
-# Bootstrap replicates for CI computation (full run)
-bootstrap_replicates: 2000
-
-# Bootstrap replicates in quick mode
-bootstrap_replicates_quick: 20
-
-# H3 search budget in full mode (number of configs to try for levels-only model)
-h3_budget: 60
-
-# H3 search budget in quick mode
-h3_budget_quick: 2
-
-# Max LOEO events in quick mode (None = unlimited in full mode)
-loeo_limit_quick: 1
-
 # SHA-256 of the eu_eba v1.1 alert profile used as comparator
 # Update when the reference profile is regenerated in eba_public_analysis
 comparator_profile_sha: "28a28fa0f89da8435abdb0d6042a69cb2bff421c456926374dd202e0089f7e40"
@@ -75,9 +57,6 @@ operating_point: "f2_on_validation_oof"
 
 # Display-only alert mode: share of R0-compliant banks flagged per period (top_10pct_per_period)
 top_alert_share: 0.10
-
-# Whether to query v1.1 red alerts for descriptive H1b comparison
-descriptive_v11: true
 
 # SHAP feature families (Table 3.x — base feature name -> family)
 shap_families:
@@ -142,3 +121,17 @@ search_spaces:
         min_child_weight: [1, 3, 6]
         subsample: [0.7, 0.85, 1.0]
         colsample_bytree: [0.7, 0.85, 1.0]
+
+# Hypotheses evaluation (scripts/hypotheses, thesis §3.6)
+hypotheses:
+  seed: 20261121                  # bootstrap seed; H1a dROC uses seed+1
+  replicates: 2000                # cluster-bootstrap draws (full run)
+  replicates_quick: 20            # draws with --quick
+  h3_budget: 60                   # configs searched for the levels-only model (full run)
+  h3_budget_quick: 2              # configs with --quick
+  validation_seed_offset: 100     # H1b validation-OOF bootstrap seed offset
+  validation_years: [2017, 2021]  # OOF window (inclusive)
+  test_years: [2022, 2024]        # final-test window (inclusive)
+  fixed_alert_shares_pct: [10, 20]  # H1b post-hoc fixed-share sensitivity
+  min_wilcoxon_n: 5               # fewer non-zero differences -> "exploratory"
+  h4_status: "pending - Stage 7 (BNM pilot)"

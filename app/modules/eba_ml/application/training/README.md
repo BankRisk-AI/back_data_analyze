@@ -6,7 +6,7 @@
 2. `save_dataset` — write compressed .npz + manifest JSON to out_dir
 3. `_run_all_searches` → `run_fold_search` per algorithm — grid search over folds
 4. `oob_curve` (RF only) — select n_estimators via OOB score
-5. `refit_folds` — OOF refit + SMOTE comparison; build predictions dict
+5. `refit_folds` — OOF refit; optional `fold_diagnostic` hook (the thesis SMOTE comparison, `scripts/ml/smote_comparison.py`)
 6. `compute_pooled_metrics` — pooled OOF PR-AUC/ROC-AUC/Brier per model
 7. `evaluate_final_test` — fit on ≤2020, evaluate on 2022–2024
 8. `build_split_report` — per-fold row/positive counts including final test
@@ -28,5 +28,7 @@ T-2 will add E2/E3 label functions; `train()` already accepts `y: np.ndarray`.
 | RF OOB candidates | `config/ml.yaml` → `oob_n_estimators` |
 | Add a model | `trainers.py` → add `train_XYZ`, add to `TRAINERS` |
 | Change class-weight formula | `oof.py` → `refit_folds` weight line |
-| Change SMOTE strategy | `smote.py` → `smote_fold_comparison` |
+| Change SMOTE strategy | `scripts/ml/smote_comparison.py` → `smote_fold_comparison` |
 | Change holdout split years | `final_test.py` → `evaluate_final_test` defaults |
+
+Thesis runs, sensitivities, R1 margin grid and hypotheses H1a-H5 are scripts: see `scripts/README.md`.

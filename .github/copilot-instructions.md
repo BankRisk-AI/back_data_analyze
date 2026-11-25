@@ -60,7 +60,7 @@ The current Makefile `initdb` target does not pass this argument.
 ## OpenAPI
 
 After relevant API changes, regenerate the specification:
-`.venv/bin/python -m app openapi --out docs/openapi.yaml`
+`.venv/bin/python -m scripts.data.export_openapi --out docs/openapi.yaml`
 
 ## Memory maintenance
 

@@ -113,3 +113,5 @@ or other potentially destructive operations:
 Explain important changes clearly.
 Prefer practical, incremental steps.
 Report modified files, executed tests and remaining issues.
+
+Git: never run any git command that changes the repository state (add, rm, mv, commit, tag, push, reset, stash, checkout, restore). Delete or move files with plain rm/mv; the owner stages and commits.

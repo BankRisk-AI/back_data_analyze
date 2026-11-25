@@ -3,7 +3,7 @@ from datetime import date
 import yaml
 import pytest
 
-from app.event_evaluation import evaluate_events, relative_usefulness, usefulness_metrics
+from scripts.ml.event_evaluation import evaluate_events, relative_usefulness, usefulness_metrics
 
 
 def test_sarlin_relative_usefulness_hand_calculation():

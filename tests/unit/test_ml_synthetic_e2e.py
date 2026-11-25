@@ -13,80 +13,44 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-_FEATURES = (
-    "cet1_ratio", "tier1_ratio", "total_capital_ratio", "leverage_ratio",
-    "npl_ratio", "stage2_share", "roe_annualised", "nace_hhi",
-    "sovereign_hhi", "loan_growth_qoq", "loan_growth_yoy",
-)
-R0 = {"cet1": 0.07, "tier1": 0.085, "total_capital": 0.105}
+from ml_synthetic import _FEATURES, R0, _dataset, _make_panel, _row, _two_configs  # noqa: F401
 
 
-def _row(bank_id, period, seed=0):
-    rng = np.random.default_rng(seed + bank_id * 100 + period.year * 10 + period.month)
-    r = {"bank_id": bank_id, "period": period}
-    for name in _FEATURES:
-        r[name] = float(rng.uniform(0.09, 0.20))
-    r["cet1_ratio"] = float(rng.uniform(0.09, 0.18))
-    r["tier1_ratio"] = float(rng.uniform(0.10, 0.20))
-    r["total_capital_ratio"] = float(rng.uniform(0.12, 0.22))
-    # Banks 1-5: gradual CET1 decline to generate E2 positives
-    if bank_id <= 5 and period.year >= 2016:
-        r["cet1_ratio"] = max(0.08, r["cet1_ratio"] - (period.year - 2015) * 0.008)
-    return r
-
-
-def _make_panel(n_banks=10):
-    rows = []
-    for b in range(1, n_banks + 1):
-        for year in range(2014, 2025):
-            for month in (6, 12):
-                rows.append(_row(b, date(year, month, 30), seed=b))
-    return rows
-
-
-def _dataset(rows):
-    import hashlib
-    X = np.asarray([[r.get(f) or 0.0 for f in _FEATURES] for r in rows], dtype=float)
-    ph = hashlib.sha256(
-        json.dumps([(r["bank_id"], r["period"].isoformat()) for r in rows],
-                   default=str).encode()).hexdigest()
-    return {"rows": rows, "X": X, "columns": list(_FEATURES),
-            "panel_hash": ph, "grid": "semiannual", "robustness": True}
-
-
-def _two_configs(name, space="table35"):
-    """Minimal 2-config version of _search_configs for fast tests."""
-    if name == "LR":
-        return [{"penalty": "l2", "solver": "liblinear", "C": 0.1},
-                {"penalty": "l1", "solver": "liblinear", "C": 1.0}]
-    if name == "RF":
-        return [{"max_depth": 3, "min_samples_leaf": 2, "max_features": "sqrt"},
-                {"max_depth": 5, "min_samples_leaf": 1, "max_features": "log2"}]
-    return [{"n_estimators": 50, "max_depth": 3, "learning_rate": 0.1,
-             "subsample": 0.8, "colsample_bytree": 0.8, "reg_lambda": 1.0},
-            {"n_estimators": 50, "max_depth": 4, "learning_rate": 0.05,
-             "subsample": 0.9, "colsample_bytree": 0.9, "reg_lambda": 0.1}]
-
-
-def test_train_synthetic_e2_or_e3(tmp_path, monkeypatch):
-    """train() with injected dataset + 2-config search completes end-to-end."""
+def test_training_is_deterministic_and_complete(tmp_path, monkeypatch):
+    """Same seed, same synthetic panel -> identical predictions; the result carries what the app needs."""
     import app.modules.eba_ml.application.training.search as search_mod
     monkeypatch.setattr(search_mod, "_search_configs", _two_configs)
-
     from app.modules.eba_ml.application.training.train import train
 
-    rows = _make_panel()
-    ds = _dataset(rows)
+    runs = [train(conn=None, label="E2_or_E3", out_dir=str(tmp_path / name), models=["LR"],
+                  wall_clock_hours=1.0, space="table35", dataset=_dataset(_make_panel()))
+            for name in ("a", "b")]
+    a, b = runs
+    assert a["predictions"] == b["predictions"] and a["test_predictions"] == b["test_predictions"]
+    assert a["operating_point_threshold"] == b["operating_point_threshold"]
+    assert a["label"] == "E2_or_E3" and a["r1_margin"] is not None and a["rows"]
+    assert (tmp_path / "a" / "search.json").exists()
 
-    result = train(conn=None, label="E2_or_E3", out_dir=str(tmp_path),
-                   wall_clock_hours=1.0, space="table35", dataset=ds)
 
-    assert result["label"] == "E2_or_E3"
-    assert "predictions" in result
-    assert "operating_point_threshold" in result
-    assert "r1_margin" in result
-    assert len(result.get("rows", [])) > 0
-    assert (tmp_path / "search.json").exists()
+def test_training_fails_clearly_when_no_row_can_be_labelled(tmp_path):
+    """A panel without any evaluable future (single last period) -> ValueError, not an empty fit."""
+    from app.modules.eba_ml.application.training.train import train
+    rows = [_row(b, date(2024, 12, 31)) for b in range(1, 6)]
+    with pytest.raises(ValueError, match="No rows in prediction sample"):
+        train(conn=None, label="E2_or_E3", out_dir=str(tmp_path), dataset=_dataset(rows))
+
+
+def test_leakage_guard_rejects_a_feature_that_is_the_label():
+    """A single feature with PR-AUC > 0.95 against the label aborts training."""
+    import logging
+    from app.modules.eba_ml.application.training.train import _check_leakage
+    y = np.array([0, 1] * 30)
+    dataset = {"X": np.column_stack([y + 0.0, np.random.default_rng(0).random(60)]),
+               "columns": ["leaky", "noise"]}
+    with pytest.raises(ValueError, match="possible label leakage: leaky"):
+        _check_leakage(dataset, y, logging.getLogger("t"))
+    dataset["X"][:, 0] = np.random.default_rng(1).random(60)
+    _check_leakage(dataset, y, logging.getLogger("t"))
 
 
 def test_train_unknown_label_raises(tmp_path):
@@ -125,19 +89,18 @@ def test_service_validate_allowed_tail_quantile():
 
 
 def test_hypotheses_synthetic_quick(tmp_path, monkeypatch):
-    """hypotheses() --quick completes on a synthetic JSON with mocked DB."""
+    """run_hypotheses() --quick completes on a synthetic JSON with mocked DB."""
     import app.modules.eba_ml.application.training.search as search_mod
     monkeypatch.setattr(search_mod, "_search_configs", _two_configs)
 
     rows = _make_panel()
     ds = _dataset(rows)
 
-    # Patch build_dataset in context.py (the import-site, not the source module)
-    import app.modules.eba_ml.application.evaluation.context as ctx_mod
+    # Patch the import-sites used by the hypotheses script (read-only DB access)
+    import scripts.hypotheses.context as ctx_mod
     monkeypatch.setattr(ctx_mod, "build_dataset", lambda conn, grid="semiannual", robustness=False: ds)
 
-    # Patch connect in hypotheses.py
-    import app.modules.eba_ml.application.evaluation.hypotheses as hyp_mod
+    import scripts.hypotheses.main as hyp_mod
 
     class _FakeConn:
         def cursor(self): return _FakeCur()
@@ -158,8 +121,8 @@ def test_hypotheses_synthetic_quick(tmp_path, monkeypatch):
     result = train(conn=None, label="E2_or_E3", out_dir=str(tmp_path),
                    wall_clock_hours=1.0, space="table35", dataset=ds)
 
-    from app.modules.eba_ml.application.evaluation.hypotheses import hypotheses
-    report = hypotheses(tmp_path, quick=True)
+    from scripts.hypotheses.main import run_hypotheses
+    report = run_hypotheses(tmp_path, quick=True)
 
     assert "H1a" in report
     assert "H1b" in report

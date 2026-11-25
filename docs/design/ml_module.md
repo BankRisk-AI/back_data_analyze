@@ -174,3 +174,23 @@ The protected thesis models are backfilled from their recorded Stage 5c
 configuration using the existing pipeline. An artifact SHA is updated only
 after fold probabilities reproduce the stored reference within `1e-12`; a
 failed reproduction leaves the registry row unchanged.
+
+## 11. Application / scripts split (Stage R-1)
+
+`app/modules/eba_ml` keeps what the application uses: dataset, labels, R0/R1 rules, operating
+point, training (`application/training/`), registry, scoring, SHAP, API and worker handlers.
+Thesis-only code lives in `scripts/` and imports `app` (never the reverse; enforced by
+`tests/unit/architecture/test_scripts_dependency.py`):
+
+| Thesis code | Location |
+|---|---|
+| Hypotheses H1a-H5 (recipe `main.py`, `h1a.py`..`h5.py`, `context.py`, `report.py`) | `scripts/hypotheses/` |
+| Bank-cluster bootstrap, exact Wilcoxon, Holm | `scripts/hypotheses/stats.py` |
+| SMOTE comparison (passed to `train()` as `fold_diagnostic`) | `scripts/ml/smote_comparison.py` |
+| R1 margin diagnostic grid | `scripts/ml/r1_margin_grid.py` |
+| Thesis training, sensitivities, golden check | `scripts/ml/train_thesis.py`, `sensitivity.py`, `compare_runs.py` |
+
+Hypotheses settings (seed, replicates, H3 budget, windows, fixed alert shares) are in the
+`hypotheses:` section of `config/ml.yaml`. Run: `python -m scripts.hypotheses.main --run <dir> [--quick]`.
+Removed as dead: `app/ml.py`, `backfill.py`, `equal_alert_volume_recall`, `lead_time_quarters`,
+`_cluster_bootstrap`, the `ml` subcommands of `python -m app`, `eba_ml/__main__.py`.

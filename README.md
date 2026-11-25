@@ -10,7 +10,7 @@ validated data atomically into the 15-table Chapter 4 schema.
 python -m venv .venv
 .venv/bin/pip install -r requirements-dev.txt
 cp .env.example .env
-python -m app init-db
+python -m scripts.data.init_db --target test
 ```
 
 Set `DATABASE_URL` and `EBA_STORAGE` in `.env`. The production application
@@ -19,14 +19,14 @@ commands are:
 ```bash
 python -m app serve
 python -m app worker
-python -m app openapi --out openapi.yaml
+python -m scripts.data.export_openapi --out openapi.yaml
 ```
 
 The CLI targets are `prod` (from `DATABASE_URL` and `EBA_STORAGE`) and `test`
 (from `TEST_DATABASE_URL` and `storage_test`). For the complete
 prepared-edition load, reset the target with
-`python -m app reset-data --target prod --confirm <database-name>` and run
-`python -m app import-all --target prod eba_prepared`. Immutable originals use
+`python -m scripts.data.reset_data --target prod --confirm <database-name>` and run
+`python -m scripts.data.import_data all eba_prepared --target prod`. Immutable originals use
 the configured `EBA_STORAGE`; tests never write inside `eba_prepared`.
 
 Set `EBA_REAL_DIR` to the prepared real-file root when running real-file
@@ -38,9 +38,9 @@ Run performance benchmarks explicitly with `pytest -m slow`.
 
 The job flow is upload -> `stage` job (staging) -> POST validation
 (`validate_data`) -> POST load (`load`). The worker processes the queued jobs.
-Operational checks include `python -m app smoke` and `python -m app preflight`;
-the complete production load uses `python -m app import-all --target prod
-eba_prepared`.
+Operational checks include `python -m scripts.data.smoke` and `python -m scripts.data.preflight`;
+the complete production load uses `python -m scripts.data.import_data all eba_prepared
+--target prod`. Every terminal command is listed in `scripts/README.md`.
 
 ## Tests
 

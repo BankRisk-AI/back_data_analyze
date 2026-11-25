@@ -30,6 +30,7 @@ def _global_oof_shap(dataset: dict, y: np.ndarray, algorithm: str, params: dict,
     tolerance.
     """
     import shap as shap_lib
+
     from app.modules.eba_ml.application.dataset import folds
     from app.modules.eba_ml.application.models import model_factory
 

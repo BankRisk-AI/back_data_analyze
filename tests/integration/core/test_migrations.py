@@ -26,7 +26,7 @@ def query(schema, text, params=()):
 
 
 def test_a_new_database_gets_every_migration_once(schema):
-    expected = ["core/001_baseline", "core/002_job_heartbeat", "core/003_chapter4_views", "core/004_fact_unique", "core/005_job_attempts", "core/006_job_kind_stage", "core/007_fact_source_location", "core/008_fact_sov", "core/009_indicator_code_map", "core/010_panel_provenance", "core/011_alert", "core/012_ml"]
+    expected = ["core/001_baseline", "core/002_job_heartbeat", "core/003_chapter4_views", "core/004_fact_unique", "core/005_job_attempts", "core/006_job_kind_stage", "core/007_fact_source_location", "core/008_fact_sov", "core/009_indicator_code_map", "core/010_panel_provenance", "core/011_alert", "core/012_ml", "core/013_ml_operating_point", "core/014_ml_top10pct_threshold"]
     assert migrate(schema) == expected
     assert migrate(schema) == []                                                              # idempotent
     assert [r[0] for r in query(schema, "SELECT version FROM schema_migrations ORDER BY version")] == expected
@@ -47,7 +47,7 @@ def test_a_database_created_before_migrations_existed_is_adopted_not_recreated(s
         cur.execute((CORE_DIR / "001_baseline.sql").read_text(encoding="utf-8"))                      # as the old init_db did
         cur.execute("INSERT INTO import_batch(status) VALUES ('uploaded')")
     conn.close()
-    assert migrate(schema) == ["core/002_job_heartbeat", "core/003_chapter4_views", "core/004_fact_unique", "core/005_job_attempts", "core/006_job_kind_stage", "core/007_fact_source_location", "core/008_fact_sov", "core/009_indicator_code_map", "core/010_panel_provenance", "core/011_alert", "core/012_ml"]  # 001 is recorded, not run again
+    assert migrate(schema) == ["core/002_job_heartbeat", "core/003_chapter4_views", "core/004_fact_unique", "core/005_job_attempts", "core/006_job_kind_stage", "core/007_fact_source_location", "core/008_fact_sov", "core/009_indicator_code_map", "core/010_panel_provenance", "core/011_alert", "core/012_ml", "core/013_ml_operating_point", "core/014_ml_top10pct_threshold"]  # 001 is recorded, not run again
     assert query(schema, "SELECT count(*) FROM import_batch") == [(1,)]                               # data kept
 
 
