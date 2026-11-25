@@ -23,6 +23,7 @@ from app.modules.eba_ml.domain.labels import (
     _add_months,
     _forward_four_q_change,
 )
+from app.core.panel_reader import load_panel
 from app.modules.eba_rules.public import compliant, regulatory_levels
 
 load_dotenv()
@@ -47,16 +48,11 @@ def window(d: date) -> str:
 def main():
     conn = psycopg2.connect(os.environ["DATABASE_URL"])
     cur = conn.cursor()
-    cur.execute("""
-        SELECT p.bank_id, b.name, v.period_end,
-               p.cet1_ratio, p.tier1_ratio, p.total_capital_ratio, p.npl_ratio
-        FROM panel_row p
-        JOIN dataset_version v USING(version_id)
-        JOIN bank b USING(bank_id)
-        WHERE v.is_active
-        ORDER BY v.period_end, p.bank_id
-    """)
-    raw = cur.fetchall()
+    panel = load_panel(cur).rows
+    cur.execute("SELECT bank_id, name FROM bank")
+    names = dict(cur.fetchall())
+    raw = [(r["bank_id"], names[r["bank_id"]], r["period"], r["cet1_ratio"], r["tier1_ratio"],
+            r["total_capital_ratio"], r["npl_ratio"]) for r in panel]
     conn.close()
 
     # Build rows with field names matching domain/labels.py

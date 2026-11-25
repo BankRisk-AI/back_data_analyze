@@ -4,6 +4,12 @@
 Stage R-1 complete (2026-11-25): structural refactor. `app/` = API, worker, services, domain; all terminal commands in `scripts/` (see `scripts/README.md`); thesis hypotheses in `scripts/hypotheses/` (`python -m scripts.hypotheses.main --run <dir> [--quick]`). `python -m app` only has `serve` and `worker`. Behaviour unchanged: golden (a) hypotheses on T3_primary identical; golden (b) retrain in `data/ml/R1_golden` is verified with `python -m scripts.ml.compare_runs data/ml/T3_primary data/ml/R1_golden` (log: R1 background run).
 Previous: T-4c (test suite cannot touch prod; DATABASE_URL locked to eba_test). 110 unit tests pass.
 
+## AUD-2
+Hooks (`core/hooks.py`) run after `build_panel`: eba_rules re-evaluates, eba_ml queues score jobs. One panel reader `core/panel_reader.py:load_panel` (ML, rules, public analysis). Alerts upserted (ids kept). Open defect (preserved): `load_executor._load` applies the exclusions of the last data file to all files, so owner decisions of earlier files (BNG, 2020S tr_cre) are logged but not applied. See `docs/audit/data_flow.md`, `AUD-1b_call_flow.md`.
+
+## AUD-1-fix
+Alert API default = active profile (module.yaml), labels by sha; F5/F6 in eba_rules; v1.1 alerts rewritten in prod 2026-11-25. Open: no job/hook triggers `evaluate_rules` after a panel rebuild (run `build_reference rules`). Details: `docs/audit/AUD-1-fix.md`, `AUD-1b_call_flow.md`.
+
 ## R-3 (rule engine module)
 `app/modules/eba_rules/` owns profiles, R0/R1, alert evaluation and the alert API; import only `eba_rules.public`. Config in its `config/` (module.yaml, profiles/, regulatory_levels.yaml); R0 levels and R1 margin grid no longer in `config/ml.yaml`. Frozen profile verified by sha256 at load. Boundary tests: `tests/unit/architecture/test_rules_module_boundary.py`.
 

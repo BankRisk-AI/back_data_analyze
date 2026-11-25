@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from datetime import datetime
+from datetime import date, datetime
 import csv
 import hashlib
 import json
@@ -12,6 +12,7 @@ from typing import Any
 import yaml
 
 from app.core.database import connect
+from app.core.panel_reader import load_panel
 
 PROFILE_LABELS = {
     "1296bd8e": "v0",
@@ -158,10 +159,10 @@ def _f3(cur, out, labels, names):
 
 def _f4(cur, out):
     plt = _matplotlib()
-    cur.execute("""SELECT to_char(v.period_end,'YYYY'),p.cet1_ratio,p.npl_ratio,p.roe_annualised,p.leverage_ratio
-                   FROM panel_row p JOIN dataset_version v USING(version_id) WHERE v.is_active""")
     values = defaultdict(lambda: defaultdict(list))
-    for year, *features in cur.fetchall():
+    for prow in load_panel(cur).rows:
+        year = prow["period"].strftime("%Y")
+        features = [prow[f] for f in ("cet1_ratio", "npl_ratio", "roe_annualised", "leverage_ratio")]
         for key, value in zip(("CET1 ratio", "NPL ratio", "RoCET1", "Leverage ratio"), features):
             if value is not None: values[key][year].append(value)
     fig, axes = plt.subplots(2, 2, figsize=(11, 7), sharex=True)
@@ -185,12 +186,18 @@ def _f4(cur, out):
 
 def _f5(cur, out, labels):
     plt = _matplotlib()
-    cur.execute("""SELECT to_char(v.period_end,'YYYYMM'),count(DISTINCT p.bank_id),
-                          CASE WHEN v.period_end < DATE '2018-09-01' THEN 'semi-annual' ELSE 'quarterly' END,
-                          max(i.edition_label)
-                   FROM panel_row p JOIN dataset_version v USING(version_id)
-                   JOIN import_batch i USING(import_id) GROUP BY v.period_end ORDER BY v.period_end""")
-    rows = cur.fetchall(); periods = [r[0] for r in rows]
+    cur.execute("""SELECT v.version_id, max(i.edition_label) FROM dataset_version v
+                   JOIN import_batch i USING(import_id) GROUP BY v.version_id""")
+    edition_of = dict(cur.fetchall())
+    banks_per_version: dict[int, set] = defaultdict(set)
+    period_of: dict[int, date] = {}
+    for prow in load_panel(cur).rows:
+        banks_per_version[prow["dataset_version"]].add(prow["bank_id"])
+        period_of[prow["dataset_version"]] = prow["period"]
+    rows = [(period.strftime("%Y%m"), len(banks_per_version[version]),
+             "semi-annual" if period < date(2018, 9, 1) else "quarterly", edition_of[version])
+            for version, period in sorted(period_of.items(), key=lambda item: item[1])]
+    periods = [r[0] for r in rows]
     fig, ax = plt.subplots(figsize=(12, 5))
     colors = {"semi-annual": "#377eb8", "quarterly": "#984ea3"}
     ax.bar([_date(p) for p in periods], [r[1] for r in rows],

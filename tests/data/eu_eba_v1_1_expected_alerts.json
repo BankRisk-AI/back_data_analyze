@@ -282,7 +282,7 @@
    }
   },
   "level": "not_evaluated",
-  "reason": "all_families_not_evaluated",
+  "reason": "required_input_missing:cet1_ratio,tier1_ratio,total_capital_ratio",
   "score": null,
   "triggered": [],
   "version_id": 101

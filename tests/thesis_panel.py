@@ -20,7 +20,7 @@ def panel_rows() -> list[dict]:
     rows = []
     for bank, series in VALUES.items():
         for i, (period, values) in enumerate(zip(PERIODS, series)):
-            row = {"bank_id": bank, "version_id": 100 + i, "period": period, "flags": {},
+            row = {"bank_id": bank, "dataset_version": 100 + i, "period": period, "flags": {},
                    "stage2_share": None, "nace_hhi": None, "sovereign_hhi": None,
                    "loan_growth_qoq": None, "loan_growth_yoy": None}
             row.update(zip(NAMES, values))

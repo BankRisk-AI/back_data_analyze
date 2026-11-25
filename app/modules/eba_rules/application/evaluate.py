@@ -6,7 +6,8 @@ from typing import Any
 from app.modules.eba_rules.application.profiles import load_profile
 from app.modules.eba_rules.domain.alert_level import evaluate_rows as _evaluate_rows
 from app.modules.eba_rules.domain.profile_schema import validate_profile
-from app.modules.eba_rules.infrastructure.alert_repository import fetch_active_panel, replace_alerts
+from app.core.panel_reader import load_panel
+from app.modules.eba_rules.infrastructure.alert_repository import replace_alerts
 
 
 def evaluate_rows(profile: dict[str, Any], rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -20,7 +21,7 @@ def evaluate_panel(conn, profile_name: str | None = None, persist: bool = True) 
     profile, sha = load_profile(profile_name)
     with conn:
         with conn.cursor() as cur:
-            results = evaluate_rows(profile, fetch_active_panel(cur))
+            results = evaluate_rows(profile, load_panel(cur).rows)
             if persist:
                 replace_alerts(cur, profile_name or profile["profile"], sha, results)
     return results

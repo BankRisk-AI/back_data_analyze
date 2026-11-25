@@ -24,7 +24,7 @@ class _Cursor:
         if "SELECT bank_id,trim(lei)" in query:
             self.rows = [(1, "TESTBANK000000000001")]
         elif "FROM panel_row" in query:
-            self.rows = [(1, date(2021, 6, 30), {})]
+            self.rows = [(1, date(2021, 6, 30), 1, {}, *[None] * 14)]   # load_panel row
         elif "FROM alert" in query:
             self.rows = [(1, date(2021, 6, 30), "red",
                           {"level_reason": "synthetic", "family_scores": {}})]

@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 
 from app.core.config import get_schema
+from app.core.hooks import register_module_hooks
 from app.core.worker import JobHandlerRegistry, Worker
 from app.modules import MODULES
 from app.core.logging import configure_logging, get_logger
@@ -14,6 +15,7 @@ logger = get_logger(__name__)
 
 def build_registry() -> JobHandlerRegistry:
     registry = JobHandlerRegistry()
+    register_module_hooks(MODULES)
     for module in MODULES:
         if module.register_handlers:
             module.register_handlers(registry)

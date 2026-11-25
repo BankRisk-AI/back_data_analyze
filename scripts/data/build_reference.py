@@ -34,8 +34,11 @@ def build_panel_cmd(a: argparse.Namespace) -> int:
     from app.core.database import connect
     from app.core.dimensions import build_dimensions
     from app.core.panel import build_panel
+    from app.core.hooks import register_module_hooks
+    from app.modules import MODULES
     target, _ = select_target(a.target)
     init_all_modules()
+    register_module_hooks(MODULES)
     build_dimensions("eba_prepared", "config/dimensions")
     conn = connect(get_schema())
     try:

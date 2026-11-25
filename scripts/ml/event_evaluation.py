@@ -9,6 +9,7 @@ from typing import Any
 
 import yaml
 
+from app.core.panel_reader import load_panel
 from app.modules.eba_rules.public import load_profile
 
 
@@ -94,11 +95,8 @@ def evaluate_baselines(conn, profile_name: str, events_path: str | Path,
     with conn.cursor() as cur:
         cur.execute("SELECT bank_id,trim(lei) FROM bank")
         bank_leis = {lei: bank_id for bank_id, lei in cur.fetchall()}
-        cur.execute("""SELECT p.bank_id,v.period_end,p.cet1_ratio,p.npl_ratio,p.roe_annualised,
-                              p.leverage_ratio,p.flags
-                       FROM panel_row p JOIN dataset_version v USING(version_id)
-                       WHERE v.is_active ORDER BY v.period_end""")
-        panel = cur.fetchall()
+        panel = [(r["bank_id"], r["period"], r["cet1_ratio"], r["npl_ratio"], r["roe_annualised"],
+                  r["leverage_ratio"], r["flags"]) for r in load_panel(cur).rows]
         profile, sha = load_profile(profile_name)
         sha = profile_sha_override or sha
         cur.execute("""SELECT bank_id,v.period_end,level FROM alert
@@ -256,10 +254,7 @@ def evaluate_events(conn, profile_name: str, events_path: str | Path,
             ids = {bank_leis[lei] for lei in leis if lei in bank_leis}
             for lei in leis:
                 lei_to_ids.setdefault(lei, set()).update(ids)
-        cur.execute("""SELECT p.bank_id,v.period_end,p.flags
-                       FROM panel_row p JOIN dataset_version v USING(version_id)
-                       WHERE v.is_active ORDER BY v.period_end""")
-        panel = cur.fetchall()
+        panel = [(r["bank_id"], r["period"], r["flags"]) for r in load_panel(cur).rows]
         cur.execute("""SELECT a.bank_id,v.period_end,a.level,a.rule_results
                        FROM alert a JOIN dataset_version v USING(version_id)
                        WHERE a.profile_sha256=%s ORDER BY v.period_end""", (profile_sha,))

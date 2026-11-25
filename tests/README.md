@@ -47,3 +47,11 @@ helper modules have unique names so `tests/` and every subfolder collect as one 
 | Panel indicators | `unit/test_panel.py` |
 | Layering (domain free of frameworks, modules independent) | `unit/architecture/test_layering.py` |
 | OpenAPI file up to date and valid | `unit/test_openapi.py` |
+| Panel rebuild runs the registered hooks (fresh alerts, queued score_panel job); a failing hook does not stop the others | `integration/test_panel_build.py::test_a_panel_rebuild_runs_the_hooks_fresh_alerts_and_a_queued_score_job`, `::test_a_failing_hook_does_not_stop_the_others_and_is_reported` |
+| build_panel end to end (ratios, NPL, RoCET1, specialist flag) | `integration/test_panel_build.py::test_build_panel_end_to_end` |
+| One reader of panel_row; core/panel.py knows no module table | `unit/architecture/test_panel_single_reader.py` |
+| Values entering rules == values entering the ML dataset | `integration/test_panel_consistency.py` |
+| Alert recompute keeps alert_ids; vanished rows are deleted | `integration/test_rules.py::test_persisted_alerts_are_idempotent`, `integration/test_panel_build.py` (hook test) |
+| Modified frozen profile -> 409 problem+json | `integration/test_rules_api_errors.py` |
+| API default profile = active profile; labels by sha | `unit/test_alert_profiles.py` |
+

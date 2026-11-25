@@ -37,6 +37,7 @@ class Outcome:
     not_evaluated: bool
     threshold: Any
     input_flags: list[str]
+    tested_value: float | None = None   # trend rules: the change that was compared with the threshold
 
 
 def row_flags(row: dict[str, Any], feature: str) -> list[str]:
@@ -105,7 +106,8 @@ def _trend(rule: dict, row: dict, value, flags: list[str], index: PanelIndex) ->
         flags = sorted(set(flags + row_flags(prior, feature) + ["series_break"]))
     if not_evaluated:
         return Outcome(False, True, rule.get("threshold"), flags)
-    return Outcome(_condition(value - prior_value, rule), False, rule["threshold"], flags)
+    change = value - prior_value
+    return Outcome(_condition(change, rule), False, rule["threshold"], flags, change)
 
 
 def _persistence(rule: dict, row: dict, value, flags: list[str], index: PanelIndex) -> Outcome:

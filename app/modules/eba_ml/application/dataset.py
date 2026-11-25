@@ -4,7 +4,6 @@ No target labels — labels are computed externally (T-2 adds E2/E3).
 """
 from __future__ import annotations
 
-import hashlib
 import json
 from datetime import date
 from pathlib import Path
@@ -12,6 +11,7 @@ from typing import Any
 
 import numpy as np
 
+from app.core.panel_reader import load_panel, panel_hash
 from app.modules.eba_ml.domain.constants import FEATURES
 
 
@@ -30,21 +30,15 @@ def build_dataset(conn, grid: str = "semiannual", robustness: bool = False) -> d
     if grid not in {"semiannual", "quarterly"}:
         raise ValueError("grid must be semiannual or quarterly")
     with conn.cursor() as cur:
-        cur.execute("""SELECT p.bank_id,v.period_end,p.flags,
-                              p.cet1_ratio,p.tier1_ratio,p.total_capital_ratio,p.leverage_ratio,
-                              p.npl_ratio,p.stage2_share,p.roe_annualised,p.nace_hhi,
-                              p.sovereign_hhi,p.loan_growth_qoq,p.loan_growth_yoy
-                       FROM panel_row p JOIN dataset_version v USING(version_id)
-                       WHERE v.is_active ORDER BY v.period_end,p.bank_id""")
-        raw = cur.fetchall()
+        panel = load_panel(cur)
     rows = []
-    for values in raw:
-        bank_id, period, flags, *feature_values = values
-        if any("specialist_institution" in value for value in (flags or {}).values()):
-            continue
-        if grid == "semiannual" and period.month not in (6, 12):
-            continue
-        rows.append({"bank_id": bank_id, "period": period, **dict(zip(FEATURES, feature_values))})
+    for source in panel.rows:                                  # ML adjustments on top of load_panel:
+        if any("specialist_institution" in value for value in source["flags"].values()):
+            continue                                           # 1. specialist institutions are excluded
+        if grid == "semiannual" and source["period"].month not in (6, 12):
+            continue                                           # 2. semiannual grid keeps June/December
+        rows.append({"bank_id": source["bank_id"], "period": source["period"],
+                     **{feature: source[feature] for feature in FEATURES}})
     by_period: dict[date, list[dict[str, Any]]] = {}
     by_bank: dict[int, list[dict[str, Any]]] = {}
     for row in rows:
@@ -73,11 +67,8 @@ def build_dataset(conn, grid: str = "semiannual", robustness: bool = False) -> d
             if not (robustness and feature in structural):
                 values.append(0.0 if value is not None else 1.0)
         matrix.append(values)
-    panel_hash = hashlib.sha256(json.dumps(
-        [(r["bank_id"], r["period"].isoformat(), [r[f] for f in FEATURES]) for r in rows],
-        default=str, sort_keys=True).encode()).hexdigest()
     return {"rows": rows, "X": np.asarray(matrix, dtype=float), "columns": columns,
-            "panel_hash": panel_hash, "grid": grid, "robustness": robustness}
+            "panel_hash": panel_hash(rows, FEATURES), "grid": grid, "robustness": robustness}
 
 
 def save_dataset(dataset: dict[str, Any], out_dir: str | Path = "data/ml") -> Path:

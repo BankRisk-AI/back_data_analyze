@@ -2,7 +2,8 @@
 from __future__ import annotations
 
 from app.core.exceptions import BadRequestError, InvalidParameter, NotFoundError
-from app.modules.eba_rules.application.profiles import profile_info
+from app.modules.eba_rules.application.profiles import (
+    active_profile_name, load_profile, profile_labels)
 from app.modules.eba_rules.domain.constants import MAX_PAGE_SIZE
 from app.core.read_session import read_session
 from app.core.specialists import specialist_leis
@@ -14,38 +15,45 @@ def validate_page(page: int, page_size: int) -> None:
         raise InvalidParameter(f"page_size must be between 1 and {MAX_PAGE_SIZE}")
 
 
-def _profile_file(name: str) -> dict:
-    """Version and frozen flag of a registered profile ({} for names only found in the table)."""
-    return profile_info(name)
+def _label(name: str, sha: str, labels: dict) -> dict:
+    """Name, version and frozen flag stored for a sha (unknown sha: no version, frozen unknown)."""
+    return labels.get(sha) or {"name": name, "version": None, "frozen": None}
 
 
 def _available_profiles(cur) -> list[dict]:
     cur.execute("""SELECT profile_name, profile_sha256, max(created_at)
                    FROM alert GROUP BY profile_name, profile_sha256
                    ORDER BY profile_name, max(created_at) DESC""")
+    labels = profile_labels()
     return [{"profile_name": name, "sha": sha, "short_sha": sha[:12],
-             "version": _profile_file(name).get("version")}
+             "version": _label(name, sha, labels)["version"]}
             for name, sha, _ in cur.fetchall()]
 
 
 def _profile_error(profile: str | None, available: list[dict]) -> NotFoundError:
     choices = ", ".join(f"{p['profile_name']} v{p['version'] or '?'} ({p['short_sha']})" for p in available)
-    return NotFoundError(f"alert profile {profile or 'eu_eba'} does not exist; available profiles: {choices or 'none'}")
+    return NotFoundError(f"alert profile {profile or active_profile_name()} does not exist; available profiles: {choices or 'none'}")
+
+
+def _registered_sha(name: str) -> str | None:
+    """sha256 of the registered profile file called name (None when the name is not registered)."""
+    try:
+        return load_profile(name)[1]
+    except KeyError:
+        return None
 
 
 def _resolve_profile(cur, profile: str | None) -> tuple[str, str]:
+    """(name, sha) of the requested alert set; no request = the active profile of module.yaml."""
     available = _available_profiles(cur)
-    if not available:
-        raise _profile_error(profile, available)
     if profile is None:
-        candidates = [p for p in available if p["profile_name"] == "eu_eba"]
-        if not candidates:
-            raise _profile_error(profile, available)
-        return candidates[0]["profile_name"], candidates[0]["sha"]
-    named = [p for p in available if p["profile_name"] == profile]
-    if named:
-        return named[0]["profile_name"], named[0]["sha"]
-    if len(profile) == 64:
+        profile = active_profile_name()
+    registered = _registered_sha(profile)
+    if registered:
+        matches = [p for p in available if p["sha"] == registered]
+    elif any(p["profile_name"] == profile for p in available):
+        matches = [next(p for p in available if p["profile_name"] == profile)]
+    elif len(profile) == 64:
         matches = [p for p in available if p["sha"] == profile]
     elif len(profile) >= 8:
         matches = [p for p in available if p["sha"].startswith(profile)]
@@ -82,10 +90,11 @@ def alert_profiles(schema: str) -> list[dict]:
                        FROM alert GROUP BY profile_name, profile_sha256
                        ORDER BY profile_name, max(created_at) DESC""")
         rows = []
+        labels = profile_labels()
         for name, sha, created, rule_count in cur.fetchall():
-            config = _profile_file(name)
-            rows.append({"profile_name": name, "version": str(config.get("version")) if config.get("version") is not None else None,
-                         "sha": sha, "frozen": config.get("frozen"), "created_at": created.isoformat(),
+            label = _label(name, sha, labels)
+            rows.append({"profile_name": name, "version": label["version"],
+                         "sha": sha, "frozen": label["frozen"], "created_at": created.isoformat(),
                          "rule_count": rule_count or 0,
                          "families": ["capital", "asset_quality", "profitability", "dynamics"]})
         return rows
@@ -181,10 +190,9 @@ def alert_detail(alert_id: int, profile: str | None, schema: str) -> dict:
         else:
             payload_dict = payload
             rules = payload.get("rules", [])
-        config = _profile_file(row[7])
+        label = _label(row[7], row[8], profile_labels())
         return {"alert_id": row[0], "bank_id": row[1], "version_id": row[2], "period": row[3],
                 "level": row[4], "score": row[5], "reason": payload_dict.get("level_reason"),
                 "family_scores": payload_dict.get("family_scores"), "rules": rules,
-                "profile_name": row[7], "profile_version": str(config.get("version"))
-            if config.get("version") is not None else None,
+                "profile_name": row[7], "profile_version": label["version"],
                 "profile_sha256": row[8]}

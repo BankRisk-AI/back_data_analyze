@@ -13,6 +13,21 @@ public.py        load_profile, evaluate_panel, evaluate_rows, regulatory_levels,
                  r0_alert, r1_alert, compliant, choose_r1_margin
 ```
 
+## Data: starts from `load_panel`, then ...
+
+`app/core/panel_reader.py:load_panel` is the only reader of `panel_row` (standard row: `bank_id, period,
+frequency, dataset_version, 14 indicators, flags, is_specialist`). `application/evaluate.py:evaluate_panel` applies **only**:
+
+1. **Profile** — the active profile (`config/module.yaml`), loaded and sha256-verified when frozen.
+2. **Thresholds / bands / percentiles** per rule (`domain/rule_evaluation.py`); trend rules compare with the
+   prior period (index shift before 2018-09, calendar year after) and are not evaluated across the NPL break;
+   persistence compares with the previous half-year.
+3. **Family severity and alert level** (`domain/alert_level.py`): maximum per family, `REQUIRED_INPUTS` missing → `not_evaluated`.
+4. **Persistence** in the alert table: upsert on (profile sha, dataset version, bank), alert_ids are kept.
+
+Rules need no ML-style derived features; specialists are excluded through their flag.
+After a panel rebuild the hook `application/hooks.py:evaluate_active_profile` recomputes the active profile.
+
 ## Parameters
 
 | Parameter | File | Effect | Frozen? |
