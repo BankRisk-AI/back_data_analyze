@@ -4,6 +4,9 @@
 Stage R-1 complete (2026-11-25): structural refactor. `app/` = API, worker, services, domain; all terminal commands in `scripts/` (see `scripts/README.md`); thesis hypotheses in `scripts/hypotheses/` (`python -m scripts.hypotheses.main --run <dir> [--quick]`). `python -m app` only has `serve` and `worker`. Behaviour unchanged: golden (a) hypotheses on T3_primary identical; golden (b) retrain in `data/ml/R1_golden` is verified with `python -m scripts.ml.compare_runs data/ml/T3_primary data/ml/R1_golden` (log: R1 background run).
 Previous: T-4c (test suite cannot touch prod; DATABASE_URL locked to eba_test). 110 unit tests pass.
 
+## R-3 (rule engine module)
+`app/modules/eba_rules/` owns profiles, R0/R1, alert evaluation and the alert API; import only `eba_rules.public`. Config in its `config/` (module.yaml, profiles/, regulatory_levels.yaml); R0 levels and R1 margin grid no longer in `config/ml.yaml`. Frozen profile verified by sha256 at load. Boundary tests: `tests/unit/architecture/test_rules_module_boundary.py`.
+
 ## R-1 layout
 - `scripts/hypotheses/` main, h1a, h1b, h2, h3, h5, stats, report, context; settings in `config/ml.yaml: hypotheses`.
 - `scripts/ml/` train_thesis, sensitivity, compare_runs, r1_margin_grid, update_model_cards, smote_comparison (hook `fold_diagnostic` of `train()`), event_evaluation, evaluate_rules.

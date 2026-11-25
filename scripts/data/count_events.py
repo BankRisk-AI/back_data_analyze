@@ -19,16 +19,15 @@ from dotenv import load_dotenv
 
 from app.modules.eba_ml.domain.labels import (
     build_labels,
-    compliant,
     compute_tail_threshold,
     _add_months,
-    _any_breach,
     _forward_four_q_change,
 )
+from app.modules.eba_rules.public import compliant, regulatory_levels
 
 load_dotenv()
 
-R0 = {"cet1": 0.07, "tier1": 0.085, "total_capital": 0.105}
+R0 = regulatory_levels()
 TRAIN_START = date(2014, 1, 1)
 TRAIN_END   = date(2021, 12, 31)
 TEST_START  = date(2022, 1, 1)

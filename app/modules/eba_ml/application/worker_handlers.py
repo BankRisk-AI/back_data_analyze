@@ -82,7 +82,7 @@ def _evaluate(job: Job, progress: ProgressReporter):
 
 
 def _score(job: Job, progress: ProgressReporter):
-    from app.modules.eba_ml.domain.rules import r0_alert
+    from app.modules.eba_rules.public import r0_alert, regulatory_levels
     with connect(job.schema) as conn, conn.cursor() as cur:
         cur.execute("SELECT message FROM job WHERE job_id=%s", (job.job_id,))
         message = cur.fetchone()[0] or ""
@@ -103,7 +103,7 @@ def _score(job: Job, progress: ProgressReporter):
             raise ValueError("champion has no fitted model format")
         algorithm = card.get("algorithm", "")
         op_threshold = card.get("operating_point", 0.5)
-        r0_levels = card.get("r0_levels", {"cet1": 0.07, "tier1": 0.085, "total_capital": 0.105})
+        r0_levels = card.get("r0_levels") or regulatory_levels()
         import yaml as _yaml
         _cfg = _yaml.safe_load(open("config/ml.yaml").read())
         top_alert_share: float = float(_cfg.get("top_alert_share", 0.10))

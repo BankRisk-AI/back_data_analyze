@@ -238,7 +238,7 @@ def _f6(cur, out, labels, crisis, stable):
 def _f7(cur, out):
     plt = _matplotlib()
     from scripts.ml.event_evaluation import evaluate_baselines, evaluate_events
-    baselines = evaluate_baselines(cur.connection, "config/rules/eu_eba.yaml", "config/events.yaml")
+    baselines = evaluate_baselines(cur.connection, "eu_eba", "config/events.yaml")
     points = [(name, data) for name, data in baselines["baselines"].items()]
     points = [(name, data) for name, data in points
               if name != "B7 random baseline"]

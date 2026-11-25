@@ -11,6 +11,8 @@ from pathlib import Path
 import yaml
 from psycopg2.extras import Json
 
+from app.core.specialists import specialist_leis
+
 FLAG_NAMES = {
     "missing_in_source", "invalid_denominator", "not_applicable_before_ifrs9",
     "template_gap", "not_reported_this_period", "fiscal_year_assumed",
@@ -20,13 +22,6 @@ FLAG_NAMES = {
     "extreme_growth", "implausible_value", "specialist_institution",
     "series_break",
 }
-
-
-def _specialist_leis(root: Path) -> set[str]:
-    path = root / "specialist_institutions.yaml"
-    if not path.exists():
-        return set()
-    return {str(item["lei"]).strip() for item in yaml.safe_load(path.read_text(encoding="utf-8")) or []}
 
 
 def _approved_crosswalks(root: Path) -> dict[str, str]:
@@ -156,7 +151,7 @@ def build_panel(conn, dimensions_root: str | Path = "config/dimensions",
                 outlier_transform: str = "raw") -> int:
     """Rebuild ``panel_row`` from active versions in one transaction."""
     dimensions = Path(dimensions_root)
-    specialist_leis = _specialist_leis(Path(dictionary_root))
+    specialist_leis = specialist_leis(Path(dictionary_root))
     crosswalk_leis = _approved_crosswalks(Path(dictionary_root))
     provenance = {
         "active_version_ids": [],

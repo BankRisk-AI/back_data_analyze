@@ -13,6 +13,7 @@ from pathlib import Path
 import numpy as np
 
 from app.modules.eba_ml.infrastructure.artifacts import ArtifactStore
+from app.modules.eba_rules.public import regulatory_levels
 
 _SHAP_NOTE = (
     "Under label E2_or_E3 the capital ratios have a positive effect because "
@@ -137,7 +138,7 @@ def update_t3_shap_model_cards(
     from app.modules.eba_ml.domain.labels import build_labels
 
     dataset_obj = build_dataset(conn, result["grid"], robustness=True)
-    r0_levels = cfg.get("r0_levels", {"cet1": 0.07, "tier1": 0.085, "total_capital": 0.105})
+    r0_levels = regulatory_levels()
     horizon = cfg.get("horizon_months", 12)
     npl_break = date.fromisoformat(cfg.get("npl_series_break", "2020-06-30"))
     y_full, included, _ = build_labels(
@@ -305,7 +306,7 @@ def import_t3_primary_experiment(
         import yaml
         cfg = yaml.safe_load(Path("config/ml.yaml").read_text())
         dataset_obj = build_dataset(conn, grid, robustness=True)
-        r0_levels = cfg.get("r0_levels", {"cet1": 0.07, "tier1": 0.085, "total_capital": 0.105})
+        r0_levels = regulatory_levels()
         horizon_months = cfg.get("horizon_months", 12)
         npl_break = date.fromisoformat(cfg.get("npl_series_break", "2020-06-30"))
         y_full, included, _ = build_labels(

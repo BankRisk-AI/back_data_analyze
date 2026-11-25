@@ -25,7 +25,8 @@ from app.modules.eba_ml.application.training.search import run_fold_search
 from app.modules.eba_ml.application.training.trainers import oob_curve
 from app.modules.eba_ml.domain.labels import LABEL_OPTIONS, build_labels
 from app.modules.eba_ml.domain.operating_point import freeze_operating_point
-from app.modules.eba_ml.domain.rules import choose_r1_margin
+from app.modules.eba_rules.public import (
+    choose_r1_margin, r1_margin_grid_pp, regulatory_levels)
 
 
 def train(
@@ -73,12 +74,12 @@ def train(
         dataset = build_dataset(conn, grid, robustness)
         save_dataset(dataset, out_dir)
 
-    r0_levels = cfg.get("r0_levels", {"cet1": 0.07, "tier1": 0.085, "total_capital": 0.105})
+    r0_levels = regulatory_levels()
     if tail_quantile is None:
         tail_quantile = cfg.get("tail_quantile", 0.95)
     horizon_months = cfg.get("horizon_months", 12)
     npl_break = date.fromisoformat(cfg.get("npl_series_break", "2020-06-30"))
-    margins_pp = cfg.get("r1_margin_grid_pp", [float(x) / 2 for x in range(21)])
+    margins_pp = r1_margin_grid_pp()
 
     y_full, included, label_meta = build_labels(
         dataset["rows"], label, tail_quantile, horizon_months, r0_levels, npl_break)

@@ -1,0 +1,16 @@
+# eba_rules module configuration: which alert profile is active and which profiles exist.
+# A profile marked frozen is verified by its sha256 every time it is loaded; editing it fails loudly.
+
+# Profile evaluated by the worker job `evaluate_rules` (override per run with env EBA_RULE_PROFILE).
+active_profile: eu_eba
+
+profiles:
+  - name: eu_eba                           # profile name stored in alert.profile_name
+    version: "1.1"                         # must equal `version` inside the file
+    file: profiles/eu_eba_v1.1.yaml        # path relative to this config directory
+    frozen: true                           # frozen: content may never change; new rules = new version file
+    sha256: 28a28fa0f89da8435abdb0d6042a69cb2bff421c456926374dd202e0089f7e40   # sha256 of the file bytes
+  - name: bnm                              # skeleton: thresholds still to be supplied by the owner
+    version: "1"
+    file: profiles/bnm.yaml
+    frozen: false                          # adjustable: sha256 is not enforced

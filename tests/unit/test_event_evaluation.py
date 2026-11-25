@@ -56,7 +56,7 @@ def test_synthetic_event_hit_lead_time_and_eligibility(tmp_path):
         "set": "primary",
         "status": "included",
     }]}))
-    result = evaluate_events(_Connection(), "config/rules/eu_eba.yaml", events)
+    result = evaluate_events(_Connection(), "eu_eba", events)
     assert result["evaluable_events"] == 1
     assert result["metrics"]["red"]["hit_rate_percent"] == 100
     assert result["metrics"]["red"]["lead_time_months"]["median"] == 7

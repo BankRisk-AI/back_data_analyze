@@ -1,20 +1,22 @@
+"""Alert API services: profiles, summary, list, bank timeline and detail (read-only)."""
 from __future__ import annotations
 
-from pathlib import Path
-
-import yaml
-
 from app.core.exceptions import BadRequestError, InvalidParameter, NotFoundError
-from app.modules.eba_public_analysis.infrastructure.db import (
-    read_session,
-    specialist_leis,
-    validate_page,
-)
+from app.modules.eba_rules.application.profiles import profile_info
+from app.modules.eba_rules.domain.constants import MAX_PAGE_SIZE
+from app.core.read_session import read_session
+from app.core.specialists import specialist_leis
+
+
+def validate_page(page: int, page_size: int) -> None:
+    """Page numbers start at 1; page_size is limited."""
+    if page < 1 or not 1 <= page_size <= MAX_PAGE_SIZE:
+        raise InvalidParameter(f"page_size must be between 1 and {MAX_PAGE_SIZE}")
 
 
 def _profile_file(name: str) -> dict:
-    path = Path("config/rules") / f"{name}.yaml"
-    return yaml.safe_load(path.read_text(encoding="utf-8")) if path.exists() else {}
+    """Version and frozen flag of a registered profile ({} for names only found in the table)."""
+    return profile_info(name)
 
 
 def _available_profiles(cur) -> list[dict]:

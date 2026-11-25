@@ -72,6 +72,13 @@
   budget=2, LOEO=1). Re-ran both full hypotheses. Next = Stage 5b-R3
   (sensitivities: original run, T5_noT1, quarterly; OOB curve with
   Brier/log-loss).
+- Stage R-3 (2026-11-25): rule engine is the independent module `app/modules/eba_rules` (domain ->
+  application -> infrastructure -> presentation, `public.py` as the only interface, all config in
+  `config/`: module.yaml, profiles/eu_eba_v1.1.yaml (sha 28a28fa0... unchanged), bnm.yaml,
+  regulatory_levels.yaml). `app/core/rules.py`, `eba_ml/domain/rules.py`, `config/rules/` and
+  `r0_levels`/`r1_margin_grid_pp` of `config/ml.yaml` removed; alert routes moved out of
+  `eba_public_analysis` with unchanged paths/responses. Golden: 4367 prod alerts recomputed identical,
+  hypotheses identical, openapi unchanged.
 - Stage R-1 (2026-11-25): structural refactor, behaviour unchanged. Application code stays in
   `app/`; every terminal command moved to `scripts/` (`data/`, `ml/`, `figures/`, `hypotheses/`,
   see `scripts/README.md`). `python -m app` now only has `serve` and `worker`. Hypotheses H1a-H5,

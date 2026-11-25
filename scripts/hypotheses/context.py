@@ -15,6 +15,7 @@ import numpy as np
 
 from app.modules.eba_ml.application.config import load_ml_config
 from app.modules.eba_ml.application.dataset import build_dataset
+from app.modules.eba_rules.public import regulatory_levels
 
 
 @dataclass
@@ -47,7 +48,7 @@ def load_settings(quick: bool = False) -> Settings:
         fixed_alert_shares_pct=tuple(h["fixed_alert_shares_pct"]),
         min_wilcoxon_n=h["min_wilcoxon_n"],
         h4_status=h["h4_status"],
-        r0_levels=cfg["r0_levels"],
+        r0_levels=regulatory_levels(),
         comparator_profile_sha=cfg.get("comparator_profile_sha", ""),
     )
 

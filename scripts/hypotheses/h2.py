@@ -11,7 +11,7 @@ from typing import Any
 
 import numpy as np
 
-from app.modules.eba_ml.domain.rules import r0_alert
+from app.modules.eba_rules.public import r0_alert
 from scripts.hypotheses.context import RunContext
 from scripts.hypotheses.stats import wilcoxon_one_sided
 

@@ -1,7 +1,7 @@
 # Stage 4: configurable rule engine
 
 Stage 4a design decisions and the fixed family calibration are implemented by
-the panel-independent evaluator in `app/core/rules.py`. The evaluator loads version-controlled YAML,
+the panel-independent evaluator of the independent module `app/modules/eba_rules` (since Stage R-3; see its README; profiles in `app/modules/eba_rules/config/profiles/`, frozen profiles verified by sha256). The evaluator loads version-controlled YAML,
 validates it, evaluates the panel, and writes one atomic alert result per
 bank-period. The same service runs EBA and BNM profiles.
 
@@ -51,7 +51,7 @@ rules and the composite by default. No panel or fact rows are written.
 
 ## Profiles
 
-`config/rules/eu_eba.yaml` contains 18 rules: 11 level, 2 trend, 2
+`app/modules/eba_rules/config/profiles/eu_eba_v1.1.yaml` contains 18 rules: 11 level, 2 trend, 2
 persistence, 2 relative, and 1 composite. Verified regulatory minima are CET1
 4.5%, Tier 1 6%, total capital 8%, leverage 3%, plus the urgent CET1 7%
 buffer rule. Verified EBA Risk Dashboard Q3 2025 bands are included for Tier
@@ -63,7 +63,7 @@ for profile compatibility and marked unused; family logic replaces summation.
 RoCET1 thresholds use multiplication, as decided: accounting ROE thresholds
 of 6% and 10% become **7.20% and 12.00%** using the production
 equity/CET1 factor **1.2001447434**, IQR **1.1151567110--1.3135999112**, and
-N=2,382 observations from 2020A--2025S. `config/rules/bnm.yaml` mirrors the
+N=2,382 observations from 2020A--2025S. `app/modules/eba_rules/config/profiles/bnm.yaml` mirrors the
 same rule structure with empty thresholds/bands/weights and `to_verify`
 status.
 

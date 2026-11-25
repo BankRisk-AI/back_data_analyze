@@ -33,7 +33,8 @@ def test_a_module_imports_no_other_module(module):
     for p in files(APP / "modules" / module):
         for name in imports_of(p):
             if name.startswith("app.modules."):
-                assert name.split(".")[2] == module, f"{p.relative_to(APP)} imports {name}"
+                other_module_public = name.split(".")[2] != module and name.split(".")[3:4] == ["public"]
+                assert name.split(".")[2] == module or other_module_public, f"{p.relative_to(APP)} imports {name}"
             assert name != "app.modules", f"{p.relative_to(APP)} imports the module registry"
 
 

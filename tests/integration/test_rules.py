@@ -5,7 +5,8 @@ import pytest
 import yaml
 from psycopg2.extras import Json
 
-from app.core.rules import evaluate_profile, evaluate_rows, load_profile, validate_profile
+from app.modules.eba_rules.domain.profile_schema import validate_profile
+from app.modules.eba_rules.public import evaluate_panel, evaluate_rows, load_profile
 
 
 def profile(*rules):
@@ -123,14 +124,14 @@ def test_profile_validation_rejects_duplicate_ids_and_missing_verified_threshold
 
 
 def test_eu_rocet1_thresholds_use_multiplication_factor():
-    config = yaml.safe_load(Path("config/rules/eu_eba.yaml").read_text())
+    config = load_profile("eu_eba")[0]
     rule = next(r for r in config["rules"] if r["id"] == "rocet1_supervisory_low")
     assert rule["bands"]["amber"]["min"] == pytest.approx(0.06 * 1.2001447434)
     assert rule["bands"]["green"]["above"] == pytest.approx(0.10 * 1.2001447434)
 
 
 def test_frozen_eu_profile_requires_version_bump_for_changes():
-    profile, profile_sha = load_profile("config/rules/eu_eba.yaml")
+    profile, profile_sha = load_profile("eu_eba")
     assert profile["version"] == "1.1"
     assert profile["frozen"] is True
     assert profile_sha == "28a28fa0f89da8435abdb0d6042a69cb2bff421c456926374dd202e0089f7e40"
@@ -155,10 +156,8 @@ def test_persisted_alerts_are_idempotent(db, tmp_path):
            VALUES (%s,%s,%s,%s)""",
         (version_id, bank_id, 0.03, Json({})),
     )
-    path = tmp_path / "profile.yaml"
-    path.write_text(yaml.safe_dump(profile(rule("level", "level", "cet1_ratio"))))
-    evaluate_profile(db.conn, path)
-    evaluate_profile(db.conn, path)
+    evaluate_panel(db.conn, "eu_eba")
+    evaluate_panel(db.conn, "eu_eba")
     db.cur.execute("SELECT count(*), count(distinct profile_sha256) FROM alert")
     assert db.cur.fetchone() == (1, 1)
 

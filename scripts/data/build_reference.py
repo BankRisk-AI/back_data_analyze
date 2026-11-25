@@ -49,15 +49,16 @@ def build_panel_cmd(a: argparse.Namespace) -> int:
 def evaluate_rules_cmd(a: argparse.Namespace) -> int:
     from app.core.config import get_schema
     from app.core.database import connect
-    from app.core.rules import evaluate_profile
+    from app.modules.eba_rules.public import evaluate_panel, load_profile
     target, _ = select_target(a.target)
     init_all_modules()
-    profile_path = Path("config/rules") / f"{a.profile}.yaml"
-    if not profile_path.is_file():
-        raise SystemExit(f"profile does not exist: {profile_path}")
+    try:
+        load_profile(a.profile)
+    except KeyError as exc:
+        raise SystemExit(str(exc)) from exc
     conn = connect(get_schema())
     try:
-        count = evaluate_profile(conn, profile_path, a.profile)
+        count = len(evaluate_panel(conn, a.profile))
     finally:
         conn.close()
     print(target_summary(target, f"rules-evaluated profile={a.profile} rows={count}"))

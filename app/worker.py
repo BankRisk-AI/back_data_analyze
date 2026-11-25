@@ -14,8 +14,6 @@ logger = get_logger(__name__)
 
 def build_registry() -> JobHandlerRegistry:
     registry = JobHandlerRegistry()
-    from app.core.rules import register_handler as register_rules_handler
-    register_rules_handler(registry, get_schema())
     for module in MODULES:
         if module.register_handlers:
             module.register_handlers(registry)

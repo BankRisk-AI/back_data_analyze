@@ -43,14 +43,7 @@ horizon_months: 12
 # NPL series break date — E3 changes spanning this date are not evaluable
 npl_series_break: "2020-06-30"
 
-# R1 margin grid in percentage points (0.0 to 10.0, step 0.5)
-r1_margin_grid_pp: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0, 10.5, 11.0, 11.5, 12.0, 12.5, 13.0, 13.5, 14.0, 14.5, 15.0, 15.5, 16.0, 16.5, 17.0, 17.5, 18.0, 18.5, 19.0, 19.5, 20.0]
-
-# R0 alert levels (fraction, not percentage points)
-r0_levels:
-  cet1: 0.07
-  tier1: 0.085
-  total_capital: 0.105
+# R0 alert levels and the R1 margin grid: app/modules/eba_rules/config/regulatory_levels.yaml
 
 # Operating point: "f2_on_validation_oof" = threshold maximising F2 on pooled OOF (2017-2021)
 operating_point: "f2_on_validation_oof"

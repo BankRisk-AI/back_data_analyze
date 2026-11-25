@@ -7,8 +7,6 @@ Writes docs/design/rule_evaluation.md.
 from __future__ import annotations
 
 import argparse
-from pathlib import Path
-
 from scripts.common import select_target, target_summary
 from scripts.ml.event_evaluation import evaluate_events, write_report
 
@@ -22,10 +20,9 @@ def main(argv: list[str] | None = None) -> int:
     target, _ = select_target(a.target)
     from app.core.config import get_schema
     from app.core.database import connect
-    profile_path = Path("config/rules") / f"{a.profile}.yaml"
     conn = connect(get_schema())
     try:
-        results = [evaluate_events(conn, profile_path, a.events, scope)
+        results = [evaluate_events(conn, a.profile, a.events, scope)
                    for scope in ("primary", "all")]
     finally:
         conn.close()

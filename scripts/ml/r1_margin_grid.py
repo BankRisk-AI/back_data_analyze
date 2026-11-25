@@ -3,7 +3,7 @@
     python -m scripts.ml.r1_margin_grid --run data/ml/T3_primary
 
 Evaluates rule R1 on the final-test rows of a run for every margin in `r1_margin_grid_pp`
-(config/ml.yaml). Diagnostic only: the margin used by the run is chosen on training rows.
+(eba_rules regulatory_levels.yaml). Diagnostic only: the margin used by the run is chosen on training rows.
 """
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ from app.core.config import get_schema
 from app.core.database import connect
 from app.modules.eba_ml.application.config import load_ml_config
 from app.modules.eba_ml.application.dataset import build_dataset
-from app.modules.eba_ml.domain.rules import r1_alert
+from app.modules.eba_rules.public import r1_alert, r1_margin_grid_pp
 
 
 def grid_rows(rows: list[dict], y: np.ndarray, r0_levels: dict, margins_pp: list[float]) -> list[dict]:
@@ -62,7 +62,7 @@ def main(argv: list[str] | None = None) -> None:
     years = (cfg["final_test"]["test_start"], cfg["final_test"]["test_end"])
     rows, y, r0_levels = test_rows(Path(a.run), years)
     print(f"rows={len(y)} positives={int(y.sum())}")
-    for e in grid_rows(rows, y, r0_levels, cfg["r1_margin_grid_pp"]):
+    for e in grid_rows(rows, y, r0_levels, r1_margin_grid_pp()):
         print(json.dumps(e))
 
 

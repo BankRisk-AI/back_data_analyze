@@ -42,8 +42,6 @@ def create_app(modules: list[ModuleSpec] | None = None, schema: str | None = Non
     app.router.add_event_handler("startup", log_database)
     app.openapi_tags = [{"name": "system", "description": "Health, enumerations and the state of any job."}] + [t for m in modules for t in m.tags]
     registry = JobHandlerRegistry()
-    from app.core.rules import register_handler as register_rules_handler
-    register_rules_handler(registry, schema)
     for module in modules:
         if module.register_handlers:
             module.register_handlers(registry)

@@ -4,7 +4,9 @@ from psycopg2 import sql
 
 from app.core.exceptions import InvalidParameter, NotFoundError
 from app.modules.eba_public_analysis.domain.constants import FEATURES, FLAG_DESCRIPTIONS
-from app.modules.eba_public_analysis.infrastructure.db import read_session, specialist_leis, validate_page
+from app.core.read_session import read_session
+from app.core.specialists import specialist_leis
+from app.modules.eba_public_analysis.infrastructure.db import validate_page
 
 
 def report_types(schema: str) -> list[dict]:

@@ -9,7 +9,7 @@ from typing import Any
 
 import yaml
 
-from app.core.rules import load_profile
+from app.modules.eba_rules.public import load_profile
 
 
 def _months_before(value: date, months: int) -> date:
@@ -84,7 +84,7 @@ def _observation_metrics(alerts: dict[tuple[int, date], str],
     return result
 
 
-def evaluate_baselines(conn, profile_path: str | Path, events_path: str | Path,
+def evaluate_baselines(conn, profile_name: str, events_path: str | Path,
                        set_name: str = "primary",
                        profile_sha_override: str | None = None) -> dict[str, Any]:
     """Evaluate fixed dashboard baselines using the same event windows."""
@@ -99,7 +99,7 @@ def evaluate_baselines(conn, profile_path: str | Path, events_path: str | Path,
                        FROM panel_row p JOIN dataset_version v USING(version_id)
                        WHERE v.is_active ORDER BY v.period_end""")
         panel = cur.fetchall()
-        profile, sha = load_profile(profile_path)
+        profile, sha = load_profile(profile_name)
         sha = profile_sha_override or sha
         cur.execute("""SELECT bank_id,v.period_end,level FROM alert
                        JOIN dataset_version v USING(version_id)
@@ -230,9 +230,9 @@ def evaluate_baselines(conn, profile_path: str | Path, events_path: str | Path,
     return {"set": set_name, "baselines": results, "random": random_metric}
 
 
-def evaluate_events(conn, profile_path: str | Path, events_path: str | Path,
+def evaluate_events(conn, profile_name: str, events_path: str | Path,
                     set_name: str = "primary", profile_sha_override: str | None = None) -> dict[str, Any]:
-    profile, profile_sha = load_profile(profile_path)
+    profile, profile_sha = load_profile(profile_name)
     profile_sha = profile_sha_override or profile_sha
     catalogue = yaml.safe_load(Path(events_path).read_text(encoding="utf-8")) or {}
     events = [
