@@ -43,6 +43,10 @@ horizon_months: 12
 # NPL series break date — E3 changes spanning this date are not evaluable
 npl_series_break: "2020-06-30"
 
+# Loans series break date — FINREP 2020 template changed the loans definition (AUD-4: median yoy
+# across the break about -9% vs +1.5..+5% nearby); loan_growth_yoy across it is NULL + series_break
+loan_series_break: "2020-06-30"
+
 # R0 alert levels and the R1 margin grid: app/modules/eba_rules/config/regulatory_levels.yaml
 
 # Operating point: "f2_on_validation_oof" = threshold maximising F2 on pooled OOF (2017-2021)

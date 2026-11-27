@@ -263,6 +263,6 @@ version and must rebuild all affected rows plus every dependent growth row.
 
 `missing_in_source`, `invalid_denominator`, `not_applicable_before_ifrs9`,
 `template_gap`, `not_reported_this_period`, `fiscal_year_assumed`,
-`denominator_missing`, `fiscal_year_mismatch`, `no_prior_period`,
+`denominator_missing`, `numerator_missing`, `fiscal_year_mismatch`, `no_prior_period`,
 `bank_entry_exit`, `lei_change`, `identity_crosswalk`, `missing_sector`,
 `outlier`, `extreme_growth`, `implausible_value`, `specialist_institution`.

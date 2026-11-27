@@ -58,6 +58,7 @@ def test_build_panel_end_to_end(db, tmp_path):
     _facts(db.cur, seeded)
     dimensions, config = tmp_path / "dimensions", tmp_path / "config"
     dimensions.mkdir(); config.mkdir()
+    (config / "ml.yaml").write_text("loan_series_break: \"2020-06-30\"\n")
     (dimensions / "T1.yaml").write_text(yaml.safe_dump({"status": "decoded", "dimensions": {"Perf_status": {
         "0": {"label": "No breakdown by Perf_status"}, "2": {"label": "Non Performing"}}}}))
     (config / "specialist_institutions.yaml").write_text(yaml.safe_dump([{"lei": LEIS["special"], "name": "s"}]))
@@ -88,6 +89,7 @@ def _setup_hook_environment(db, tmp_path, monkeypatch):
     _facts(db.cur, seeded)
     dimensions, config = tmp_path / "dimensions", tmp_path / "config"
     dimensions.mkdir(); config.mkdir()
+    (config / "ml.yaml").write_text("loan_series_break: \"2020-06-30\"\n")
     (dimensions / "T1.yaml").write_text(yaml.safe_dump({"status": "decoded", "dimensions": {"Perf_status": {
         "0": {"label": "No breakdown by Perf_status"}, "2": {"label": "Non Performing"}}}}))
     db.cur.execute("""INSERT INTO ml_dataset(target,grid,feature_set,panel_hash,content_hash,manifest,row_count,status)

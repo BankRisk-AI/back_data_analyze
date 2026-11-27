@@ -23,7 +23,7 @@ FLAG_NAMES = {
     "bank_entry_exit", "lei_change", "identity_crosswalk", "missing_sector",
     "outlier", "group_crosswalk",
     "extreme_growth", "implausible_value", "specialist_institution",
-    "series_break",
+    "series_break", "numerator_missing",
 }
 
 
@@ -89,6 +89,14 @@ def hhi(values: list[float]) -> float | None:
     if total <= 0:
         return None
     return sum((value / total) ** 2 for value in positive)
+
+
+def loan_series_break(root: Path) -> date:
+    """Loans series break date from `<root>/ml.yaml` (key `loan_series_break`, required)."""
+    cfg = yaml.safe_load((root / "ml.yaml").read_text(encoding="utf-8")) or {}
+    if "loan_series_break" not in cfg:
+        raise KeyError(f"loan_series_break missing in {root / 'ml.yaml'}")
+    return date.fromisoformat(str(cfg["loan_series_break"]))
 
 
 def _config_hash(root: Path) -> str:
@@ -157,6 +165,7 @@ class PanelContext:
     year: dict[int, int]
     edition: dict[int, str]
     bank_leis: dict[int, str]
+    loan_break: date
 
 
 @dataclass
@@ -188,14 +197,15 @@ def _active_versions(cur) -> list[tuple]:
     return cur.fetchall()
 
 
-def _context(cur, versions: list[tuple]) -> PanelContext:
+def _context(cur, versions: list[tuple], loan_break: date) -> PanelContext:
     cur.execute("SELECT bank_id, lei FROM bank")
     return PanelContext(
         version_ids=[row[0] for row in versions],
         period={row[0]: row[1] for row in versions},
         year={row[0]: row[2] for row in versions},
         edition={row[0]: row[4] for row in versions},
-        bank_leis={bank_id: lei.strip() for bank_id, lei in cur.fetchall()})
+        bank_leis={bank_id: lei.strip() for bank_id, lei in cur.fetchall()},
+        loan_break=loan_break)
 
 
 def _base_rows(cur, ctx: PanelContext, crosswalk_leis: dict, specialists: set) -> list[dict]:
@@ -321,7 +331,9 @@ def _roe(row: dict, key: tuple, month: int, facts: FactIndex) -> None:
     row["roe_annualised"] = annual / cet1_amount if annual is not None and cet1_amount else None
     if assumed:
         _add_flag(row["_flags"], "roe_annualised", "fiscal_year_assumed")
-    if row["roe_annualised"] is None:
+    if annual is None:
+        _add_flag(row["_flags"], "roe_annualised", "numerator_missing")
+    if not cet1_amount:
         _add_flag(row["_flags"], "roe_annualised", "denominator_missing")
 
 
@@ -378,7 +390,7 @@ def _growth_features(rows: list[dict], ctx: PanelContext) -> None:
             period, ctx.period[prior["version_id"]], prior["frequency"])) else None
         annual_prior = by_period.get((bank, _subtract_months(period, 12)))
         _quarterly_changes(row, immediate, period, break_period, ctx)
-        _yearly_growth(row, annual_prior, period, break_period, ctx)
+        _yearly_growth(row, annual_prior, period, ctx)
         previous[bank] = row
 
 
@@ -400,7 +412,9 @@ def _quarterly_changes(row: dict, immediate, period: date, break_period: date, c
         row["loan_growth_qoq"] = row["npl_delta_qoq"] = row["cet1_delta_qoq"] = None
 
 
-def _yearly_growth(row: dict, annual_prior, period: date, break_period: date, ctx: PanelContext) -> None:
+def _yearly_growth(row: dict, annual_prior, period: date, ctx: PanelContext) -> None:
+    """Loan growth over 12 months; NULL + series_break across `ctx.loan_break`."""
+    break_period = ctx.loan_break
     if annual_prior and crosses_series_break(period, ctx.period[annual_prior["version_id"]], break_period):
         row["loan_growth_yoy"] = None
         _add_flag(row["_flags"], "loan_growth_yoy", "series_break")
@@ -448,7 +462,7 @@ def compute_panel(cur, dimensions_root: str | Path = "config/dimensions",
     if not versions:
         return None
     root = Path(dictionary_root)
-    ctx = _context(cur, versions)
+    ctx = _context(cur, versions, loan_series_break(root))
     rows = _base_rows(cur, ctx, _approved_crosswalks(root), specialist_leis(root))
     facts, _ = _load_facts(cur, ctx.version_ids)
     _own_features(rows, ctx, facts, Path(dimensions_root))

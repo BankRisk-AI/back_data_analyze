@@ -1,0 +1,46 @@
+Prioritate mare: pot schimba concluziile
+
+1. Băncile care dispar nu au etichetă (cenzurare informativă)
+Eticheta are nevoie de valoarea de peste 12 luni. O bancă care e rezolvată, absorbită sau iese din eșantion nu are această valoare, deci rândul primește „etichetă necunoscută” și e exclus. Cazurile cele mai grave (Banco Popular, Veneto, Vicenza) pot lipsi exact din cauza asta. Cele 61 de bănci care apar doar în train sugerează că fenomenul e mare.
+Analiza: câte rânduri pierd eticheta pentru că banca iese din eșantion și cum arată indicatorii lor înainte de ieșire, comparat cu restul.
+Decizia: dacă băncile care ies arată ca cele cu evenimente, ieșirea trebuie tratată ca eveniment sau cel puțin raportată ca limită majoră.
+
+2. Întârzierea publicării (ce se știa în momentul deciziei)
+EBA publică datele la ~5–6 luni după perioadă: datele din iunie apar în noiembrie–decembrie. Modelul presupune că la data t știe deja valorile din t. În realitate, din fereastra de 12 luni a evenimentului rămân doar ~6–7 luni utile. Pentru un sistem de avertizare timpurie, e prima întrebare a unui supraveghetor.
+Analiza: data de publicare a fiecărei ediții; refacerea etichetei cu fereastra pornind de la data publicării.
+Decizia: orizontul real al avertizării; poate eticheta trebuie să fie pe 18 luni.
+
+3. Validarea etichetei pe cazuri reale cunoscute
+Prinde eticheta crizele bancare documentate? Exemple: Monte dei Paschi 2016–2017, Banco Popular 2017, Veneto/Vicenza 2017, Carige 2019, NordLB 2019, băncile grecești 2015, Sberbank Europe 2022. E o validare externă, independentă de model.
+Analiza: o listă de ~10–15 cazuri cunoscute și verificarea: le marchează E1, E2 sau E3? Câte apar și câte lipsesc, și din ce motiv (de exemplu ieșirea, punctul 1)?
+Decizia: alegerea definiției E2. E argumentul cel mai convingător pentru comisie.
+
+4. Recurența: e evenimentul trecut cel mai bun predictor?
+Banca 193 are 5 episoade, iar alte câteva bănci câte 3–4. Dacă „a avut un eveniment în ultimii 2 ani” prezice mai bine decât orice model, asta trebuie să fie linia de bază cu care compari ML-ul. Altfel, comisia te poate întreba de ce nu ai folosit regula simplă.
+Analiza: probabilitatea unui eveniment după un eveniment anterior față de rata de bază, plus AUC-ul acestei reguli.
+Decizia: un comparator în plus la H1, simplu și greu de contestat.
+
+Prioritate medie: întăresc argumentația
+
+5. Fuziunile și schimbările de perimetru la nivel de bancă
+Creșterea creditelor de +507% (banca 1135) sau un CET1 de 67% (banca 217) sunt aproape sigur fuziuni, achiziții sau bănci-vehicul. Ele produc „evenimente” false.
+Analiza: detectarea salturilor bruște simultane în mai mulți indicatori, apoi marcarea și excluderea acelor ferestre.
+
+6. Curba de învățare: ar ajuta mai multe date?
+Antrenezi pe 25%, 50%, 75% și 100% din bănci și urmărești performanța. Dacă stagnează, problema e semnalul, nu cantitatea de date. Dacă încă urcă, problema e numărul de evenimente.
+Decizia: o frază foarte puternică pentru concluzii: „limita nu este modelul, ci X”.
+
+7. Efectul de țară
+Băncile din aceeași țară au același ciclu economic, aceleași reguli naționale și același supraveghetor. NPL în Grecia, Cipru și Italia e un fenomen de țară, nu de bancă.
+Analiza: descompunerea variației cu țara ca a patra componentă; rz calculat în interiorul țării, nu pe toată Europa.
+Decizia: dacă țara explică mult, intervalele de încredere trebuie calculate prin bootstrap pe țări, nu doar pe bănci.
+
+8. Densitatea activelor ponderate la risc
+CET1 / leverage ≈ expunere totală / active ponderate la risc. O bancă cu CET1 mare, dar leverage mic, are active ponderate „subțiri”, adică modele interne optimiste. E o variabilă cunoscută în literatura de supraveghere și se calculează din ce ai deja.
+Analiza: încă o fișă, pentru această variabilă.
+
+Prioritate mică: verificări de calitate
+
+9. Valori neplauzibile: NPL exact 0 (banca 29), Stage 2 exact 0 (banca 125), indicele HHI = 1,0 (banca 106). E o eroare de raportare sau un model de afaceri special? O regulă de plauzibilitate și o listă revizuită manual (Tabelul 3.7).
+
+10. Sensibilitatea etichetei la orizont și prag: 6, 12 sau 24 de luni; percentila 0,95 față de 0,975. Cât de mult se schimbă care bănci sunt marcate, nu doar câte?
