@@ -4,6 +4,9 @@
 Stage R-1 complete (2026-11-25): structural refactor. `app/` = API, worker, services, domain; all terminal commands in `scripts/` (see `scripts/README.md`); thesis hypotheses in `scripts/hypotheses/` (`python -m scripts.hypotheses.main --run <dir> [--quick]`). `python -m app` only has `serve` and `worker`. Behaviour unchanged: golden (a) hypotheses on T3_primary identical; golden (b) retrain in `data/ml/R1_golden` is verified with `python -m scripts.ml.compare_runs data/ml/T3_primary data/ml/R1_golden` (log: R1 background run).
 Previous: T-4c (test suite cannot touch prod; DATABASE_URL locked to eba_test). 110 unit tests pass.
 
+## AUD-4
+Missing-value audit (read-only): leverage 2015-12/2016-06 absent from the 2016 edition files; yoy 2020-06…2021-03 NULL by the series-break guard in `core/panel.py:403` (median −9 % across the break); 2016-12 and 2025-03 gaps are source gaps. See `docs/audit/AUD-4_missing_gaps.md`. AUD-4b done: `loan_series_break` key in `config/ml.yaml` (read by `core/panel.py:loan_series_break`, required; panel build roots need `ml.yaml`); ROE sets `numerator_missing` / `denominator_missing`. Values identical (eba_test check). Prod panel not rebuilt (flags change on next rebuild).
+
 ## AUD-2
 Hooks (`core/hooks.py`) run after `build_panel`: eba_rules re-evaluates, eba_ml queues score jobs. One panel reader `core/panel_reader.py:load_panel` (ML, rules, public analysis). Alerts upserted (ids kept). Open defect (preserved): `load_executor._load` applies the exclusions of the last data file to all files, so owner decisions of earlier files (BNG, 2020S tr_cre) are logged but not applied. See `docs/audit/data_flow.md`, `AUD-1b_call_flow.md`.
 
