@@ -1,14 +1,22 @@
 """Events in the panel and what the indicators look like before them (exploratory, read-only).
 
-Approximation of the ML labels:
-  E2 = CET1 12-month change in the lowest 5% (cut-off from training periods <= 2020-12)
-  E3 = NPL 12-month change in the highest 5% (windows crossing the 2020-06 NPL break not labelled)
-  event = E2 or E3
-  E1 = a capital ratio below the thesis thresholds in the period itself
+Labels: one row = bank at period t; event window = t .. t + horizon.
+  E2  large CET1 fall over the window; cut-off = 5% tail of training changes (<= 2020-12)
+        kind "abs"  : change in percentage points (the original ML label)
+        kind "rel"  : change in percent of the starting level
+        kind "weak" : abs fall that also ends in the bottom quartile of CET1 in its period
+  E3  large NPL rise over the window (5% tail); windows crossing the 2020-06 NPL break not labelled
+  E4  optional: the bank leaves the sample inside the window, weak at its last report
+        (E1 breach, negative ROE, or NPL in the top decile of its period)
+  event = E2 or E3 (or E4); None = unknown
+  E1  a capital ratio below the thesis thresholds in the period itself (descriptive)
+Optional: windows with a loan-book change >= 30% (mergers, portfolio sales) are set to unknown.
 """
 from __future__ import annotations
 
 from collections import Counter, defaultdict
+from dataclasses import dataclass
+from datetime import date
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -19,7 +27,40 @@ from scripts.analyses.draw_graph import DEFAULT_INDICATORS, NPL_BREAK, _month_en
 E1_MINIMA = {"cet1_ratio": 0.07, "tier1_ratio": 0.085, "total_capital_ratio": 0.105}
 TAIL = 0.05
 HORIZON = 12
+SCOPE_CHANGE = 0.30          # loan-book change treated as merger / sale
+WEAK_QUARTILE = 0.25         # E2 "weak": CET1 ends in the bottom quartile of its period
+NPL_TOP_DECILE = 0.90        # E4: NPL in the top decile at the last report
 OFFSETS = (-24, -18, -12, -6, 0, 6, 12)
+
+
+@dataclass(frozen=True)
+class LabelSpec:
+    """How the event label is built."""
+    kind: str = "abs"                 # E2: abs | rel | weak
+    horizon: int = HORIZON
+    tail: float = TAIL
+    e3: bool = True
+    e3_kind: str = "abs"              # E3: abs | weak (NPL also ends in the top quartile)
+    exits: bool = False               # add E4
+    drop_scope_changes: bool = False  # unknown label for windows with mergers / sales
+
+    def name(self) -> str:
+        parts = [self.kind, f"{self.horizon}m"]
+        if self.tail != TAIL:
+            parts.append(f"tail{self.tail:g}")
+        if not self.e3:
+            parts.append("noE3")
+        elif self.e3_kind != "abs":
+            parts.append(f"e3{self.e3_kind}")
+        if self.exits:
+            parts.append("exits")
+        if self.drop_scope_changes:
+            parts.append("noscope")
+        return "_".join(parts)
+
+
+ORIGINAL = LabelSpec()
+RECOMMENDED = LabelSpec(kind="weak", e3_kind="weak", exits=True, drop_scope_changes=True)
 
 
 # ---------- labels ----------
@@ -32,35 +73,111 @@ def _forward_change(index: dict, row: dict, indicator: str, months: int = HORIZO
     return later[indicator] - row[indicator]
 
 
-def label_rows(rows: list[dict], semiannual: bool = False):
-    """One item per row with e1, e2, e3 and event (None = unknown). Returns (items, cut-offs)."""
+def _period_ranks(rows: list[dict], indicator: str) -> dict:
+    """{(bank_id, period): rank in (0, 1] among the banks of that period}."""
+    from scipy.stats import rankdata
+    by_period = defaultdict(list)
+    for r in rows:
+        if r[indicator] is not None:
+            by_period[r["period"]].append(r)
+    ranks = {}
+    for period, group in by_period.items():
+        values = rankdata([r[indicator] for r in group]) / len(group)
+        for r, v in zip(group, values):
+            ranks[(r["bank_id"], period)] = float(v)
+    return ranks
+
+
+def _scope_change(index: dict, row: dict, horizon: int) -> bool:
+    """A loan-book change >= SCOPE_CHANGE reported inside the window (merger, sale, split)."""
+    for months in range(3, horizon + 1, 3):
+        later = index.get((row["bank_id"], _month_end(row["period"], months)))
+        if later is not None and later["loan_growth_yoy"] is not None \
+                and abs(later["loan_growth_yoy"]) >= SCOPE_CHANGE:
+            return True
+    return False
+
+
+def _weak_last_report(row: dict, npl_ranks: dict) -> bool:
+    """E1 breach, negative ROE or NPL in the top decile at the bank's last report."""
+    breach = any(row[k] is not None and row[k] < v for k, v in E1_MINIMA.items())
+    loss = row["roe_annualised"] is not None and row["roe_annualised"] < 0
+    bad_npl = npl_ranks.get((row["bank_id"], row["period"]), 0.0) >= NPL_TOP_DECILE
+    return breach or loss or bad_npl
+
+
+def label_rows(rows: list[dict], semiannual: bool = False, spec: LabelSpec | None = None):
+    """One item per row with e1..e4 and event (None = unknown). Returns (items, info)."""
+    spec = spec or ORIGINAL
     index = {(r["bank_id"], r["period"]): r for r in rows}
-    if semiannual:
-        base = [r for r in rows if r["period"].month in (6, 12)]
-    else:
-        base = rows
+    last_period = max(r["period"] for r in rows)
+    last_report: dict[int, date] = {}
+    for r in rows:
+        if r["bank_id"] not in last_report or r["period"] > last_report[r["bank_id"]]:
+            last_report[r["bank_id"]] = r["period"]
+    cet1_ranks = _period_ranks(rows, "cet1_ratio")
+    npl_ranks = _period_ranks(rows, "npl_ratio")
+    base = [r for r in rows if r["period"].month in (6, 12)] if semiannual else rows
+
     items = []
     for r in base:
-        crosses_break = r["period"] < NPL_BREAK <= _month_end(r["period"], HORIZON)
-        breach = any(r[k] is not None and r[k] < v for k, v in E1_MINIMA.items())
+        end = _month_end(r["period"], spec.horizon)
+        later = index.get((r["bank_id"], end))
+        d_cet1 = None
+        if later is not None and r["cet1_ratio"] is not None and later["cet1_ratio"] is not None:
+            if spec.kind == "rel":
+                if r["cet1_ratio"] > 0:
+                    d_cet1 = later["cet1_ratio"] / r["cet1_ratio"] - 1
+            else:
+                d_cet1 = later["cet1_ratio"] - r["cet1_ratio"]
+        d_npl = None
+        if spec.e3 and not (r["period"] < NPL_BREAK <= end):
+            d_npl = _forward_change(index, r, "npl_ratio", spec.horizon)
+        ends_weak = later is not None and \
+            cet1_ranks.get((later["bank_id"], later["period"]), 1.0) <= WEAK_QUARTILE
+        npl_ends_bad = later is not None and \
+            npl_ranks.get((later["bank_id"], later["period"]), 0.0) >= 1 - WEAK_QUARTILE
+        last = last_report[r["bank_id"]]
+        leaves = r["period"] <= last < end <= last_period
+        e4 = None
+        if spec.exits and leaves and _weak_last_report(index[(r["bank_id"], last)], npl_ranks):
+            e4 = True
         items.append({
             "bank_id": r["bank_id"],
             "period": r["period"],
-            "d_cet1": _forward_change(index, r, "cet1_ratio"),
-            "d_npl": None if crosses_break else _forward_change(index, r, "npl_ratio"),
-            "e1": breach,
+            "d_cet1": d_cet1,
+            "d_npl": d_npl,
+            "ends_weak": ends_weak,
+            "npl_ends_bad": npl_ends_bad,
+            "scope": spec.drop_scope_changes and _scope_change(index, r, spec.horizon),
+            "e1": any(r[k] is not None and r[k] < v for k, v in E1_MINIMA.items()),
+            "e4": e4,
         })
+
     train = [i for i in items if i["period"] <= TRAIN_END]
+    cet1_train = [i["d_cet1"] for i in train if i["d_cet1"] is not None]
+    npl_train = [i["d_npl"] for i in train if i["d_npl"] is not None]
     cuts = {
-        "cet1_fall": float(np.quantile([i["d_cet1"] for i in train if i["d_cet1"] is not None], TAIL)),
-        "npl_rise": float(np.quantile([i["d_npl"] for i in train if i["d_npl"] is not None], 1 - TAIL)),
+        "cet1_fall": float(np.quantile(cet1_train, spec.tail)),
+        "npl_rise": float(np.quantile(npl_train, 1 - spec.tail)) if npl_train else None,
     }
     for i in items:
-        i["e2"] = None if i["d_cet1"] is None else bool(i["d_cet1"] <= cuts["cet1_fall"])
-        i["e3"] = None if i["d_npl"] is None else bool(i["d_npl"] >= cuts["npl_rise"])
-        known = [x for x in (i["e2"], i["e3"]) if x is not None]
+        if i["scope"] or i["d_cet1"] is None:
+            i["e2"] = None
+        else:
+            fall = i["d_cet1"] <= cuts["cet1_fall"]
+            i["e2"] = bool(fall and (spec.kind != "weak" or i["ends_weak"]))
+        if i["scope"] or i["d_npl"] is None or cuts["npl_rise"] is None:
+            i["e3"] = None
+        else:
+            rise = i["d_npl"] >= cuts["npl_rise"]
+            i["e3"] = bool(rise and (spec.e3_kind != "weak" or i["npl_ends_bad"]))
+        known = [x for x in (i["e2"], i["e3"], i["e4"]) if x is not None]
         i["event"] = any(known) if known else None
-    return items, cuts
+    info = {**cuts, "label": spec.name(),
+            "scope_dropped": sum(1 for i in items if i["scope"]),
+            "exit_events": sum(1 for i in items if i["e4"])}
+    return items, info
 
 
 def episode_starts(items: list[dict], key: str = "event") -> list[dict]:
@@ -92,16 +209,20 @@ def auc(positive: list[float], negative: list[float]) -> float:
 
 # ---------- 9. how many events, when, where ----------
 
-def print_events(items: list[dict], cuts: dict) -> None:
+def print_events(items: list[dict], info: dict) -> None:
     """Events per year, episodes, banks, and the E1 breaches."""
-    print(f"\ncut-offs from training periods: CET1 12-month change <= {cuts['cet1_fall']:+.4f}, "
-          f"NPL 12-month change >= {cuts['npl_rise']:+.4f}")
+    npl = "-" if info["npl_rise"] is None else f"{info['npl_rise']:+.4f}"
+    print(f"\nlabel: {info['label']}")
+    print(f"cut-offs from training periods: CET1 change <= {info['cet1_fall']:+.4f}, "
+          f"NPL change >= {npl}")
+    print(f"windows set to unknown because of a merger / sale: {info['scope_dropped']}; "
+          f"exit events (E4): {info['exit_events']}")
     starts = episode_starts(items)
     starts_per_year = Counter(i["period"].year for i in starts)
     by_year = defaultdict(list)
     for i in items:
         by_year[i["period"].year].append(i)
-    print("\nyear  labelled  E1 now  E2 rows  E3 rows  event rows   rate  episodes  banks")
+    print("\nyear  labelled  E1 now  E2 rows  E3 rows  E4 rows  event rows   rate  episodes  banks")
     for year in sorted(by_year):
         group = by_year[year]
         known = [i for i in group if i["event"] is not None]
@@ -110,9 +231,10 @@ def print_events(items: list[dict], cuts: dict) -> None:
         e1 = sum(i["e1"] for i in group)
         e2 = sum(bool(i["e2"]) for i in group)
         e3 = sum(bool(i["e3"]) for i in group)
+        e4 = sum(bool(i["e4"]) for i in group)
         banks = len({i["bank_id"] for i in events})
-        print(f"{year}  {len(known):8d} {e1:7d} {e2:8d} {e3:8d} {len(events):11d} {rate:6.1%} "
-              f"{starts_per_year[year]:9d} {banks:6d}")
+        print(f"{year}  {len(known):8d} {e1:7d} {e2:8d} {e3:8d} {e4:8d} {len(events):11d} "
+              f"{rate:6.1%} {starts_per_year[year]:9d} {banks:6d}")
     known = [i for i in items if i["event"] is not None]
     events = [i for i in known if i["event"]]
     print(f"total: {len(known)} labelled rows, {len(events)} event rows, {len(starts)} episodes, "
@@ -124,7 +246,7 @@ def print_events(items: list[dict], cuts: dict) -> None:
 
 
 def events_figure(items: list[dict]):
-    """Top: share of banks starting an event window per period. Bottom: E1 breaches. Returns (fig, periods)."""
+    """Top: share of banks starting an event window per period. Bottom: E1 breaches."""
     by_period = defaultdict(list)
     for i in items:
         by_period[i["period"]].append(i)
@@ -134,13 +256,20 @@ def events_figure(items: list[dict]):
         known = [i for i in group if i[key] is not None]
         return sum(bool(i[key]) for i in known) / len(known) if known else np.nan
 
+    def share(group, key):
+        known = [i for i in group if i["event"] is not None]
+        return sum(bool(i[key]) for i in known) / len(known) if known else np.nan
+
     x = np.arange(len(periods))
     fig, (top, bottom) = plt.subplots(2, 1, figsize=(12, 6.5), sharex=True)
-    top.bar(x, [rate(by_period[p], "event") for p in periods], color="lightgrey", label="E2 or E3")
+    top.bar(x, [rate(by_period[p], "event") for p in periods], color="lightgrey", label="any event")
     top.plot(x, [rate(by_period[p], "e2") for p in periods], color="tab:blue", marker="o",
              markersize=3, label="E2: large CET1 fall")
     top.plot(x, [rate(by_period[p], "e3") for p in periods], color="tab:red", marker="o",
              markersize=3, label="E3: large NPL rise")
+    if any(i["e4"] for i in items):
+        top.plot(x, [share(by_period[p], "e4") for p in periods], color="black", marker="x",
+                 markersize=4, linestyle="none", label="E4: leaves in a weak state")
     top.axhline(TAIL, color="black", linestyle=":", linewidth=1, label="5% (cut-off level)")
     train_edge = sum(1 for p in periods if p <= TRAIN_END) - 0.5
     for ax in (top, bottom):
@@ -169,7 +298,8 @@ def period_medians(rows: list[dict], indicators: tuple[str, ...]) -> dict:
     return {key: float(np.median(v)) for key, v in values.items()}
 
 
-def event_profiles(rows: list[dict], items: list[dict], indicators: tuple[str, ...] = DEFAULT_INDICATORS):
+def event_profiles(rows: list[dict], items: list[dict],
+                   indicators: tuple[str, ...] = DEFAULT_INDICATORS):
     """{indicator: {offset: (event values, control values)}} relative to the period median."""
     index = {(r["bank_id"], r["period"]): r for r in rows}
     medians = period_medians(rows, indicators)
@@ -200,12 +330,12 @@ def print_event_study(profiles: dict, n_events: int, n_controls: int) -> None:
             events, controls = by_offset[k]
             if not events or not controls:
                 continue
-            print(f"{indicator:22s} {k:+4d}m {np.median(events):+13.4f} {np.median(controls):+14.4f} "
-                  f"{auc(events, controls):5.2f} {len(events):9d}")
+            print(f"{indicator:22s} {k:+4d}m {np.median(events):+13.4f} "
+                  f"{np.median(controls):+14.4f} {auc(events, controls):5.2f} {len(events):9d}")
 
 
 def event_study_figure(profiles: dict, n_events: int):
-    """Median and 25-75% band of events vs non-events around the event start. Returns (fig, panels)."""
+    """Median and 25-75% band of events vs non-events around the event start."""
     indicators = list(profiles)
     columns = 2
     lines = (len(indicators) + 1) // columns
@@ -234,6 +364,6 @@ def event_study_figure(profiles: dict, n_events: int):
     for ax in list(axes.flat)[len(indicators):]:
         ax.set_visible(False)
     fig.suptitle(f"Before and after an event ({n_events} episodes); months from t0, "
-                 f"values minus the period median; shaded = 12-month event window")
+                 f"values minus the period median; shaded = event window")
     fig.tight_layout()
     return fig, len(indicators)

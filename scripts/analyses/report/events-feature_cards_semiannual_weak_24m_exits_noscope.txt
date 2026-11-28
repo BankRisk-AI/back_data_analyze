@@ -1,0 +1,155 @@
+# generated 2026-11-28 09:57
+# command: python -m scripts.analyses.main --events --feature-cards --semiannual --label recommended --horizon 24 --report
+rows=4085 banks=190 periods=36
+
+label used: weak_24m_exits_noscope
+
+label: weak_24m_exits_noscope
+cut-offs from training periods: CET1 change <= -0.0356, NPL change >= +0.0040
+windows set to unknown because of a merger / sale: 140; exit events (E4): 69
+
+year  labelled  E1 now  E2 rows  E3 rows  E4 rows  event rows   rate  episodes  banks
+2014        83       2        1        6        5          12  14.5%        12     12
+2015       178       6        1        9       13          23  12.9%         6     16
+2016       191       3        2        5       14          21  11.0%         9     18
+2017       199       1        3        7        9          19   9.5%         5     14
+2018       198       1        2        0        6           8   4.0%         4      8
+2019       186       1        2        0        7           9   4.8%         3      6
+2020       191       0        2       11        7          20  10.5%        10     15
+2021       185       0        0       18        3          21  11.4%        10     16
+2022       200       0        0       33        3          36  18.0%        10     23
+2023       101       0        0       16        2          18  17.8%         2     18
+2024         0       0        0        0        0           0   nan%         0      0
+2025         0       0        0        0        0           0   nan%         0      0
+total: 1712 labelled rows, 187 event rows, 71 episodes, 56 banks with at least one episode
+E1 breaches: 14 rows at 8 banks: [19, 43, 68, 71, 76, 94, 113, 185]
+banks with most episodes: 58 (4), 19 (3), 13 (2), 20 (2), 22 (2), 27 (2), 68 (2), 72 (2), 112 (2), 127 (2)
+
+Selection rule (training periods only): min_coverage=0.5, min_auc_ci_low=0.5, min_sign_stability=0.6, max_ks_within_train=0.15, redundant_rho=0.8
+Test columns are reported only; they are not used to decide.
+
+feature                        category      cov tr cov te KS in tr KS tr-te  AUC tr [95% CI]    stab AUC te  decision
+cet1_ratio:raw                 Capital         100%   100%     0.21     0.20  0.55 [0.44, 0.66]   57%   0.56  drop: no signal, unstable direction, drifts
+cet1_ratio:rank                Capital         100%   100%     0.03     0.04  0.54 [0.43, 0.65]   57%   0.56  drop: no signal, unstable direction
+cet1_ratio:rz                  Capital         100%   100%     0.09     0.08  0.54 [0.42, 0.64]   57%   0.56  drop: no signal, unstable direction
+cet1_ratio:chg                 Capital          77%    90%     0.16     0.20  0.50 [0.42, 0.57]   50%   0.48  drop: no signal, unstable direction, drifts
+cet1_ratio:chg_rank            Capital          77%    90%     0.15     0.03  0.50 [0.43, 0.57]   50%   0.48  drop: no signal, unstable direction
+cet1_ratio:chg_pct             Capital          77%    90%     0.17     0.21  0.50 [0.42, 0.57]   50%   0.48  drop: no signal, unstable direction, drifts
+cet1_ratio:vol                 Capital          77%    90%     0.06     0.07  0.59 [0.51, 0.68]   83%   0.52  keep
+
+tier1_ratio:raw                Capital         100%   100%     0.21     0.24  0.56 [0.44, 0.67]   71%   0.57  drop: no signal, drifts
+tier1_ratio:rank               Capital         100%   100%     0.04     0.04  0.54 [0.43, 0.66]   71%   0.57  drop: no signal
+tier1_ratio:rz                 Capital         100%   100%     0.06     0.07  0.55 [0.43, 0.66]   71%   0.57  drop: no signal
+tier1_ratio:chg                Capital          77%    90%     0.14     0.20  0.52 [0.45, 0.60]   67%   0.53  drop: no signal
+tier1_ratio:chg_rank           Capital          77%    90%     0.13     0.04  0.51 [0.44, 0.59]   50%   0.50  drop: no signal, unstable direction
+tier1_ratio:chg_pct            Capital          77%    90%     0.14     0.21  0.52 [0.45, 0.61]   67%   0.53  drop: no signal
+tier1_ratio:vol                Capital          77%    90%     0.03     0.06  0.58 [0.51, 0.67]   83%   0.52  drop: redundant with cet1_ratio:vol
+
+total_capital_ratio:raw        Capital         100%   100%     0.19     0.26  0.59 [0.48, 0.70]   71%   0.52  drop: no signal, drifts
+total_capital_ratio:rank       Capital         100%   100%     0.03     0.03  0.57 [0.45, 0.68]   71%   0.53  drop: no signal
+total_capital_ratio:rz         Capital         100%   100%     0.05     0.06  0.58 [0.46, 0.68]   71%   0.53  drop: no signal
+total_capital_ratio:chg        Capital          77%    90%     0.16     0.18  0.51 [0.44, 0.59]   67%   0.54  drop: no signal, drifts
+total_capital_ratio:chg_rank   Capital          77%    90%     0.11     0.05  0.51 [0.44, 0.58]   83%   0.48  drop: no signal
+total_capital_ratio:chg_pct    Capital          77%    90%     0.16     0.18  0.51 [0.43, 0.59]   67%   0.55  drop: no signal, drifts
+total_capital_ratio:vol        Capital          77%    90%     0.05     0.06  0.58 [0.51, 0.67]   83%   0.56  keep
+
+leverage_ratio:raw             Capital          84%   100%     0.12     0.11  0.57 [0.46, 0.68]   86%   0.54  drop: no signal
+leverage_ratio:rank            Capital          84%   100%     0.03     0.05  0.60 [0.48, 0.70]   86%   0.54  drop: no signal
+leverage_ratio:rz              Capital          84%   100%     0.05     0.10  0.60 [0.48, 0.71]   86%   0.54  drop: no signal
+leverage_ratio:chg             Capital          51%    90%     0.22     0.21  0.51 [0.35, 0.64]   25%   0.47  drop: no signal, unstable direction, drifts
+leverage_ratio:chg_rank        Capital          51%    90%     0.18     0.11  0.51 [0.41, 0.61]   50%   0.44  drop: no signal, unstable direction, drifts
+leverage_ratio:chg_pct         Capital          51%    90%     0.22     0.22  0.53 [0.38, 0.67]   25%   0.48  drop: no signal, unstable direction, drifts
+leverage_ratio:vol             Capital          51%    90%     0.16     0.23  0.60 [0.47, 0.71]   50%   0.59  drop: no signal, unstable direction, drifts
+
+npl_ratio:raw                  Asset quality    94%    92%     0.23     0.31  0.69 [0.57, 0.78]  100%   0.41  drop: drifts
+npl_ratio:rank                 Asset quality    94%    92%     0.03     0.03  0.67 [0.56, 0.78]  100%   0.41  keep
+npl_ratio:rz                   Asset quality    94%    92%     0.14     0.14  0.67 [0.56, 0.77]  100%   0.41  drop: redundant with npl_ratio:rank
+npl_ratio:chg                  Asset quality    59%    84%     0.07     0.18  0.53 [0.41, 0.67]   80%   0.68  drop: no signal
+npl_ratio:chg_rank             Asset quality    59%    84%     0.08     0.13  0.51 [0.41, 0.60]   60%   0.65  drop: no signal
+npl_ratio:vol                  Asset quality    59%    84%     0.11     0.23  0.66 [0.52, 0.79]  100%   0.42  keep
+
+stage2_share:raw               Asset quality    35%    90%      nan     0.09  0.67 [0.43, 0.80]  100%   0.62  drop: coverage, no signal, drift not measurable
+stage2_share:rank              Asset quality    35%    90%      nan     0.05  0.66 [0.42, 0.79]  100%   0.62  drop: coverage, no signal, drift not measurable
+stage2_share:rz                Asset quality    35%    90%      nan     0.07  0.65 [0.42, 0.79]  100%   0.62  drop: coverage, no signal, drift not measurable
+stage2_share:chg               Asset quality    20%    83%      nan     0.18  0.50 [0.32, 0.69]   50%   0.45  drop: coverage, no signal, unstable direction, drift not measurable
+stage2_share:chg_rank          Asset quality    20%    83%      nan     0.10  0.54 [0.42, 0.67]  100%   0.45  drop: coverage, no signal, drift not measurable
+stage2_share:vol               Asset quality    20%    83%      nan     0.18  0.56 [0.40, 0.69]  100%   0.59  drop: coverage, no signal, drift not measurable
+
+roe_annualised:raw             Earnings         95%    92%     0.09     0.29  0.67 [0.58, 0.75]  100%   0.63  keep
+roe_annualised:rank            Earnings         95%    92%     0.02     0.04  0.66 [0.56, 0.74]  100%   0.64  drop: redundant with roe_annualised:raw
+roe_annualised:rz              Earnings         95%    92%     0.05     0.08  0.67 [0.57, 0.75]  100%   0.63  drop: redundant with roe_annualised:raw
+roe_annualised:chg             Earnings         73%    84%     0.22     0.24  0.54 [0.46, 0.60]   33%   0.50  drop: no signal, unstable direction, drifts
+roe_annualised:chg_rank        Earnings         73%    84%     0.09     0.08  0.51 [0.43, 0.57]   50%   0.49  drop: no signal, unstable direction
+roe_annualised:vol             Earnings         73%    84%     0.08     0.07  0.65 [0.54, 0.77]  100%   0.50  keep
+
+nace_hhi:raw                   Concentration    22%    92%      nan     0.05  0.59 [0.44, 0.74]   50%   0.74  drop: coverage, no signal, unstable direction, drift not measurable
+nace_hhi:rank                  Concentration    22%    92%      nan     0.05  0.59 [0.44, 0.74]   50%   0.74  drop: coverage, no signal, unstable direction, drift not measurable
+nace_hhi:rz                    Concentration    22%    92%      nan     0.08  0.59 [0.43, 0.74]   50%   0.74  drop: coverage, no signal, unstable direction, drift not measurable
+nace_hhi:chg                   Concentration     7%    84%      nan     0.13  0.52 [0.25, 0.80]  100%   0.50  drop: coverage, no signal, drift not measurable
+nace_hhi:chg_rank              Concentration     7%    84%      nan     0.11  0.50 [0.30, 0.68]    0%   0.44  drop: coverage, no signal, unstable direction, drift not measurable
+nace_hhi:chg_pct               Concentration     7%    84%      nan     0.14  0.51 [0.25, 0.77]  100%   0.53  drop: coverage, no signal, drift not measurable
+nace_hhi:vol                   Concentration     7%    84%      nan     0.12  0.68 [0.44, 0.86]  100%   0.55  drop: coverage, no signal, drift not measurable
+
+sovereign_hhi:raw              Concentration    65%    99%     0.11     0.07  0.57 [0.45, 0.70]   60%   0.53  drop: no signal
+sovereign_hhi:rank             Concentration    65%    99%     0.05     0.04  0.57 [0.44, 0.71]   60%   0.53  drop: no signal
+sovereign_hhi:rz               Concentration    65%    99%     0.05     0.14  0.57 [0.44, 0.70]   60%   0.53  drop: no signal
+sovereign_hhi:chg              Concentration    41%    89%     0.10     0.07  0.60 [0.50, 0.70]   50%   0.53  drop: coverage, no signal, unstable direction
+sovereign_hhi:chg_rank         Concentration    41%    89%     0.06     0.15  0.56 [0.48, 0.66]   50%   0.51  drop: coverage, no signal, unstable direction
+sovereign_hhi:chg_pct          Concentration    41%    89%     0.09     0.06  0.59 [0.48, 0.69]   50%   0.56  drop: coverage, no signal, unstable direction
+sovereign_hhi:vol              Concentration    34%    89%     0.18     0.07  0.53 [0.41, 0.66]   50%   0.63  drop: coverage, no signal, unstable direction, drifts
+
+loan_growth_qoq:raw            Growth           28%    88%      nan     0.11  0.53 [0.34, 0.65]   50%   0.57  drop: coverage, no signal, unstable direction, drift not measurable
+loan_growth_qoq:rank           Growth           28%    88%      nan     0.03  0.54 [0.35, 0.66]   50%   0.56  drop: coverage, no signal, unstable direction, drift not measurable
+loan_growth_qoq:rz             Growth           28%    88%      nan     0.06  0.54 [0.35, 0.66]   50%   0.56  drop: coverage, no signal, unstable direction, drift not measurable
+loan_growth_qoq:chg            Growth           13%    80%      nan     0.14  0.52 [0.39, 0.68]   50%   0.52  drop: coverage, no signal, unstable direction, drift not measurable
+loan_growth_qoq:chg_rank       Growth           13%    80%      nan     0.06  0.52 [0.36, 0.65]   50%   0.49  drop: coverage, no signal, unstable direction, drift not measurable
+loan_growth_qoq:vol            Growth            7%    80%      nan     0.20  0.58 [0.32, 0.84]  100%   0.46  drop: coverage, no signal, drift not measurable
+
+loan_growth_yoy:raw            Growth           60%    85%     0.10     0.11  0.69 [0.57, 0.80]  100%   0.57  keep
+loan_growth_yoy:rank           Growth           60%    85%     0.03     0.03  0.67 [0.56, 0.78]  100%   0.56  drop: redundant with loan_growth_yoy:raw
+loan_growth_yoy:rz             Growth           60%    85%     0.07     0.03  0.67 [0.56, 0.78]  100%   0.56  drop: redundant with loan_growth_yoy:raw
+loan_growth_yoy:chg            Growth           42%    79%     0.12     0.05  0.57 [0.45, 0.67]   50%   0.40  drop: coverage, no signal, unstable direction
+loan_growth_yoy:chg_rank       Growth           42%    79%     0.05     0.05  0.56 [0.44, 0.67]   75%   0.43  drop: coverage, no signal
+loan_growth_yoy:vol            Growth           42%    79%     0.10     0.12  0.57 [0.45, 0.68]   75%   0.51  drop: coverage, no signal
+
+kept 7 of 72: cet1_ratio:vol, total_capital_ratio:vol, npl_ratio:rank, npl_ratio:vol, roe_annualised:raw, roe_annualised:vol, loan_growth_yoy:raw
+
+Spearman correlation between features (training rows; * = kept; others = best variant of each indicator)
+                               1     2     3     4     5     6     7     8     9    10    11    12    13    14    15
+* cet1_ratio:vol            1.00  0.77 -0.07  0.04 -0.07  0.19 -0.08  0.93  0.28  0.37 -0.06 -0.05  0.32 -0.02  0.02  (1)
+* total_capital_ratio:vol   0.77  1.00 -0.16 -0.06 -0.03  0.14 -0.07  0.84  0.35  0.33 -0.15 -0.09  0.23  0.06  0.07  (2)
+* npl_ratio:rank           -0.07 -0.16  1.00  0.76 -0.30  0.25 -0.31 -0.11 -0.49  0.26  0.96  0.53 -0.31 -0.05 -0.16  (3)
+* npl_ratio:vol             0.04 -0.06  0.76  1.00 -0.23  0.29 -0.15  0.01 -0.47  0.22  0.77  0.42   nan -0.00  0.00  (4)
+* roe_annualised:raw       -0.07 -0.03 -0.30 -0.23  1.00 -0.25  0.35 -0.05  0.16 -0.18 -0.28 -0.27  0.10 -0.08 -0.18  (5)
+* roe_annualised:vol        0.19  0.14  0.25  0.29 -0.25  1.00 -0.21  0.18 -0.08  0.24  0.27  0.19  0.03  0.07  0.17  (6)
+* loan_growth_yoy:raw      -0.08 -0.07 -0.31 -0.15  0.35 -0.21  1.00 -0.09  0.14 -0.15 -0.31 -0.17   nan -0.00 -0.28  (7)
+  tier1_ratio:vol           0.93  0.84 -0.11  0.01 -0.05  0.18 -0.09  1.00  0.34  0.41 -0.10 -0.06  0.29  0.00  0.04  (8)
+  total_capital_ratio:raw   0.28  0.35 -0.49 -0.47  0.16 -0.08  0.14  0.34  1.00 -0.02 -0.56 -0.12  0.26  0.04  0.04  (9)
+  leverage_ratio:vol        0.37  0.33  0.26  0.22 -0.18  0.24 -0.15  0.41 -0.02  1.00  0.25  0.23 -0.04  0.00  0.25  (10)
+  npl_ratio:raw            -0.06 -0.15  0.96  0.77 -0.28  0.27 -0.31 -0.10 -0.56  0.25  1.00  0.53 -0.31 -0.07 -0.16  (11)
+  stage2_share:raw         -0.05 -0.09  0.53  0.42 -0.27  0.19 -0.17 -0.06 -0.12  0.23  0.53  1.00 -0.12  0.06 -0.11  (12)
+  nace_hhi:vol              0.32  0.23 -0.31   nan  0.10  0.03   nan  0.29  0.26 -0.04 -0.31 -0.12  1.00  0.07   nan  (13)
+  sovereign_hhi:chg        -0.02  0.06 -0.05 -0.00 -0.08  0.07 -0.00  0.00  0.04  0.00 -0.07  0.06  0.07  1.00   nan  (14)
+  loan_growth_qoq:vol       0.02  0.07 -0.16  0.00 -0.18  0.17 -0.28  0.04  0.04  0.25 -0.16 -0.11   nan   nan  1.00  (15)
+
+VIF of the kept features (722 training rows with all of them; < 5 fine, > 10 a problem)
+  cet1_ratio:vol                  2.34
+  total_capital_ratio:vol         2.36
+  npl_ratio:rank                  2.80
+  npl_ratio:vol                   2.55
+  roe_annualised:raw              1.21
+  roe_annualised:vol              1.18
+  loan_growth_yoy:raw             1.27
+
+what each kept feature also stands for (other features with |rho| >= 0.5):
+  cet1_ratio:vol                 tier1_ratio:vol +0.93, total_capital_ratio:vol +0.77
+  total_capital_ratio:vol        tier1_ratio:vol +0.84, cet1_ratio:vol +0.77
+  npl_ratio:rank                 npl_ratio:rz +0.99, npl_ratio:raw +0.96, npl_ratio:vol +0.76, stage2_share:rz +0.54, stage2_share:rank +0.54, stage2_share:raw +0.53, nace_hhi:raw -0.53, nace_hhi:rz -0.52, nace_hhi:rank -0.52, total_capital_ratio:rz -0.50, total_capital_ratio:rank -0.50
+  npl_ratio:vol                  npl_ratio:raw +0.77, npl_ratio:rz +0.77, npl_ratio:rank +0.76, npl_ratio:chg -0.73
+  roe_annualised:raw             roe_annualised:rank +0.94, roe_annualised:rz +0.94
+  roe_annualised:vol             nothing
+  loan_growth_yoy:raw            loan_growth_yoy:rank +0.98, loan_growth_yoy:rz +0.98, loan_growth_yoy:chg_rank +0.59, loan_growth_yoy:chg +0.53
+written /var/projects/python/eba_analyst/scripts/analyses/report/feature_cards_semiannual_weak_24m_exits_noscope.csv
+saved /var/projects/python/eba_analyst/scripts/analyses/report/events_semiannual_weak_24m_exits_noscope.png
+saved /var/projects/python/eba_analyst/scripts/analyses/report/feature_cards_semiannual_weak_24m_exits_noscope.png
+saved /var/projects/python/eba_analyst/scripts/analyses/report/feature_correlation_semiannual_weak_24m_exits_noscope.png
