@@ -1,0 +1,252 @@
+# generated 2026-11-28 09:36
+# command: python -m scripts.analyses.main --validity --semiannual --report
+rows=4085 banks=190 periods=36
+
+=== 1. banks leaving the sample (informative censoring) ===
+banks: 190; leaving before 2025-06-30: 78
+exits per year: 2015: 4, 2016: 15, 2017: 9, 2018: 9, 2019: 2, 2020: 13, 2021: 10, 2022: 5, 2023: 4, 2024: 7
+exits per country: DE: 10, ES: 7, IT: 7, GB: 6, AT: 5, IE: 5, CY: 4, LU: 4
+labels unknown although t+12m is inside the data: 185; because the bank left the sample: 153
+leavers with an event or E1 in the 24 months before leaving: 20 of 78
+
+value minus the median bank of the same period (median per group); AUC = leavers vs no event
+indicator              left   event start   no event    AUC
+cet1_ratio           +0.0077      +0.0192    -0.0006   0.55
+leverage_ratio       +0.0010      +0.0064    -0.0006   0.57
+npl_ratio            +0.0065      +0.0007    -0.0001   0.58
+roe_annualised       -0.0192      -0.0177    +0.0024   0.41
+
+leavers with the weakest capital at their last report
+    185 DE last=2018-06-30 CET1=0.074 NPL=0.157 ROE=-0.167 recent event=yes HSH Beteiligungs Management GmbH
+     50 ES last=2024-06-30 CET1=0.130 NPL=0.023 ROE=0.187 recent event=no  Abanca Holding Hispania
+    113 PT last=2020-06-30 CET1=0.115 NPL=0.120 ROE=-0.086 recent event=no  Caixa Económica Montepio Geral, Caixa Económi
+     40 ES last=2017-06-30 CET1=0.105 NPL=0.062 ROE=0.129 recent event=no  Criteria Caixa S.A.U.
+     43 ES last=2017-06-30 CET1=0.110 NPL=0.095 ROE=-0.007 recent event=yes Banco Mare Nostrum
+    951 DE last=2022-06-30 CET1=0.124 NPL=0.028 ROE=0.049 recent event=no  HSBC Germany Holdings GmbH
+      3 AT last=2016-06-30 CET1=0.103 NPL=0.094 ROE=0.036 recent event=no  Raiffeisen-Landesbanken-Holding GmbH
+     72 IT last=2018-06-30 CET1=0.119 NPL=0.228 ROE=-0.023 recent event=yes Banca Carige SpA - Cassa di Risparmio di Geno
+     71 IT last=2016-06-30 CET1=0.107 NPL=0.297 ROE=-0.237 recent event=yes Veneto Banca SCpA
+     76 IT last=2016-06-30 CET1=0.108 NPL=0.310 ROE=-0.646 recent event=yes Banca Popolare di Vicenza SCpA
+
+=== 2. publication lag ===
+edition  published (approx.)  reference dates                      lag in months
+2015     2015-12-01           2014-12, 2015-06                     6-12
+2016     2016-12-01           2015-12, 2016-06                     6-12
+2017     2017-12-01           2016-12, 2017-06                     6-12
+2018     2018-12-01           2017-12, 2018-06                     6-12
+2019     2019-12-01           2018-09, 2018-12, 2019-03, 2019-06   6-15
+2020     2020-12-01           2019-09, 2019-12, 2020-03, 2020-06   6-15
+2021     2021-12-01           2020-09, 2020-12, 2021-03, 2021-06   6-15
+2022     2022-12-01           2021-09, 2021-12, 2022-03, 2022-06   6-15
+2023     2023-12-01           2022-09, 2022-12, 2023-03, 2023-06   6-15
+2024     2024-12-01           2023-09, 2023-12, 2024-03, 2024-06   6-15
+2025     2025-12-01           2024-09, 2024-12, 2025-03, 2025-06   6-15
+
+event episodes: 120; months of the 12-month event window still ahead when the data were published: median 3, none left for 60 (50%)
+
+known cases marked by the label: lead counted from the reference date vs from publication
+  Monte dei Paschi         first signal 2015-06-30  lead  24 months, after publication  18
+  Veneto Banca             first signal 2015-06-30  lead  24 months, after publication  18
+  Popolare di Vicenza      first signal 2015-06-30  lead  24 months, after publication  18
+  Norddeutsche Landesbank  first signal 2017-12-31  lead  24 months, after publication  12
+  Caixa Geral              first signal 2015-06-30  lead  21 months, after publication  15
+  HSH                      first signal 2016-12-31  lead  23 months, after publication  11
+  Novo Banco               first signal 2015-12-31  lead  22 months, after publication  10
+  ABLV                     first signal 2016-06-30  lead  20 months, after publication  14
+
+=== 3. known public distress cases ===
+case                     date        bank  in panel                E2/E3  E1  lead(m)  verdict
+Monte dei Paschi         2017-06-30    68  2014-12-31..2025-06-30      4   2       24  marked (precautionary recapitalisation)
+Banco Popular            2017-06-07    44  2014-12-31..2016-06-30      0   0        -  missed: left the sample (resolution, sold to Santander)
+Veneto Banca             2017-06-25    71  2014-12-31..2016-06-30      1   2       24  marked (liquidation)
+Popolare di Vicenza      2017-06-25    76  2014-12-31..2016-06-30      1   2       24  marked (liquidation)
+Carige                   2019-01-02    72  2014-12-31..2018-06-30      0   0        -  missed: left the sample (temporary administration)
+Norddeutsche Landesbank  2019-12-31    19  2014-12-31..2025-06-30      2   2       24  marked (recapitalisation)
+Caixa Geral              2017-03-31    94  2014-12-31..2025-06-30      2   1       21  marked (state recapitalisation)
+Sberbank Europe          2022-02-28   119  2015-12-31..2021-06-30      0   0        -  missed: left the sample (failing or likely to fail)
+HSH                      2018-11-28   185  2016-12-31..2018-06-30      1   1       23  marked (sale after state aid)
+Banco Mare Nostrum       2017-12-29    43  2014-12-31..2017-06-30      0   0        -  missed: left the sample (merger into state-owned Bankia)
+Novo Banco               2017-10-18   115  2015-12-31..2018-06-30      1   0       22  marked (sale with contingent capital)
+ABLV                     2018-02-23    83  2014-12-31..2017-06-30      1   0       20  marked (failing or likely to fail)
+Etruria                  2015-11-22     -  name not found
+Banca Marche             2015-11-22     -  name not found
+Piraeus                  2015-12-31   134  2015-12-31..2025-06-30      0   0        -  no history before the event (recapitalisation)
+National Bank of Greece  2015-12-31   123  2015-12-31..2025-06-30      0   0        -  no history before the event (recapitalisation)
+Alpha                    2015-12-31  1352  2024-09-30..2025-06-30      0   0        -  no history before the event (recapitalisation)
+Alpha                    2015-12-31   128  2015-12-31..2024-06-30      1   0        0  no history before the event (recapitalisation)
+Eurobank                 2015-12-31   135  2015-12-31..2025-06-30      0   0        -  no history before the event (recapitalisation)
+Popolare di Bari         2019-12-31     -  name not found
+
+cases with history in the panel: 12; marked 8, missed because the bank left 4, missed otherwise 0; without history before the event 5
+
+=== 4. recurrence of events ===
+prior event = an event window of the same bank that closed in the 24 months before t
+part    rows  with prior  P(event|prior)  P(event|none)  AUC of the rule
+train   1363         215           14.0%           7.7%             0.55
+test     544         132           14.4%           7.8%             0.57
+episodes that follow an earlier one: 26 of 120
+
+banks with most episodes
+    193   5 episodes  DE  finrep=True   State Street Europe Holdings Germany S.a.r.l. & Co. KG
+     20   4 episodes  DE  finrep=True   Aareal Bank AG
+     19   3 episodes  DE  finrep=True   Norddeutsche Landesbank - Girozentrale -
+     68   3 episodes  IT  finrep=True   Banca Monte dei Paschi di Siena S.p.A.
+    130   3 episodes  MT  finrep=True   MDB Group Limited
+    134   3 episodes  GR  finrep=True   Piraeus Financial Holdings
+    217   3 episodes  LU  finrep=False  J.P. Morgan Bank Luxembourg S.A.
+      5   2 episodes  AT  finrep=True   Raiffeisenbankengruppe OÖ Verbund eGen
+     13   2 episodes  CY  finrep=True   Hellenic Bank Public Company Ltd
+     22   2 episodes  DE  finrep=True   DekaBank Deutsche Girozentrale
+     23   2 episodes  DE  finrep=False  DEUTSCHE APOTHEKER- UND ÄRZTEBANK EG
+     87   2 episodes  NL  finrep=False  SNS REAAL N.V.
+    100   2 episodes  SI  finrep=True   Nova Ljubljanska Banka d.d., Ljubljana
+    109   2 episodes  RO  finrep=True   Banca Transilvania
+    127   2 episodes  DE  finrep=True   Deutsche Pfandbriefbank AG
+
+=== 5. mergers and scope changes ===
+event window = t..t+12m; structural change = loan book change of at least 30% over the same window
+event windows with a structural change: 6.9%; other windows: 2.0%; event rate when flagged: 25.0%
+banks with most event windows that include a structural change:
+    161  2  EE  AS LHV Group
+    210  2  IT  ICCREA BANCA S.P.A.
+     51  2  ES  Unicaja Banco, S.A.
+   1040  2  SI  AIKGROUP (CY) LIMITED
+    109  1  RO  Banca Transilvania
+    100  1  SI  Nova Ljubljanska Banka d.d., Ljubljana
+    383  1  ES  CaixaBank, S.A.
+    478  1  LV  Akciju sabiedrība "Citadele banka"
+    272  1  AT  BAWAG Group AG
+banks already joined through the approved crosswalk: 29
+
+training AUC of the kept features (> 0.5 = higher before events): all windows vs without structural changes
+  cet1_ratio:rz            0.61 -> 0.63
+  tier1_ratio:vol          0.60 -> 0.61
+  npl_ratio:chg            0.62 -> 0.64
+  roe_annualised:raw       0.40 -> 0.39
+
+=== 6. learning curve ===
+test: 544 rows, 51 events (base rate 9.4%); descriptive use of the test period
+features        share of banks  banks  events  ROC-AUC (sd)   PR-AUC (sd)
+kept 4                     25%     40      31  0.612 (0.100)  0.196 (0.039)
+kept 4                     50%     79      58  0.665 (0.058)  0.210 (0.025)
+kept 4                     75%    118      88  0.677 (0.029)  0.206 (0.010)
+kept 4                    100%    158     118  0.682 (0.000)  0.204 (0.000)
+raw levels 11              25%     40      31  0.457 (0.096)  0.137 (0.042)
+raw levels 11              50%     79      58  0.498 (0.088)  0.160 (0.043)
+raw levels 11              75%    118      88  0.520 (0.043)  0.169 (0.023)
+raw levels 11             100%    158     118  0.510 (0.000)  0.168 (0.000)
+
+=== 7. country ===
+variance shares (values clipped to p1-p99)
+indicator              country  bank in country  common in time  bank-specific change
+cet1_ratio                 20%              58%              2%                   20%
+tier1_ratio                21%              56%              3%                   20%
+total_capital_ratio        25%              50%              3%                   22%
+leverage_ratio             45%              41%              1%                   12%
+npl_ratio                  46%              21%              5%                   27%
+stage2_share               24%              45%              2%                   28%
+roe_annualised             14%              26%             12%                   49%
+nace_hhi                   42%              56%              0%                    2%
+sovereign_hhi              24%              62%              1%                   14%
+loan_growth_qoq             7%               8%              4%                   81%
+loan_growth_yoy            16%              17%              2%                   65%
+
+country  banks  labelled rows  episodes  per 100 rows
+DE          33            369        29           7.9
+IT          19            218        10           4.6
+GR           5             70         8          11.4
+IE          10             74         6           8.1
+SI           5             39         6          15.4
+LU           6             64         6           9.4
+AT          10            106         5           4.7
+MT           3             41         5          12.2
+SE           6            100         5           5.0
+IS           3             36         5          13.9
+ES          17            211         4           1.9
+NL           8             76         4           5.3
+episodes in the 3 countries with most episodes: 47 of 120
+
+kept features: training AUC with CI resampling banks vs resampling countries
+feature                   AUC   CI banks        CI countries
+cet1_ratio:rz             0.61  [0.52, 0.71]    [0.47, 0.73]
+tier1_ratio:vol           0.60  [0.51, 0.69]    [0.48, 0.70]
+npl_ratio:chg             0.62  [0.52, 0.73]    [0.50, 0.71]
+roe_annualised:raw        0.60  [0.52, 0.68]    [0.46, 0.72]
+
+=== 8. RWA density ===
+rwa_density = leverage ratio / CET1 ratio ~ RWA / leverage exposure (Tier 1 ~ CET1)
+
+Selection rule (training periods only): min_coverage=0.5, min_auc_ci_low=0.5, min_sign_stability=0.6, max_ks_within_train=0.15, redundant_rho=0.8
+Test columns are reported only; they are not used to decide.
+
+feature                        category      cov tr cov te KS in tr KS tr-te  AUC tr [95% CI]    stab AUC te  decision
+rwa_density:raw                -                85%   100%     0.07     0.20  0.55 [0.44, 0.65]   57%   0.41  drop: no signal, unstable direction
+rwa_density:rank               -                85%   100%     0.01     0.03  0.54 [0.44, 0.64]   71%   0.41  drop: no signal
+rwa_density:rz                 -                85%   100%     0.08     0.03  0.54 [0.44, 0.64]   71%   0.42  drop: no signal
+rwa_density:chg                -                51%    93%     0.08     0.12  0.53 [0.43, 0.61]   50%   0.48  drop: no signal, unstable direction
+rwa_density:chg_rank           -                51%    93%     0.07     0.14  0.55 [0.47, 0.62]   75%   0.50  drop: no signal
+rwa_density:vol                -                51%    93%     0.12     0.04  0.50 [0.40, 0.59]   50%   0.39  drop: no signal, unstable direction
+
+kept 0 of 6: none
+
+correlation with the kept capital feature cet1_ratio:rz
+  rwa_density:raw          rho = -0.30
+  rwa_density:rank         rho = -0.29
+  rwa_density:rz           rho = -0.30
+  rwa_density:chg          rho = +0.10
+  rwa_density:chg_rank     rho = -0.01
+  rwa_density:vol          rho = -0.15
+
+=== 9. implausible values ===
+rule                       rows  banks  of which event rows  examples
+NPL exactly 0                20      4                    2  125 RBC Investor Services , 29 Landwirtschaftliche Re, 1269 RBS Holdings N.V.
+Stage 2 exactly 0            39      3                    3  695 UBS Europe SE, 125 RBC Investor Services , 899 LP Group B.V.
+sector HHI = 1                9      1                    0  106 SBAB Bank AB - Grupp
+sovereign HHI = 1            41     19                    5  879 BANCA MEDIOLANUM S.P.A, 37 Sydbank A/S, 66 Permanent TSB Group Ho
+Tier 1 < CET1                 0      0                    0  
+total capital < Tier 1        0      0                    0  
+leverage > Tier 1 ratio       0      0                    0  
+CET1 above 50%                3      1                    2  217 J.P. Morgan Bank Luxem
+|ROE| above 100%              7      6                    2  134 Piraeus Financial Hold, 76 Banca Popolare di Vice, 87 SNS REAAL N.V.
+NPL above 50%                16      4                    2  134 Piraeus Financial Hold, 11 Bank of Cyprus Public , 128 ALPHA SERVICES AND HOL
+CET1 identical in 4 or more consecutive reports: 0 cases at 0 banks
+panel flags (outlier = more than 3 MAD from the period median):
+  npl_ratio              outlier              471
+  nace_hhi               outlier              464
+  roe_annualised         outlier              380
+  loan_growth_qoq        outlier              357
+  loan_growth_yoy        outlier              338
+  leverage_ratio         outlier              304
+  cet1_ratio             outlier              299
+  total_capital_ratio    outlier              298
+  tier1_ratio            outlier              286
+  stage2_share           outlier              186
+  loan_growth_yoy        extreme_growth        16
+  sovereign_hhi          outlier                7
+
+=== 10. label sensitivity and alternative definitions ===
+training AUC is raw: > 0.5 = higher before events, < 0.5 = lower before events
+variant                      rows  events  episodes  banks  Jaccard  known marked  CET1 rz at start  AUC cet1:rz  tier1:vol  npl:chg  roe
+baseline: abs 12m 5%         2107     189       120     88     1.00       8 of 12             +0.45         0.61       0.60     0.62  0.40
+horizon 6m                   2304     226       182    109     0.38       8 of 12             +0.59         0.62       0.66     0.59  0.37
+horizon 24m                  1758     185        81     66     0.33       6 of 12             +0.45         0.72       0.71     0.72  0.47
+tail 10%                     2107     403       232    131     0.47       8 of 12             +0.30         0.64       0.63     0.60  0.43
+tail 2.5%                    2107     101        59     50     0.53       6 of 12             +0.56         0.57       0.63     0.63  0.36
+relative CET1 fall           2107     188       120     92     0.82       8 of 12             +0.27         0.56       0.58     0.56  0.39
+fall into bottom quartile    2107     113        70     55     0.60       8 of 12             -0.07         0.39       0.51     0.63  0.33
+E2 only (no NPL rise)        2107      99        68     54     0.52       6 of 12             +1.07         0.78       0.64     0.59  0.44
+
+=== summary of findings ===
+1 leaving the sample   78 of 190 banks leave; 153 of 185 unknown labels are lost by exit; 20 leavers had an event or E1 in the 24m before
+2 publication lag      lag 5-17 months; median 3 months of the event window left after publication; 50% of episodes with none; real lead of marked cases 10-18 months
+3 known cases          8 of 12 cases with history marked; 4 lost by exit; 0 missed otherwise; 5 without history
+4 recurrence           P(event | earlier event) 14% vs 8%; rule AUC on test 0.57; 26 of 120 episodes are repeats
+5 mergers, scope       7% of event windows vs 2% of others include a loan-book change >= 30%
+6 learning curve       ROC-AUC on test, 25% -> 100% of training banks: kept 4 0.61 -> 0.68; raw levels 11 0.46 -> 0.51
+7 country              country share of variance: NPL 46%, leverage 45%, CET1 20%; top 3 countries hold 47 of 120 episodes; lower CI bounds with country resampling 0.46-0.50
+8 RWA density          kept by the rule: none
+9 implausible values   122 bank-periods break at least one rule; 0 stale CET1 runs
+10 label variants      baseline: abs 12m 5%: 120 episodes, 8/12 cases, CET1 rz +0.45; horizon 6m: 182 episodes, 8/12 cases, CET1 rz +0.59; horizon 24m: 81 episodes, 6/12 cases, CET1 rz +0.45; tail 10%: 232 episodes, 8/12 cases, CET1 rz +0.30; tail 2.5%: 59 episodes, 6/12 cases, CET1 rz +0.56; relative CET1 fall: 120 episodes, 8/12 cases, CET1 rz +0.27; fall into bottom quartile: 70 episodes, 8/12 cases, CET1 rz -0.07; E2 only (no NPL rise): 68 episodes, 6/12 cases, CET1 rz +1.07
+saved /var/projects/python/eba_analyst/scripts/analyses/report/exits_semiannual.png
+saved /var/projects/python/eba_analyst/scripts/analyses/report/learning_curve_semiannual.png
+saved /var/projects/python/eba_analyst/scripts/analyses/report/countries_semiannual.png

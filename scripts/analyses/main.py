@@ -1,13 +1,14 @@
 """Look at the panel (read-only): counts, distributions, per-bank views, variance, change over time,
-train/test split, missing values, correlations, events, event study, features and feature cards.
+train/test split, missing values, correlations, events, event study, features, feature cards
+and validity checks.
 
+    python -m scripts.analyses.main --events --feature-cards --semiannual --label recommended --report
+    python -m scripts.analyses.main --validity --semiannual --report       # validity checks
     python -m scripts.analyses.main --all --semiannual --report  # full report, ML grid
-    python -m scripts.analyses.main --all --report               # full report, all periods
     python -m scripts.analyses.main --feature-cards --semiannual --report
-    python -m scripts.analyses.main --feature-cards --semiannual           # on screen
+    python -m scripts.analyses.main --events --label weak --horizon 24     # other label
     python -m scripts.analyses.main --features                   # quick drift + AUC per variant
-    python -m scripts.analyses.main --events                     # 9: events per year, banks, E1
-    python -m scripts.analyses.main --event-study                # 10: indicators before events
+    python -m scripts.analyses.main --event-study                # indicators before events
     python -m scripts.analyses.main --missing                    # missing values per period
     python -m scripts.analyses.main --correlation                # correlations between indicators
     python -m scripts.analyses.main --split                      # train (<= 2020) vs test (2022-2024)
@@ -30,6 +31,7 @@ import os
 import sys
 from collections import defaultdict
 from contextlib import redirect_stdout
+from dataclasses import replace
 from datetime import datetime
 from pathlib import Path
 
@@ -62,6 +64,9 @@ from scripts.analyses.draw_graph import (
     write_per_bank,
 )
 from scripts.analyses.events import (
+    ORIGINAL,
+    RECOMMENDED,
+    LabelSpec,
     event_profiles,
     event_study_figure,
     events_figure,
@@ -84,13 +89,14 @@ from scripts.analyses.features import (
     print_feature_evidence,
 )
 from scripts.analyses.panel_data import get_panel
+from scripts.analyses.validity import validity_analyses
 
 PER_BANK_DEFAULT = "/tmp/eba/per_bank.pdf"
 REPORT_DIR = str(Path(__file__).resolve().parent / "report")
 # analyses switched on by --all, in the order they are printed
 ANALYSES = (
     "outliers", "missing", "correlation", "variance", "persistence", "min_periods_table",
-    "split", "events", "event_study", "features", "feature_cards", "over_time",
+    "split", "events", "event_study", "features", "feature_cards", "validity", "over_time",
 )
 
 
@@ -139,16 +145,34 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
                    help="what each minimum-periods filter would keep")
     p.add_argument("--split", action="store_true", help="train (<= 2020) vs test (2022-2024)")
     p.add_argument("--semiannual", action="store_true",
-                   help="split/events/event study/features/cards: June/December only")
+                   help="split/events/event study/features/cards/validity: June/December only")
+    p.add_argument("--label", choices=("abs", "rel", "weak", "recommended"), default="abs",
+                   help="E2 definition: abs (original), rel, weak, or recommended "
+                        "(weak + exit events + no merger windows)")
+    p.add_argument("--horizon", type=int, default=12, help="event window in months")
+    p.add_argument("--exit-events", action="store_true",
+                   help="add E4: the bank leaves the sample in a weak state")
+    p.add_argument("--drop-scope-changes", action="store_true",
+                   help="unknown label for windows with a loan-book change >= 30%%")
     p.add_argument("--events", action="store_true", help="events per year, episodes, banks, E1")
     p.add_argument("--event-study", action="store_true", help="indicators before and after events")
     p.add_argument("--features", action="store_true", help="candidate features: drift and AUC")
     p.add_argument("--feature-cards", action="store_true",
                    help="evidence per feature and decision by the fixed rule")
     p.add_argument("--cards-out", metavar="PATH", help="--feature-cards: also write a CSV")
+    p.add_argument("--validity", action="store_true",
+                   help="ten validity checks (leavers, publication lag, known cases, ...)")
     p.add_argument("--boxplot", metavar="INDICATOR", help="one box per bank for this indicator")
     p.add_argument("--timeseries", type=int, metavar="BANK_ID", help="one bank over time")
     return p.parse_args(argv)
+
+
+def label_spec(args: argparse.Namespace) -> LabelSpec:
+    """The label asked for on the command line."""
+    if args.label == "recommended":
+        return replace(RECOMMENDED, horizon=args.horizon)
+    return LabelSpec(kind=args.label, horizon=args.horizon, exits=args.exit_events,
+                     drop_scope_changes=args.drop_scope_changes)
 
 
 def apply_all(args: argparse.Namespace) -> None:
@@ -161,7 +185,10 @@ def apply_all(args: argparse.Namespace) -> None:
 
 
 def suffix(args: argparse.Namespace) -> str:
-    return "_semiannual" if args.semiannual else ""
+    """File-name ending: grid, then the label when it is not the original one."""
+    end = "_semiannual" if args.semiannual else ""
+    spec = label_spec(args)
+    return end if spec == ORIGINAL else f"{end}_{spec.name()}"
 
 
 def run_name(args: argparse.Namespace) -> str:
@@ -179,7 +206,7 @@ def load_rows(args: argparse.Namespace) -> list[dict]:
     cross_bank = any([
         args.over_time, args.variance, args.persistence, args.boxplot, args.per_bank,
         args.split, args.min_periods_table, args.missing, args.correlation,
-        args.events, args.event_study, args.features, args.feature_cards,
+        args.events, args.event_study, args.features, args.feature_cards, args.validity,
     ])
     if args.timeseries is not None:
         bank = args.timeseries
@@ -263,16 +290,19 @@ def print_min_periods_table(rows: list[dict], thresholds=(1, 4, 8, 12, 16, 20, 2
         print(f"{threshold:11d} {len(kept):11d} {rows_kept:10d} {len(dropped):15d} {exited:16d}")
 
 
-# ---------- event analyses (9, 10, features, cards) ----------
+# ---------- event analyses (events, event study, features, cards, validity) ----------
 
 def event_analyses(rows: list[dict], args: argparse.Namespace) -> dict:
-    """Print the event and feature tables and return their figures."""
+    """Print the event, feature and validity tables and return their figures."""
     figures = {}
-    if not (args.events or args.event_study or args.features or args.feature_cards):
+    asked = (args.events or args.event_study or args.features or args.feature_cards
+             or args.validity)
+    if not asked:
         return figures
-    items, cuts = label_rows(rows, args.semiannual)
+    items, info = label_rows(rows, args.semiannual, label_spec(args))
+    print(f"\nlabel used: {info['label']}")
     if args.events:
-        print_events(items, cuts)
+        print_events(items, info)
         figures["events"], _ = events_figure(items)
     if args.event_study:
         profiles, n_events, n_controls = event_profiles(rows, items)
@@ -293,6 +323,8 @@ def event_analyses(rows: list[dict], args: argparse.Namespace) -> dict:
                 print(f"written {args.cards_out}")
             figures["feature_cards"], _ = cards_figure(cards)
             figures["feature_correlation"], _ = feature_correlation_figure(features, items, cards)
+    if args.validity:
+        figures.update(validity_analyses(rows, items, args.semiannual))
     return figures
 
 

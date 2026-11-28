@@ -1,0 +1,496 @@
+# generated 2026-11-27 20:41
+# command: python -m scripts.analyses.main --all --semiannual --report
+rows=4085 banks=190 periods=36
+
+cet1_ratio
+  lowest  bank=68   period=2017-06-30 value=0.0150 specialist=False
+  lowest  bank=19   period=2019-09-30 value=0.0650 specialist=False
+  lowest  bank=185  period=2016-12-31 value=0.0652 specialist=False
+  lowest  bank=19   period=2019-03-31 value=0.0654 specialist=False
+  lowest  bank=19   period=2018-12-31 value=0.0663 specialist=False
+  highest bank=217  period=2018-12-31 value=0.6705 specialist=False
+  highest bank=217  period=2018-09-30 value=0.6430 specialist=False
+  highest bank=217  period=2016-12-31 value=0.5490 specialist=False
+  highest bank=193  period=2016-12-31 value=0.4991 specialist=False
+  highest bank=696  period=2020-09-30 value=0.4710 specialist=False
+
+tier1_ratio
+  lowest  bank=68   period=2017-06-30 value=0.0150 specialist=False
+  lowest  bank=76   period=2015-12-31 value=0.0665 specialist=False
+  lowest  bank=76   period=2015-06-30 value=0.0681 specialist=False
+  lowest  bank=94   period=2016-12-31 value=0.0701 specialist=False
+  lowest  bank=19   period=2019-09-30 value=0.0721 specialist=False
+  highest bank=217  period=2018-12-31 value=0.6705 specialist=False
+  highest bank=217  period=2018-09-30 value=0.6430 specialist=False
+  highest bank=217  period=2016-12-31 value=0.5490 specialist=False
+  highest bank=193  period=2016-12-31 value=0.4991 specialist=False
+  highest bank=696  period=2020-09-30 value=0.4710 specialist=False
+
+total_capital_ratio
+  lowest  bank=68   period=2017-06-30 value=0.0276 specialist=False
+  lowest  bank=76   period=2015-06-30 value=0.0763 specialist=False
+  lowest  bank=94   period=2016-12-31 value=0.0807 specialist=False
+  lowest  bank=76   period=2015-12-31 value=0.0813 specialist=False
+  lowest  bank=71   period=2015-12-31 value=0.0906 specialist=False
+  highest bank=217  period=2018-12-31 value=0.6705 specialist=False
+  highest bank=217  period=2018-09-30 value=0.6430 specialist=False
+  highest bank=217  period=2016-12-31 value=0.5490 specialist=False
+  highest bank=106  period=2016-12-31 value=0.5163 specialist=False
+  highest bank=193  period=2016-12-31 value=0.4991 specialist=False
+
+leverage_ratio
+  lowest  bank=68   period=2017-06-30 value=0.0058 specialist=False
+  lowest  bank=19   period=2019-03-31 value=0.0201 specialist=False
+  lowest  bank=19   period=2018-12-31 value=0.0202 specialist=False
+  lowest  bank=19   period=2019-09-30 value=0.0206 specialist=False
+  lowest  bank=19   period=2019-06-30 value=0.0209 specialist=False
+  highest bank=58   period=2015-06-30 value=0.2418 specialist=False
+  highest bank=58   period=2018-09-30 value=0.2394 specialist=False
+  highest bank=58   period=2014-12-31 value=0.2378 specialist=False
+  highest bank=58   period=2019-06-30 value=0.2359 specialist=False
+  highest bank=58   period=2019-03-31 value=0.2355 specialist=False
+
+npl_ratio
+  lowest  bank=29   period=2016-12-31 value=0.0000 specialist=False
+  lowest  bank=193  period=2016-12-31 value=0.0000 specialist=False
+  lowest  bank=29   period=2017-06-30 value=0.0000 specialist=False
+  lowest  bank=29   period=2017-12-31 value=0.0000 specialist=False
+  lowest  bank=29   period=2018-06-30 value=0.0000 specialist=False
+  highest bank=11   period=2014-12-31 value=0.5473 specialist=False
+  highest bank=11   period=2015-06-30 value=0.5452 specialist=False
+  highest bank=12   period=2014-12-31 value=0.5391 specialist=False
+  highest bank=11   period=2015-12-31 value=0.5376 specialist=False
+  highest bank=134  period=2017-06-30 value=0.5338 specialist=False
+
+stage2_share
+  lowest  bank=125  period=2018-09-30 value=0.0000 specialist=False
+  lowest  bank=125  period=2018-12-31 value=0.0000 specialist=False
+  lowest  bank=125  period=2019-03-31 value=0.0000 specialist=False
+  lowest  bank=125  period=2019-06-30 value=0.0000 specialist=False
+  lowest  bank=125  period=2019-09-30 value=0.0000 specialist=False
+  highest bank=950  period=2025-06-30 value=0.7625 specialist=False
+  highest bank=950  period=2025-03-31 value=0.7417 specialist=False
+  highest bank=950  period=2023-12-31 value=0.6935 specialist=False
+  highest bank=950  period=2024-09-30 value=0.6892 specialist=False
+  highest bank=950  period=2022-06-30 value=0.6887 specialist=False
+
+roe_annualised
+  lowest  bank=68   period=2017-06-30 value=-7.0620 specialist=False
+  lowest  bank=87   period=2015-06-30 value=-1.4965 specialist=False
+  lowest  bank=134  period=2021-09-30 value=-1.2568 specialist=False
+  lowest  bank=134  period=2021-06-30 value=-1.2059 specialist=False
+  lowest  bank=76   period=2015-06-30 value=-1.1806 specialist=False
+  highest bank=60   period=2020-03-31 value=1.4569 specialist=False
+  highest bank=242  period=2016-12-31 value=1.1608 specialist=False
+  highest bank=50   period=2014-12-31 value=0.8802 specialist=False
+  highest bank=242  period=2020-03-31 value=0.8681 specialist=False
+  highest bank=1040 period=2022-03-31 value=0.8013 specialist=False
+
+nace_hhi
+  lowest  bank=51   period=2021-06-30 value=0.0799 specialist=False
+  lowest  bank=51   period=2020-12-31 value=0.0803 specialist=False
+  lowest  bank=51   period=2021-03-31 value=0.0803 specialist=False
+  lowest  bank=51   period=2024-03-31 value=0.0809 specialist=False
+  lowest  bank=51   period=2020-09-30 value=0.0827 specialist=False
+  highest bank=106  period=2021-09-30 value=1.0000 specialist=False
+  highest bank=106  period=2021-06-30 value=1.0000 specialist=False
+  highest bank=106  period=2021-03-31 value=1.0000 specialist=False
+  highest bank=106  period=2020-12-31 value=1.0000 specialist=False
+  highest bank=106  period=2020-09-30 value=1.0000 specialist=False
+
+sovereign_hhi
+  lowest  bank=3    period=2015-12-31 value=0.0650 specialist=False
+  lowest  bank=82   period=2020-06-30 value=0.0700 specialist=False
+  lowest  bank=3    period=2016-06-30 value=0.0718 specialist=False
+  lowest  bank=140  period=2021-06-30 value=0.0732 specialist=False
+  lowest  bank=82   period=2020-12-31 value=0.0745 specialist=False
+  highest bank=879  period=2025-06-30 value=1.0000 specialist=False
+  highest bank=1280 period=2024-06-30 value=1.0000 specialist=False
+  highest bank=879  period=2024-06-30 value=1.0000 specialist=False
+  highest bank=879  period=2023-06-30 value=1.0000 specialist=False
+  highest bank=879  period=2022-12-31 value=1.0000 specialist=False
+
+loan_growth_qoq
+  lowest  bank=1269 period=2024-12-31 value=-0.7620 specialist=False
+  lowest  bank=1269 period=2024-06-30 value=-0.4743 specialist=False
+  lowest  bank=25   period=2022-09-30 value=-0.3877 specialist=False
+  lowest  bank=724  period=2022-09-30 value=-0.2853 specialist=False
+  lowest  bank=899  period=2022-06-30 value=-0.2697 specialist=False
+  highest bank=1269 period=2025-03-31 value=3.0093 specialist=False
+  highest bank=210  period=2019-03-31 value=1.9298 specialist=False
+  highest bank=1135 period=2023-12-31 value=1.5068 specialist=False
+  highest bank=1269 period=2024-09-30 value=1.2115 specialist=False
+  highest bank=51   period=2021-09-30 value=0.9213 specialist=False
+
+loan_growth_yoy
+  lowest  bank=82   period=2017-12-31 value=-0.7239 specialist=False
+  lowest  bank=82   period=2018-06-30 value=-0.7108 specialist=False
+  lowest  bank=25   period=2023-06-30 value=-0.3858 specialist=False
+  lowest  bank=25   period=2022-12-31 value=-0.3857 specialist=False
+  lowest  bank=25   period=2022-09-30 value=-0.3845 specialist=False
+  highest bank=1135 period=2024-06-30 value=5.0670 specialist=False
+  highest bank=1135 period=2023-12-31 value=4.9962 specialist=False
+  highest bank=1135 period=2024-09-30 value=4.3606 specialist=False
+  highest bank=1135 period=2024-03-31 value=3.8075 specialist=False
+  highest bank=125  period=2017-12-31 value=2.7166 specialist=False
+
+indicator              missing  before 2018-09  from 2018-09  first period with values
+cet1_ratio                  0%              0%            0%  2014-12-31
+tier1_ratio                 0%              0%            0%  2014-12-31
+total_capital_ratio         0%              0%            0%  2014-12-31
+leverage_ratio              6%             26%            0%  2014-12-31
+npl_ratio                   7%              6%            7%  2014-12-31
+stage2_share               30%            100%           10%  2018-09-30
+roe_annualised              7%              4%            7%  2014-12-31
+nace_hhi                   39%            100%           22%  2019-09-30
+sovereign_hhi              51%             42%           54%  2015-12-31
+loan_growth_qoq            35%            100%           16%  2018-12-31
+loan_growth_yoy            32%             35%           31%  2015-12-31
+
+Spearman correlation, levels (banks compared with each other)
+            cet1   tier1     tcr     lev     npl  stage2     roenace_hhisovereigloan_gro   loans
+cet1        1.00    0.95    0.84    0.33   -0.38   -0.03    0.07    0.26    0.00    0.04    0.08
+tier1       0.95    1.00    0.93    0.22   -0.46   -0.06    0.12    0.26   -0.08    0.01    0.05
+tcr         0.84    0.93    1.00    0.10   -0.50   -0.06    0.13    0.26   -0.11   -0.00    0.04
+lev         0.33    0.22    0.10    1.00    0.32    0.28    0.05   -0.08    0.07    0.01    0.03
+npl        -0.38   -0.46   -0.50    0.32    1.00    0.45   -0.14   -0.46    0.12   -0.07   -0.17
+stage2     -0.03   -0.06   -0.06    0.28    0.45    1.00   -0.10   -0.07   -0.02   -0.09   -0.14
+roe         0.07    0.12    0.13    0.05   -0.14   -0.10    1.00   -0.10   -0.05    0.13    0.21
+nace_hhi    0.26    0.26    0.26   -0.08   -0.46   -0.07   -0.10    1.00   -0.00   -0.05   -0.09
+sovereig    0.00   -0.08   -0.11    0.07    0.12   -0.02   -0.05   -0.00    1.00    0.12    0.02
+loan_gro    0.04    0.01   -0.00    0.01   -0.07   -0.09    0.13   -0.05    0.12    1.00    0.49
+loans       0.08    0.05    0.04    0.03   -0.17   -0.14    0.21   -0.09    0.02    0.49    1.00
+strong pairs (|rho| >= 0.7): cet1-tier1 +0.95, cet1-tcr +0.84, tier1-tcr +0.93
+
+Spearman correlation, within bank (movement over time, bank mean removed)
+            cet1   tier1     tcr     lev     npl  stage2     roenace_hhisovereigloan_gro   loans
+cet1        1.00    0.97    0.86    0.46   -0.21    0.04    0.12    0.05   -0.13   -0.06   -0.11
+tier1       0.97    1.00    0.91    0.43   -0.26    0.05    0.16    0.04   -0.12   -0.07   -0.10
+tcr         0.86    0.91    1.00    0.32   -0.31    0.01    0.17    0.05   -0.10   -0.08   -0.09
+lev         0.46    0.43    0.32    1.00    0.17    0.11   -0.02   -0.00   -0.05   -0.12   -0.18
+npl        -0.21   -0.26   -0.31    0.17    1.00    0.14   -0.27    0.00    0.22   -0.06   -0.12
+stage2      0.04    0.05    0.01    0.11    0.14    1.00   -0.04   -0.01    0.02   -0.09   -0.09
+roe         0.12    0.16    0.17   -0.02   -0.27   -0.04    1.00    0.05   -0.19    0.07    0.07
+nace_hhi    0.05    0.04    0.05   -0.00    0.00   -0.01    0.05    1.00   -0.03    0.02   -0.01
+sovereig   -0.13   -0.12   -0.10   -0.05    0.22    0.02   -0.19   -0.03    1.00    0.01    0.01
+loan_gro   -0.06   -0.07   -0.08   -0.12   -0.06   -0.09    0.07    0.02    0.01    1.00    0.38
+loans      -0.11   -0.10   -0.09   -0.18   -0.12   -0.09    0.07   -0.01    0.01    0.38    1.00
+strong pairs (|rho| >= 0.7): cet1-tier1 +0.97, cet1-tcr +0.86, tier1-tcr +0.91
+
+raw values
+indicator              between banks  common in time  bank-specific change
+cet1_ratio                       75%              2%                   23%
+tier1_ratio                      75%              3%                   23%
+total_capital_ratio              72%              3%                   25%
+leverage_ratio                   88%              1%                   11%
+npl_ratio                        67%              5%                   28%
+stage2_share                     81%              1%                   18%
+roe_annualised                   20%              4%                   75%
+nace_hhi                         98%              0%                    2%
+sovereign_hhi                    85%              1%                   14%
+loan_growth_qoq                  16%              2%                   83%
+loan_growth_yoy                  59%              1%                   41%
+
+clipped to p1-p99
+indicator              between banks  common in time  bank-specific change
+cet1_ratio                       77%              2%                   20%
+tier1_ratio                      77%              3%                   20%
+total_capital_ratio              75%              3%                   22%
+leverage_ratio                   87%              1%                   12%
+npl_ratio                        67%              5%                   27%
+stage2_share                     70%              2%                   28%
+roe_annualised                   40%             12%                   49%
+nace_hhi                         98%              0%                    2%
+sovereign_hhi                    85%              1%                   14%
+loan_growth_qoq                  15%              4%                   81%
+loan_growth_yoy                  33%              2%                   65%
+
+indicator              pairs   rho     p
+cet1_ratio              2689 -0.07  0.000
+tier1_ratio             2689 -0.10  0.000
+total_capital_ratio     2689 -0.12  0.000
+leverage_ratio          2339 -0.03  0.121
+npl_ratio               2524 +0.39  0.000
+stage2_share            1747 -0.09  0.000
+roe_annualised          2519 -0.30  0.000
+nace_hhi                1444 -0.05  0.067
+sovereign_hhi           1166 -0.03  0.352
+loan_growth_qoq         1496 -0.42  0.000
+loan_growth_yoy         1171 -0.41  0.000
+
+min periods  banks kept  rows kept   banks dropped  of which left early
+          1         190       4085               0                0
+          4         180       4065              10               10
+          8         151       3921              39               35
+         12         136       3790              54               46
+         16         120       3579              70               52
+         20         102       3275              88               66
+         25          91       3033              99               72
+
+train rows=1501  test rows=686  share train=69%  (June/December only)
+banks: {'train_banks': 167, 'test_banks': 128, 'both': 106, 'only_train': 61, 'only_test': 22}
+
+indicator              n_tr  n_te  miss_tr miss_te   med_tr  med_te    p10-p90 train      p10-p90 test     KS
+cet1_ratio              1498   686      0%      0%    0.146   0.167  [ 0.117,  0.218]  [ 0.132,  0.223]  0.27
+tier1_ratio             1498   686      0%      0%    0.157   0.178  [ 0.120,  0.223]  [ 0.147,  0.228]  0.29
+total_capital_ratio     1498   686      0%      0%    0.179   0.201  [ 0.138,  0.251]  [ 0.169,  0.254]  0.30
+leverage_ratio          1260   686     16%      0%    0.059   0.063  [ 0.042,  0.102]  [ 0.044,  0.093]  0.08
+npl_ratio               1413   631      6%      8%    0.035   0.021  [ 0.007,  0.201]  [ 0.005,  0.043]  0.34
+stage2_share             537   613     64%     11%    0.074   0.084  [ 0.034,  0.155]  [ 0.036,  0.156]  0.13
+roe_annualised          1425   631      5%      8%    0.072   0.123  [-0.025,  0.152]  [ 0.048,  0.232]  0.33
+nace_hhi                 324   631     78%      8%    0.147   0.154  [ 0.110,  0.388]  [ 0.109,  0.427]  0.08
+sovereign_hhi            988   677     34%      1%    0.437   0.378  [ 0.152,  0.832]  [ 0.145,  0.841]  0.11
+loan_growth_qoq          427   614     72%     10%    0.002   0.009  [-0.059,  0.048]  [-0.035,  0.056]  0.12
+loan_growth_yoy          908   595     40%     13%    0.023   0.028  [-0.072,  0.136]  [-0.045,  0.120]  0.10
+
+cut-offs from training periods: CET1 12-month change <= -0.0250, NPL 12-month change >= +0.0059
+
+year  labelled  E1 now  E2 rows  E3 rows  event rows   rate  episodes  banks
+2014        94       2        1       10          10  10.6%        10     10
+2015       197       6        3       14          16   8.1%         7     13
+2016       210       3        7        9          16   7.6%        13     15
+2017       219       1       17        5          22  10.0%        18     20
+2018       222       1       15        6          20   9.0%        12     18
+2019       218       1        8        0           8   3.7%         6      8
+2020       203       0       18       10          26  12.8%        19     20
+2021       200       0       16        4          20  10.0%        12     18
+2022       218       0        1       16          16   7.3%        10     13
+2023       217       0        6       17          23  10.6%         7     16
+2024       109       0        7        5          12  11.0%         6     12
+2025         0       0        0        0           0   nan%         0      0
+total: 2107 labelled rows, 189 event rows, 120 episodes, 88 banks with at least one episode
+E1 breaches: 14 rows at 8 banks: [19, 43, 68, 71, 76, 94, 113, 185]
+banks with most episodes: 193 (5), 20 (4), 19 (3), 68 (3), 130 (3), 134 (3), 217 (3), 5 (2), 13 (2), 22 (2)
+
+120 event episodes vs 1918 non-event rows; values = indicator minus the median of all banks in that period
+AUC: 0.5 = no difference, > 0.5 = higher before events, < 0.5 = lower before events
+indicator              offset  median event  median control   AUC  n events
+cet1_ratio              -12m       +0.0198        -0.0004  0.65        86
+cet1_ratio               -6m       +0.0185        -0.0006  0.65        96
+cet1_ratio               +0m       +0.0192        -0.0006  0.65       120
+tier1_ratio             -12m       +0.0224        -0.0011  0.64        86
+tier1_ratio              -6m       +0.0206        -0.0007  0.63        96
+tier1_ratio              +0m       +0.0224        -0.0005  0.63       120
+total_capital_ratio     -12m       +0.0182        -0.0012  0.64        86
+total_capital_ratio      -6m       +0.0199        -0.0007  0.61        96
+total_capital_ratio      +0m       +0.0146        -0.0007  0.62       120
+leverage_ratio          -12m       +0.0027        -0.0006  0.57        79
+leverage_ratio           -6m       +0.0067        -0.0008  0.59        87
+leverage_ratio           +0m       +0.0064        -0.0006  0.60       107
+npl_ratio               -12m       -0.0031        -0.0000  0.47        78
+npl_ratio                -6m       -0.0021        -0.0000  0.50        88
+npl_ratio                +0m       +0.0007        -0.0001  0.52       110
+stage2_share            -12m       +0.0042        -0.0011  0.56        42
+stage2_share             -6m       +0.0026        -0.0002  0.53        48
+stage2_share             +0m       +0.0019        +0.0000  0.52        56
+roe_annualised          -12m       -0.0027        +0.0024  0.47        78
+roe_annualised           -6m       -0.0112        +0.0015  0.45        90
+roe_annualised           +0m       -0.0177        +0.0024  0.41       112
+nace_hhi                -12m       +0.0341        -0.0015  0.63        35
+nace_hhi                 -6m       +0.0335        -0.0014  0.59        48
+nace_hhi                 +0m       +0.0291        -0.0011  0.58        52
+sovereign_hhi           -12m       -0.0564        -0.0033  0.48        67
+sovereign_hhi            -6m       -0.0357        -0.0058  0.47        76
+sovereign_hhi            +0m       -0.0071        -0.0057  0.50        89
+loan_growth_qoq         -12m       -0.0006        +0.0003  0.45        39
+loan_growth_qoq          -6m       -0.0013        +0.0001  0.48        45
+loan_growth_qoq          +0m       -0.0022        +0.0006  0.46        49
+loan_growth_yoy         -12m       -0.0202        +0.0025  0.40        52
+loan_growth_yoy          -6m       -0.0178        +0.0011  0.45        62
+loan_growth_yoy          +0m       -0.0086        +0.0007  0.45        65
+
+KS: train vs test (lower = more stable; rank is uniform by construction)
+AUC: direction fixed on train; 0.5 = no separation
+indicator              variant      KS  AUC train  AUC test  events train/test
+cet1_ratio             raw        0.25       0.61      0.58    118/51
+cet1_ratio             rank       0.01       0.61      0.57    118/51
+cet1_ratio             rz         0.07       0.61      0.57    118/51
+cet1_ratio             chg        0.13       0.51      0.50     77/46
+cet1_ratio             chg_rank   0.04       0.55      0.49     77/46
+cet1_ratio             chg_pct    0.14       0.51      0.50     77/46
+cet1_ratio             vol        0.05       0.60      0.60     77/46
+
+tier1_ratio            raw        0.28       0.60      0.55    118/51
+tier1_ratio            rank       0.01       0.60      0.54    118/51
+tier1_ratio            rz         0.05       0.60      0.54    118/51
+tier1_ratio            chg        0.13       0.52      0.53     77/46
+tier1_ratio            chg_rank   0.05       0.55      0.45     77/46
+tier1_ratio            chg_pct    0.14       0.53      0.53     77/46
+tier1_ratio            vol        0.04       0.60      0.60     77/46
+
+total_capital_ratio    raw        0.30       0.60      0.54    118/51
+total_capital_ratio    rank       0.01       0.60      0.54    118/51
+total_capital_ratio    rz         0.04       0.60      0.54    118/51
+total_capital_ratio    chg        0.11       0.54      0.54     77/46
+total_capital_ratio    chg_rank   0.06       0.52      0.45     77/46
+total_capital_ratio    chg_pct    0.12       0.54      0.54     77/46
+total_capital_ratio    vol        0.06       0.60      0.64     77/46
+
+leverage_ratio         raw        0.08       0.55      0.68    100/51
+leverage_ratio         rank       0.02       0.56      0.67    100/51
+leverage_ratio         rz         0.12       0.56      0.67    100/51
+leverage_ratio         chg        0.14       0.57      0.44     58/46
+leverage_ratio         chg_rank   0.13       0.54      0.46     58/46
+leverage_ratio         chg_pct    0.13       0.58      0.44     58/46
+leverage_ratio         vol        0.13       0.54      0.61     58/46
+
+npl_ratio              raw        0.33       0.55      0.45    104/47
+npl_ratio              rank       0.02       0.55      0.45    104/47
+npl_ratio              rz         0.16       0.55      0.45    104/47
+npl_ratio              chg        0.26       0.62      0.69     48/42
+npl_ratio              chg_rank   0.10       0.54      0.32     48/42
+npl_ratio              vol        0.24       0.51      0.40     48/42
+
+stage2_share           raw        0.13       0.51      0.33     32/43
+stage2_share           rank       0.01       0.55      0.33     32/43
+stage2_share           rz         0.03       0.56      0.33     32/43
+stage2_share           chg        0.15       0.56      0.54     19/38
+stage2_share           chg_rank   0.11       0.58      0.43     19/38
+stage2_share           vol        0.16       0.51      0.39     19/38
+
+roe_annualised         raw        0.32       0.60      0.63    106/47
+roe_annualised         rank       0.02       0.58      0.65    106/47
+roe_annualised         rz         0.07       0.58      0.65    106/47
+roe_annualised         chg        0.22       0.54      0.53     67/42
+roe_annualised         chg_rank   0.07       0.53      0.52     67/42
+roe_annualised         vol        0.04       0.55      0.47     67/42
+
+nace_hhi               raw        0.08       0.51      0.27     24/47
+nace_hhi               rank       0.03       0.51      0.27     24/47
+nace_hhi               rz         0.07       0.50      0.27     24/47
+nace_hhi               chg        0.13       0.51      0.57     10/42
+nace_hhi               chg_rank   0.08       0.59      0.49     10/42
+nace_hhi               chg_pct    0.15       0.52      0.53     10/42
+nace_hhi               vol        0.10       0.56      0.62     10/42
+
+sovereign_hhi          raw        0.10       0.52      0.48     75/50
+sovereign_hhi          rank       0.02       0.52      0.49     75/50
+sovereign_hhi          rz         0.16       0.52      0.49     75/50
+sovereign_hhi          chg        0.08       0.57      0.52     41/45
+sovereign_hhi          chg_rank   0.11       0.51      0.47     41/45
+sovereign_hhi          chg_pct    0.07       0.54      0.52     41/45
+sovereign_hhi          vol        0.07       0.51      0.59     37/45
+
+loan_growth_qoq        raw        0.12       0.52      0.64     22/47
+loan_growth_qoq        rank       0.02       0.52      0.62     22/47
+loan_growth_qoq        rz         0.05       0.52      0.62     22/47
+loan_growth_qoq        chg        0.11       0.59      0.43     11/42
+loan_growth_qoq        chg_rank   0.05       0.63      0.46     11/42
+loan_growth_qoq        vol        0.17        nan      0.46      2/42
+
+loan_growth_yoy        raw        0.07       0.59      0.54     48/46
+loan_growth_yoy        rank       0.02       0.59      0.53     48/46
+loan_growth_yoy        rz         0.04       0.60      0.52     48/46
+loan_growth_yoy        chg        0.06       0.55      0.55     28/41
+loan_growth_yoy        chg_rank   0.04       0.54      0.55     28/41
+loan_growth_yoy        vol        0.12       0.52      0.47     28/41
+
+Selection rule (training periods only): min_coverage=0.5, min_auc_ci_low=0.5, min_sign_stability=0.6, max_ks_within_train=0.15, redundant_rho=0.8
+Test columns are reported only; they are not used to decide.
+
+feature                        category      cov tr cov te KS in tr KS tr-te  AUC tr [95% CI]    stab AUC te  decision
+cet1_ratio:raw                 Capital         100%   100%     0.22     0.25  0.61 [0.51, 0.71]   71%   0.58  drop: drifts
+cet1_ratio:rank                Capital         100%   100%     0.02     0.01  0.61 [0.52, 0.71]   71%   0.57  drop: redundant with cet1_ratio:rz
+cet1_ratio:rz                  Capital         100%   100%     0.08     0.07  0.61 [0.52, 0.71]   71%   0.57  keep
+cet1_ratio:chg                 Capital          77%    93%     0.17     0.13  0.51 [0.42, 0.59]   40%   0.50  drop: no signal, unstable direction, drifts
+cet1_ratio:chg_rank            Capital          77%    93%     0.15     0.04  0.55 [0.49, 0.62]   80%   0.49  drop: no signal, drifts
+cet1_ratio:chg_pct             Capital          77%    93%     0.17     0.14  0.51 [0.43, 0.59]   40%   0.50  drop: no signal, unstable direction, drifts
+cet1_ratio:vol                 Capital          77%    93%     0.09     0.05  0.60 [0.50, 0.69]   80%   0.60  drop: no signal
+
+tier1_ratio:raw                Capital         100%   100%     0.22     0.28  0.60 [0.50, 0.71]   71%   0.55  drop: drifts
+tier1_ratio:rank               Capital         100%   100%     0.03     0.01  0.60 [0.51, 0.70]   71%   0.54  drop: redundant with cet1_ratio:rz
+tier1_ratio:rz                 Capital         100%   100%     0.06     0.05  0.60 [0.51, 0.70]   71%   0.54  drop: redundant with cet1_ratio:rz
+tier1_ratio:chg                Capital          77%    93%     0.15     0.13  0.52 [0.43, 0.62]   60%   0.53  drop: no signal
+tier1_ratio:chg_rank           Capital          77%    93%     0.13     0.05  0.55 [0.48, 0.62]  100%   0.45  drop: no signal
+tier1_ratio:chg_pct            Capital          77%    93%     0.15     0.14  0.53 [0.44, 0.61]   40%   0.53  drop: no signal, unstable direction, drifts
+tier1_ratio:vol                Capital          77%    93%     0.05     0.04  0.60 [0.51, 0.69]  100%   0.60  keep
+
+total_capital_ratio:raw        Capital         100%   100%     0.20     0.30  0.60 [0.50, 0.69]   71%   0.54  drop: drifts
+total_capital_ratio:rank       Capital         100%   100%     0.03     0.01  0.60 [0.51, 0.69]   71%   0.54  drop: redundant with cet1_ratio:rz
+total_capital_ratio:rz         Capital         100%   100%     0.06     0.04  0.60 [0.51, 0.69]   71%   0.54  drop: redundant with cet1_ratio:rz
+total_capital_ratio:chg        Capital          77%    93%     0.15     0.11  0.54 [0.45, 0.62]   60%   0.54  drop: no signal, drifts
+total_capital_ratio:chg_rank   Capital          77%    93%     0.13     0.06  0.52 [0.46, 0.59]   60%   0.45  drop: no signal
+total_capital_ratio:chg_pct    Capital          77%    93%     0.15     0.12  0.54 [0.46, 0.62]   60%   0.54  drop: no signal, drifts
+total_capital_ratio:vol        Capital          77%    93%     0.07     0.06  0.60 [0.51, 0.68]   80%   0.64  drop: redundant with tier1_ratio:vol
+
+leverage_ratio:raw             Capital          85%   100%     0.13     0.08  0.55 [0.46, 0.64]   86%   0.68  drop: no signal
+leverage_ratio:rank            Capital          85%   100%     0.01     0.02  0.56 [0.47, 0.65]   86%   0.67  drop: no signal
+leverage_ratio:rz              Capital          85%   100%     0.04     0.12  0.56 [0.47, 0.65]   86%   0.67  drop: no signal
+leverage_ratio:chg             Capital          51%    93%     0.17     0.14  0.57 [0.49, 0.64]   50%   0.44  drop: no signal, unstable direction, drifts
+leverage_ratio:chg_rank        Capital          51%    93%     0.17     0.13  0.54 [0.46, 0.60]   50%   0.46  drop: no signal, unstable direction, drifts
+leverage_ratio:chg_pct         Capital          51%    93%     0.18     0.13  0.58 [0.51, 0.65]   75%   0.44  drop: drifts
+leverage_ratio:vol             Capital          51%    93%     0.17     0.13  0.54 [0.44, 0.64]   75%   0.61  drop: no signal, drifts
+
+npl_ratio:raw                  Asset quality    94%    92%     0.22     0.33  0.55 [0.46, 0.65]   57%   0.45  drop: no signal, unstable direction, drifts
+npl_ratio:rank                 Asset quality    94%    92%     0.03     0.02  0.55 [0.45, 0.64]   57%   0.45  drop: no signal, unstable direction
+npl_ratio:rz                   Asset quality    94%    92%     0.15     0.16  0.55 [0.46, 0.64]   43%   0.45  drop: no signal, unstable direction
+npl_ratio:chg                  Asset quality    59%    86%     0.06     0.26  0.62 [0.52, 0.73]   75%   0.69  keep
+npl_ratio:chg_rank             Asset quality    59%    86%     0.10     0.10  0.54 [0.44, 0.65]   75%   0.32  drop: no signal
+npl_ratio:vol                  Asset quality    59%    86%     0.08     0.24  0.51 [0.39, 0.63]   50%   0.40  drop: no signal, unstable direction
+
+stage2_share:raw               Asset quality    36%    89%      nan     0.13  0.51 [0.39, 0.62]  100%   0.33  drop: coverage, no signal, drifts
+stage2_share:rank              Asset quality    36%    89%      nan     0.01  0.55 [0.43, 0.66]  100%   0.33  drop: coverage, no signal, drifts
+stage2_share:rz                Asset quality    36%    89%      nan     0.03  0.56 [0.45, 0.67]  100%   0.33  drop: coverage, no signal, drifts
+stage2_share:chg               Asset quality    19%    83%      nan     0.15  0.56 [0.44, 0.69]    0%   0.54  drop: coverage, no signal, unstable direction, drifts
+stage2_share:chg_rank          Asset quality    19%    83%      nan     0.11  0.58 [0.43, 0.72]  100%   0.43  drop: coverage, no signal, drifts
+stage2_share:vol               Asset quality    19%    83%      nan     0.16  0.51 [0.39, 0.64]  100%   0.39  drop: coverage, no signal, drifts
+
+roe_annualised:raw             Earnings         95%    92%     0.09     0.32  0.60 [0.52, 0.68]   71%   0.63  keep
+roe_annualised:rank            Earnings         95%    92%     0.03     0.02  0.58 [0.49, 0.65]   71%   0.65  drop: no signal
+roe_annualised:rz              Earnings         95%    92%     0.04     0.07  0.58 [0.49, 0.66]   71%   0.65  drop: no signal
+roe_annualised:chg             Earnings         72%    86%     0.20     0.22  0.54 [0.45, 0.62]   60%   0.53  drop: no signal, drifts
+roe_annualised:chg_rank        Earnings         72%    86%     0.10     0.07  0.53 [0.46, 0.60]   80%   0.52  drop: no signal
+roe_annualised:vol             Earnings         72%    86%     0.07     0.04  0.55 [0.47, 0.64]   60%   0.47  drop: no signal
+
+nace_hhi:raw                   Concentration    21%    92%      nan     0.08  0.51 [0.39, 0.64]  100%   0.27  drop: coverage, no signal, drifts
+nace_hhi:rank                  Concentration    21%    92%      nan     0.03  0.51 [0.39, 0.64]  100%   0.27  drop: coverage, no signal, drifts
+nace_hhi:rz                    Concentration    21%    92%      nan     0.07  0.50 [0.39, 0.63]  100%   0.27  drop: coverage, no signal, drifts
+nace_hhi:chg                   Concentration     6%    86%      nan     0.13  0.51 [0.32, 0.73]  100%   0.57  drop: coverage, no signal, drifts
+nace_hhi:chg_rank              Concentration     6%    86%      nan     0.08  0.59 [0.42, 0.75]  100%   0.49  drop: coverage, no signal, drifts
+nace_hhi:chg_pct               Concentration     6%    86%      nan     0.15  0.52 [0.30, 0.74]  100%   0.53  drop: coverage, no signal, drifts
+nace_hhi:vol                   Concentration     6%    86%      nan     0.10  0.56 [0.34, 0.75]  100%   0.62  drop: coverage, no signal, drifts
+
+sovereign_hhi:raw              Concentration    66%    99%     0.14     0.10  0.52 [0.42, 0.61]   50%   0.48  drop: no signal, unstable direction
+sovereign_hhi:rank             Concentration    66%    99%     0.02     0.02  0.52 [0.42, 0.61]   50%   0.49  drop: no signal, unstable direction
+sovereign_hhi:rz               Concentration    66%    99%     0.06     0.16  0.52 [0.42, 0.61]   50%   0.49  drop: no signal, unstable direction
+sovereign_hhi:chg              Concentration    41%    91%     0.08     0.08  0.57 [0.48, 0.67]   67%   0.52  drop: coverage, no signal
+sovereign_hhi:chg_rank         Concentration    41%    91%     0.05     0.11  0.51 [0.43, 0.58]   67%   0.47  drop: coverage, no signal
+sovereign_hhi:chg_pct          Concentration    41%    91%     0.08     0.07  0.54 [0.45, 0.65]   67%   0.52  drop: coverage, no signal
+sovereign_hhi:vol              Concentration    33%    91%     0.14     0.07  0.51 [0.40, 0.60]   67%   0.59  drop: coverage, no signal
+
+loan_growth_qoq:raw            Growth           29%    89%      nan     0.12  0.52 [0.37, 0.64]   67%   0.64  drop: coverage, no signal, drifts
+loan_growth_qoq:rank           Growth           29%    89%      nan     0.02  0.52 [0.37, 0.64]   67%   0.62  drop: coverage, no signal, drifts
+loan_growth_qoq:rz             Growth           29%    89%      nan     0.05  0.52 [0.37, 0.64]   67%   0.62  drop: coverage, no signal, drifts
+loan_growth_qoq:chg            Growth           13%    83%      nan     0.11  0.59 [0.40, 0.77]  100%   0.43  drop: coverage, no signal, drifts
+loan_growth_qoq:chg_rank       Growth           13%    83%      nan     0.05  0.63 [0.44, 0.79]  100%   0.46  drop: coverage, no signal, drifts
+
+loan_growth_yoy:raw            Growth           61%    87%     0.10     0.07  0.59 [0.48, 0.68]  100%   0.54  drop: no signal
+loan_growth_yoy:rank           Growth           61%    87%     0.03     0.02  0.59 [0.48, 0.67]  100%   0.53  drop: no signal
+loan_growth_yoy:rz             Growth           61%    87%     0.07     0.04  0.60 [0.48, 0.68]  100%   0.52  drop: no signal
+loan_growth_yoy:chg            Growth           42%    81%     0.13     0.06  0.55 [0.45, 0.63]   67%   0.55  drop: coverage, no signal
+loan_growth_yoy:chg_rank       Growth           42%    81%     0.05     0.04  0.54 [0.43, 0.63]  100%   0.55  drop: coverage, no signal
+loan_growth_yoy:vol            Growth           42%    81%     0.11     0.12  0.52 [0.42, 0.62]   67%   0.47  drop: coverage, no signal
+
+kept 4 of 71: cet1_ratio:rz, tier1_ratio:vol, npl_ratio:chg, roe_annualised:raw
+written /var/projects/python/eba_analyst/scripts/analyses/report/feature_cards_semiannual.csv
+saved /var/projects/python/eba_analyst/scripts/analyses/report/events_semiannual.png
+saved /var/projects/python/eba_analyst/scripts/analyses/report/event_study_semiannual.png
+saved /var/projects/python/eba_analyst/scripts/analyses/report/features_semiannual.png
+saved /var/projects/python/eba_analyst/scripts/analyses/report/feature_cards_semiannual.png
+saved /var/projects/python/eba_analyst/scripts/analyses/report/missing_semiannual.png
+saved /var/projects/python/eba_analyst/scripts/analyses/report/correlation_semiannual.png
+saved /var/projects/python/eba_analyst/scripts/analyses/report/over_time_cet1_ratio_semiannual.png
+saved /var/projects/python/eba_analyst/scripts/analyses/report/over_time_tier1_ratio_semiannual.png
+saved /var/projects/python/eba_analyst/scripts/analyses/report/over_time_total_capital_ratio_semiannual.png
+saved /var/projects/python/eba_analyst/scripts/analyses/report/over_time_leverage_ratio_semiannual.png
+saved /var/projects/python/eba_analyst/scripts/analyses/report/over_time_npl_ratio_semiannual.png
+saved /var/projects/python/eba_analyst/scripts/analyses/report/over_time_stage2_share_semiannual.png
+saved /var/projects/python/eba_analyst/scripts/analyses/report/over_time_roe_annualised_semiannual.png
+saved /var/projects/python/eba_analyst/scripts/analyses/report/over_time_nace_hhi_semiannual.png
+saved /var/projects/python/eba_analyst/scripts/analyses/report/over_time_sovereign_hhi_semiannual.png
+saved /var/projects/python/eba_analyst/scripts/analyses/report/over_time_loan_growth_qoq_semiannual.png
+saved /var/projects/python/eba_analyst/scripts/analyses/report/over_time_loan_growth_yoy_semiannual.png
+saved /var/projects/python/eba_analyst/scripts/analyses/report/variance_semiannual.png
+saved /var/projects/python/eba_analyst/scripts/analyses/report/persistence_semiannual.png
+saved /var/projects/python/eba_analyst/scripts/analyses/report/split_timeline_semiannual.png
+saved /var/projects/python/eba_analyst/scripts/analyses/report/split_distributions_semiannual.png
